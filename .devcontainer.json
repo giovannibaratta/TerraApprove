@@ -1,0 +1,24 @@
+{
+    "name": "TerraApprove",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        // Add docker in docker support
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "moby": true,
+            "dockerDashComposeVersion": "v1"
+		},
+        // Add node support
+		"ghcr.io/devcontainers/features/node:1": {
+			"nodeGypDependencies": true,
+			"version": "18"
+		}
+    },
+    "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+            // Add the IDs of extensions you want installed when the container is created.
+            "extensions": ["hashicorp.terraform"]
+        }
+    }
+}
