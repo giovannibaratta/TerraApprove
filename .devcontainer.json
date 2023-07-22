@@ -1,34 +1,40 @@
 {
-    "name": "TerraApprove",
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    "onCreateCommand": {
-        "install-yarn": "/bin/bash ./.devcontainer/install_yarn.sh"
+  "name": "TerraApprove",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "onCreateCommand": {
+    "install-yarn": "/bin/bash ./.devcontainer/install_yarn.sh"
+  },
+  "features": {
+    // Add docker in docker support
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v1"
     },
-    "features": {
-        // Add docker in docker support
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {
-            "version": "latest",
-            "moby": true,
-            "dockerDashComposeVersion": "v1"
-		},
-        // Add node support
-		"ghcr.io/devcontainers/features/node:1": {
-			"nodeGypDependencies": true,
-			"version": "18"
-		}
-    },
-    "customizations": {
-        // Configure properties specific to VS Code.
-        "vscode": {
-            // Add the IDs of extensions you want installed when the container is created.
-            "extensions": ["hashicorp.terraform", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
-            "settings": {
-                "editor.formatOnSave": true,
-                "typescript.suggest.enabled": true,
-                "typescript.inlayHints.parameterNames.enabled": "all",
-                "typescript.inlayHints.variableTypes.enabled": true,
-                "typescript.inlayHints.propertyDeclarationTypes.enabled": true
-            }
-        }
+    // Add node support
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "18"
     }
+  },
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "hashicorp.terraform",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        // Required by Yarn 3 (see https://yarnpkg.com/getting-started/editor-sdks#vscode)
+        "arcanis.vscode-zipfs"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "typescript.suggest.enabled": true,
+        "typescript.inlayHints.parameterNames.enabled": "all",
+        "typescript.inlayHints.variableTypes.enabled": true,
+        "typescript.inlayHints.propertyDeclarationTypes.enabled": true
+      }
+    }
+  }
 }
