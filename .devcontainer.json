@@ -21,7 +21,14 @@
         // Configure properties specific to VS Code.
         "vscode": {
             // Add the IDs of extensions you want installed when the container is created.
-            "extensions": ["hashicorp.terraform"]
+            "extensions": ["hashicorp.terraform", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
+            "settings": {
+                "editor.formatOnSave": true,
+                "typescript.suggest.enabled": true,
+                "typescript.inlayHints.parameterNames.enabled": "all",
+                "typescript.inlayHints.variableTypes.enabled": true,
+                "typescript.inlayHints.propertyDeclarationTypes.enabled": true
+            }
         }
     }
 }
