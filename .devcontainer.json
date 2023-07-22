@@ -1,6 +1,9 @@
 {
     "name": "TerraApprove",
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "onCreateCommand": {
+        "install-yarn": "/bin/bash ./.devcontainer/install_yarn.sh"
+    },
     "features": {
         // Add docker in docker support
         "ghcr.io/devcontainers/features/docker-in-docker:2": {
