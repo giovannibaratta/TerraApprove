@@ -2,7 +2,12 @@
   "extends": "./tsconfig-google.json",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "build"
+    "baseUrl": ".",
+    "outDir": "build",
+    "types": ["jest", "node"],
+    "paths": {
+      "@domain/*": ["libs/src/domain/*"]
+    }
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["main/**/*.ts", "libs/**/*.ts"]
 }
