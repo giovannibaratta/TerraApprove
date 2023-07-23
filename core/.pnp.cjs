@@ -34,6 +34,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:18.11.9"],\
             ["@typescript-eslint/eslint-plugin", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:6.1.0"],\
             ["@typescript-eslint/parser", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:6.1.0"],\
+            ["domain", "link:./libs/src/domain::locator=terraapprove%40workspace%3A."],\
             ["eslint", "npm:8.45.0"],\
             ["eslint-config-prettier", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:8.8.0"],\
             ["eslint-plugin-jest", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:27.2.3"],\
@@ -42,6 +43,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:29.6.1"],\
             ["prettier", "npm:2.8.8"],\
             ["ts-node", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:10.9.1"],\
+            ["tslog", "npm:4.8.2"],\
             ["typescript", "patch:typescript@npm%3A5.1.6#~builtin<compat/typescript>::version=5.1.6&hash=5da071"]\
           ],\
           "linkType": "SOFT"\
@@ -2874,6 +2876,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["esutils", "npm:2.0.3"]\
           ],\
           "linkType": "HARD"\
+        }]\
+      ]],\
+      ["domain", [\
+        ["link:./libs/src/domain::locator=terraapprove%40workspace%3A.", {\
+          "packageLocation": "./libs/src/domain/",\
+          "packageDependencies": [\
+            ["domain", "link:./libs/src/domain::locator=terraapprove%40workspace%3A."]\
+          ],\
+          "linkType": "SOFT",\
+          "discardFromLookup": true\
         }]\
       ]],\
       ["eastasianwidth", [\
@@ -5806,6 +5818,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:18.11.9"],\
             ["@typescript-eslint/eslint-plugin", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:6.1.0"],\
             ["@typescript-eslint/parser", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:6.1.0"],\
+            ["domain", "link:./libs/src/domain::locator=terraapprove%40workspace%3A."],\
             ["eslint", "npm:8.45.0"],\
             ["eslint-config-prettier", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:8.8.0"],\
             ["eslint-plugin-jest", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:27.2.3"],\
@@ -5814,6 +5827,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:29.6.1"],\
             ["prettier", "npm:2.8.8"],\
             ["ts-node", "virtual:d5d7509ce329e98ce738557729ab1a93289aa6645589615a58a4c2cd4c0c1066e302074183e26c3113b036664401b11a333b16b293f7b89fbe9c35262dab1ddd#npm:10.9.1"],\
+            ["tslog", "npm:4.8.2"],\
             ["typescript", "patch:typescript@npm%3A5.1.6#~builtin<compat/typescript>::version=5.1.6&hash=5da071"]\
           ],\
           "linkType": "SOFT"\
@@ -5953,6 +5967,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/tslib-npm-1.14.1-102499115e-dbe628ef87.zip/node_modules/tslib/",\
           "packageDependencies": [\
             ["tslib", "npm:1.14.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["tslog", [\
+        ["npm:4.8.2", {\
+          "packageLocation": "./.yarn/cache/tslog-npm-4.8.2-e7b12cf872-04d2c2c68b.zip/node_modules/tslog/",\
+          "packageDependencies": [\
+            ["tslog", "npm:4.8.2"]\
           ],\
           "linkType": "HARD"\
         }]\

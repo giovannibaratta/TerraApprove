@@ -1,8 +1,20 @@
-import {validate} from "@domain/validator/validator"
+import {readFileSync} from "fs"
+import {findTerraformResourcesInFile} from "domain/terraform/resource"
+import {Logger} from "tslog"
+
+function readFileAndSplitLines(filePath: string): string[] {
+  const content = readFileSync(filePath, "utf8")
+  return content.split("\n")
+}
 
 function main() {
-  console.log("Hello world")
-  validate("PASS")
+  const logger = new Logger()
+  const content = readFileAndSplitLines(process.argv[2])
+  const resources = findTerraformResourcesInFile({
+    name: process.argv[2],
+    lines: content
+  })
+  logger.info(resources)
 }
 
 main()

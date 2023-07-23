@@ -2040,6 +2040,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"domain@link:./libs/src/domain::locator=terraapprove%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "domain@link:./libs/src/domain::locator=terraapprove%40workspace%3A."
+  languageName: node
+  linkType: soft
+
 "eastasianwidth@npm:^0.2.0":
   version: 0.2.0
   resolution: "eastasianwidth@npm:0.2.0"
@@ -4590,6 +4596,7 @@ __metadata:
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 6.1.0
     "@typescript-eslint/parser": 6.1.0
+    domain: "link:./libs/src/domain"
     eslint: 8.45.0
     eslint-config-prettier: 8.8.0
     eslint-plugin-jest: 27.2.3
@@ -4598,6 +4605,7 @@ __metadata:
     jest: 29.6.1
     prettier: 2.8.8
     ts-node: 10.9.1
+    tslog: 4.8.2
     typescript: 5.1.6
   languageName: unknown
   linkType: soft
@@ -4694,6 +4702,13 @@ __metadata:
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
+  languageName: node
+  linkType: hard
+
+"tslog@npm:4.8.2":
+  version: 4.8.2
+  resolution: "tslog@npm:4.8.2"
+  checksum: 04d2c2c68be53578b090ff1729b08ee23f3b5c8c509d6ffa332c43d25bcb9599ede8cce1db2c9dcb29ea3647b21c47c1ba11180ee9652a03c901702199dc87cd
   languageName: node
   linkType: hard
 
