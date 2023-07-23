@@ -16,16 +16,19 @@
     "ghcr.io/devcontainers/features/node:1": {
       "nodeGypDependencies": true,
       "version": "18"
-    }
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {}
   },
   "customizations": {
     // Configure properties specific to VS Code.
     "vscode": {
       // Add the IDs of extensions you want installed when the container is created.
       "extensions": [
+        "github.copilot",
         "hashicorp.terraform",
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
+        "orta.vscode-jest",
         // Required by Yarn 3 (see https://yarnpkg.com/getting-started/editor-sdks#vscode)
         "arcanis.vscode-zipfs"
       ],
