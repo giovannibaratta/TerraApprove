@@ -1,0 +1,12 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint-typescript-app:
+      root: core
+      run: yarn lint
+    compile-typescript-app:
+      root: core
+      run: yarn compile
+    test-typescript-app:
+      root: core
+      run: yarn test

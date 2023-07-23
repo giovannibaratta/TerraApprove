@@ -3,7 +3,8 @@
     "start": "ts-node main/src/main.ts",
     "lint": "yarn eslint --cache --fix .",
     "format:prettier": "yarn prettier --config .prettierrc . --write",
-    "compile": "tsc"
+    "compile": "tsc",
+    "test": "yarn jest {libs/**/*.test.ts,main/**/*.test.ts}"
   },
   "name": "terraapprove",
   "version": "0.0.1",
