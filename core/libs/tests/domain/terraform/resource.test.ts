@@ -63,7 +63,7 @@ describe("findTerraformResourcesInFile", () => {
         "some random content that should be ignored",
         `resource "${type1}" "${name1}" {`,
         "}",
-        "@RequireApproval()",
+        "#@RequireApproval()",
         `resource "${type2}" "${name2}" {`,
         "some random content that should be ignored",
         "}"
@@ -85,6 +85,53 @@ describe("findTerraformResourcesInFile", () => {
         file: file.name,
         type: type2,
         name: name2,
+        requireApproval: true
+      }
+    ])
+  })
+
+  it("should correctly identify the resources that require approval even if there are multiple spaces before and after the tag", () => {
+    // Given
+    const [type1, name1] = ["google_bucket", "bucket"]
+    const [type2, name2] = ["google_bucket", "bucket2"]
+    const [type3, name3] = ["google_bucket", "bucket3"]
+
+    const file = {
+      name: "file",
+      lines: [
+        "# @RequireApproval()",
+        `resource "${type1}" "${name1}" {`,
+        "}",
+        "#@RequireApproval() ",
+        `resource "${type2}" "${name2}" {`,
+        "}",
+        "#  @RequireApproval() ",
+        `resource "${type3}" "${name3}" {`,
+        "}"
+      ]
+    }
+
+    // When
+    const resources = findTerraformResourcesInFile(file)
+
+    // Expect
+    expect(resources).toEqual([
+      {
+        file: file.name,
+        type: type1,
+        name: name1,
+        requireApproval: true
+      },
+      {
+        file: file.name,
+        type: type2,
+        name: name2,
+        requireApproval: true
+      },
+      {
+        file: file.name,
+        type: type3,
+        name: name3,
         requireApproval: true
       }
     ])

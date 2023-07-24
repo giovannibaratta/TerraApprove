@@ -39,8 +39,10 @@ export function findTerraformResourcesInFile(file: File): TerraformResource[] {
   return resources
 }
 
-// Regex that matches the pattern @RequireApproval()
-const requireApprovalRegex = /^@RequireApproval\(\)$/
+// Regex that matches the pattern # @RequireApproval()
+// The decorator must be defined inside a comment otherwise
+// it will not be terraform compliant
+const requireApprovalRegex = /^# *@RequireApproval\(\) *$/
 
 function doesLinesContainsApprovalTag(line: string): boolean {
   return line.match(requireApprovalRegex) !== null
