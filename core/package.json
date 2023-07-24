@@ -17,6 +17,7 @@
   "packageManager": "yarn@3.6.1",
   "dependencies": {
     "domain": "link:./libs/src/domain",
+    "fp-ts": "2.16.0",
     "tslog": "4.8.2"
   },
   "devDependencies": {
@@ -26,12 +27,13 @@
     "@types/node": "18.11.9",
     "@typescript-eslint/eslint-plugin": "6.1.0",
     "@typescript-eslint/parser": "6.1.0",
-    "eslint": "8.45.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-jest": "27.2.3",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.2.1",
+    "eslint": "8.45.0",
     "jest": "29.6.1",
+    "memfs": "4.2.0",
     "prettier": "2.8.8",
     "ts-node": "10.9.1",
     "typescript": "5.1.6"

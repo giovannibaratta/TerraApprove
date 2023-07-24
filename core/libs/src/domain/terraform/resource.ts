@@ -1,7 +1,4 @@
-interface File {
-  readonly name: string
-  readonly lines: string[]
-}
+import {File} from "../file/file"
 
 export interface TerraformResource {
   readonly file: string
