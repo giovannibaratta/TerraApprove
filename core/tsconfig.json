@@ -1,9 +1,16 @@
 {
   "extends": "./tsconfig-google.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build",
-    "types": ["jest", "node"]
-  },
-  "include": ["main/**/*.ts", "libs/**/*.ts"]
+    "outDir": "./build",
+    "baseUrl": "./",
+    "types": ["jest", "node"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "paths": {
+      "@libs/domain": ["libs/domain/src"],
+      "@libs/domain/*": ["libs/domain/src/*"],
+      "@libs/service": ["libs/service/src"],
+      "@libs/service/*": ["libs/service/src/*"]
+    }
+  }
 }
