@@ -10,7 +10,9 @@
       "@libs/domain": ["libs/domain/src"],
       "@libs/domain/*": ["libs/domain/src/*"],
       "@libs/service": ["libs/service/src"],
-      "@libs/service/*": ["libs/service/src/*"]
+      "@libs/service/*": ["libs/service/src/*"],
+      "@libs/external": ["libs/external/src"],
+      "@libs/external/*": ["libs/external/src/*"]
     }
   }
 }

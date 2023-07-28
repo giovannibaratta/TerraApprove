@@ -62,7 +62,9 @@
         "jest/no-identical-title": "error",
         "jest/prefer-to-have-length": "warn",
         "jest/valid-expect": "error",
-        "jest/prefer-expect-assertions": "off"
+        "jest/prefer-expect-assertions": "off",
+        "node/no-unpublished-require": "off",
+        "node/no-unpublished-import": "off"
       }
     }
   ]
