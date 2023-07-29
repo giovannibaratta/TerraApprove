@@ -1,31 +1,71 @@
 import {Injectable} from "@nestjs/common"
 import {FileHandler} from "../file-handler/file-handler"
-import {isLeft} from "fp-ts/lib/Either"
-import {findTerraformResourcesInFile} from "@libs/domain/terraform/resource"
+import {chainW, isLeft} from "fp-ts/lib/Either"
+import {
+  TerraformResource,
+  findTerraformResourcesInFile
+} from "@libs/domain/terraform/resource"
+import {PlanReaderService} from "../plan-reader/plan-reader.service"
+import {pipe} from "fp-ts/lib/function"
+import {either} from "fp-ts"
+import {TerraformDiff} from "@libs/domain/terraform/diffs"
 
 @Injectable()
 export class ApprovalService {
-  constructor(private readonly fileHandler: FileHandler) {}
+  constructor(
+    private readonly fileHandler: FileHandler,
+    private readonly planReaderService: PlanReaderService
+  ) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  isApprovalRequired(codeBaseDir: string, _planFile: string): boolean {
-    const fileHandler = new FileHandler()
+  async isApprovalRequired(
+    codeBaseDir: string,
+    planFile: string
+  ): Promise<boolean> {
+    const eitherTerraformResources = pipe(
+      either.right(codeBaseDir),
+      // Get all the terraform files in the folder
+      chainW(dir => this.fileHandler.getTerraformFilesInFolder(dir)),
+      // Extract the terraform resource for each file in the folder
+      chainW(files => {
+        return either.right(
+          files.map(file => findTerraformResourcesInFile(file)).flat()
+        )
+      })
+    )
 
-    const eitherFilesToParse =
-      fileHandler.getTerraformFilesInFolder(codeBaseDir)
-
-    if (isLeft(eitherFilesToParse)) {
-      throw new Error(eitherFilesToParse.left)
+    if (isLeft(eitherTerraformResources)) {
+      throw new Error(eitherTerraformResources.left)
     }
 
-    const filesToParse = eitherFilesToParse.right
+    const eitherTerraformDiffs = await this.planReaderService.readPlan(planFile)
 
-    filesToParse
-      .map(file => {
-        return findTerraformResourcesInFile(file)
-      })
-      .flat()
+    if (isLeft(eitherTerraformDiffs)) {
+      throw new Error(eitherTerraformDiffs.left)
+    }
 
-    return true
+    const terraformResources = eitherTerraformResources.right
+    const terraformDiffs = eitherTerraformDiffs.right
+
+    return Object.keys(terraformDiffs).some(key =>
+      this.doesRequiredApproval(terraformDiffs[key], terraformResources)
+    )
+  }
+
+  private doesRequiredApproval(
+    diff: TerraformDiff,
+    resources: TerraformResource[]
+  ): boolean {
+    const resource = resources.find(
+      resource =>
+        resource.name === diff.name && resource.type === diff.resourceType
+    )
+
+    if (resource === undefined) {
+      throw new Error(
+        `Could not find resource ${diff.name} of type ${diff.resourceType}`
+      )
+    }
+
+    return resource.requireApproval
   }
 }

@@ -1,8 +1,8 @@
-import {readFileSync, readdirSync, statSync} from "fs"
-import {Either, isLeft} from "fp-ts/lib/Either"
-import {either} from "fp-ts"
-import {Injectable} from "@nestjs/common"
 import {File} from "@libs/domain/file/file"
+import {Injectable} from "@nestjs/common"
+import {either} from "fp-ts"
+import {Either, isLeft} from "fp-ts/lib/Either"
+import {readFileSync, readdirSync, statSync} from "fs"
 
 type FileError = "not_a_directory" | "directory_not_found"
 

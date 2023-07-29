@@ -1,0 +1,98 @@
+import {ApprovalService} from "@libs/service/approval/approval.service"
+import {TestingModule, Test} from "@nestjs/testing"
+import {FileHandlerMock} from "../mocks/file-handler.service.mock"
+import {FileHandler} from "@libs/service/file-handler/file-handler"
+import {PlanReaderService} from "@libs/service/plan-reader/plan-reader.service"
+import {PlanReaderServiceMock} from "../mocks/plan-reader.service.mock"
+import * as Resource from "@libs/domain/terraform/resource"
+import {either} from "fp-ts"
+import {File} from "@libs/domain/file/file"
+import {TerraformDiff} from "@libs/domain/terraform/diffs"
+
+describe("ApprovalService", () => {
+  let approvalService: ApprovalService
+  let fileHandler: FileHandler
+  let planReaderService: PlanReaderService
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ApprovalService,
+        {
+          provide: FileHandler,
+          useClass: FileHandlerMock
+        },
+        {
+          provide: PlanReaderService,
+          useClass: PlanReaderServiceMock
+        }
+      ]
+    }).compile()
+
+    approvalService = module.get(ApprovalService)
+    fileHandler = module.get(FileHandler)
+    planReaderService = module.get(PlanReaderService)
+
+    jest.restoreAllMocks()
+  })
+
+  describe("isApprovalRequired", () => {
+    it("should return true if the plan contains a resource that requires approval", async () => {
+      // Given
+      const foundFiles: File[] = [
+        {
+          name: "main.tf",
+          lines: ["something"]
+        }
+      ]
+
+      const resourceType: string = "aws_s3_bucket"
+      const resourceName: string = "my_bucket"
+
+      jest
+        .spyOn(fileHandler, "getTerraformFilesInFolder")
+        .mockReturnValue(either.right(foundFiles))
+      jest.spyOn(Resource, "findTerraformResourcesInFile").mockReturnValue([
+        {
+          file: "main.tf",
+          type: resourceType,
+          name: resourceName,
+          requireApproval: true
+        }
+      ])
+
+      const diffFromPlan: TerraformDiff = {
+        name: resourceName,
+        resourceType: resourceType,
+        diffType: "create"
+      }
+
+      const terraformDiffMap = {
+        [`${resourceType}.${resourceName}`]: diffFromPlan
+      }
+
+      jest
+        .spyOn(planReaderService, "readPlan")
+        .mockResolvedValue(either.right(terraformDiffMap))
+
+      const tfCodeBaseDir = "terraformCodeBaseDir"
+      const tfPlanPath = "terraformPlanPath"
+
+      // When
+      const result = await approvalService.isApprovalRequired(
+        tfCodeBaseDir,
+        tfPlanPath
+      )
+
+      // Expect
+      expect(result).toBe(true)
+      expect(fileHandler.getTerraformFilesInFolder).toHaveBeenCalledWith(
+        tfCodeBaseDir
+      )
+      expect(Resource.findTerraformResourcesInFile).toHaveBeenCalledWith(
+        foundFiles[0]
+      )
+      expect(planReaderService.readPlan).toHaveBeenCalledWith(tfPlanPath)
+    })
+  })
+})
