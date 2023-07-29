@@ -12,7 +12,9 @@
       "@libs/service": ["libs/service/src"],
       "@libs/service/*": ["libs/service/src/*"],
       "@libs/external": ["libs/external/src"],
-      "@libs/external/*": ["libs/external/src/*"]
+      "@libs/external/*": ["libs/external/src/*"],
+      "@libs/testing": ["libs/testing/src"],
+      "@libs/testing/*": ["libs/testing/src/*"]
     }
   }
 }

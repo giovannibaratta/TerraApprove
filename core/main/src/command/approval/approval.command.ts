@@ -1,5 +1,5 @@
 import {ApprovalService} from "@libs/service/approval/approval.service"
-import {CommandRunner, Command} from "nest-commander"
+import {Command, CommandRunner} from "nest-commander"
 
 @Command({
   name: "ApprovalCommand",
