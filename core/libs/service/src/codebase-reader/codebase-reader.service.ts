@@ -45,6 +45,9 @@ export class CodebaseReaderService {
     return content.split("\n")
   }
 
+  /**
+   * Read all terraform files in a folder (non-recursively) and generate an internal representation of them
+   */
   getTerraformFilesInFolder(folder: string): Either<FileError, File[]> {
     const eitherFiles = this.listTerraformFilesInFolder(folder)
 

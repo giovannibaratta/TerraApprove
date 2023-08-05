@@ -7,8 +7,18 @@ import {CodebaseReaderService} from "@libs/service/codebase-reader/codebase-read
 
 jest.mock("fs", () => fs)
 
-describe("FileHandler", () => {
+const basePath = "/tmp"
+
+describe("CodebaseReaderService", () => {
   let codebaseReader: CodebaseReaderService
+
+  beforeEach(() => {
+    cleanResources()
+  })
+
+  afterEach(() => {
+    cleanResources()
+  })
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -21,7 +31,7 @@ describe("FileHandler", () => {
   it('should return "directory_not_found" when the folder does not exist', () => {
     // When
     const result = codebaseReader.getTerraformFilesInFolder(
-      "/tmp/does-not-exist"
+      `${basePath}/does-not-exist`
     )
 
     // Expect
@@ -30,7 +40,8 @@ describe("FileHandler", () => {
 
   it('should return "not_a_directory" when the path is not a directory', () => {
     // Given
-    const path = "/afile"
+    fs.mkdirSync(basePath)
+    const path = `${basePath}/afile`
     fs.writeFileSync(path, "content")
 
     // When
@@ -42,7 +53,7 @@ describe("FileHandler", () => {
 
   it("should read only terraform files", () => {
     // Given
-    const dirPath = "/tmp"
+    const dirPath = basePath
     fs.mkdirSync(dirPath)
     const terraformFileName = "aterraformfile.tf"
     fs.writeFileSync(`${dirPath}/${terraformFileName}`, "content")
@@ -61,4 +72,33 @@ describe("FileHandler", () => {
       ])
     )
   })
+
+  it("should ignore terraform files in subfolders", () => {
+    // Given
+    const dirPath = basePath
+    fs.mkdirSync(dirPath)
+    const terraformFileName = "aterraformfile.tf"
+    fs.writeFileSync(`${dirPath}/${terraformFileName}`, "content")
+    const subFolder = `${dirPath}/subfolder`
+    fs.mkdirSync(subFolder)
+    const subFolderTerraformFileName = "aSubFolderTerraformfile.tf"
+    fs.writeFileSync(`${subFolder}/${subFolderTerraformFileName}`, "content")
+
+    // When
+    const result = codebaseReader.getTerraformFilesInFolder(dirPath)
+
+    // Expect
+    expect(result).toMatchObject(
+      either.right([
+        {
+          name: terraformFileName
+        }
+      ])
+    )
+  })
 })
+
+function cleanResources() {
+  // Clean all resources
+  fs.rmSync(basePath, {recursive: true, force: true})
+}
