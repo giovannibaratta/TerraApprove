@@ -37,7 +37,7 @@ describe("ApprovalService", () => {
   })
 
   describe("isApprovalRequired", () => {
-    it("should return true if the plan contains a resource that requires approval", async () => {
+    it("should return true if the plan contains a plain resource that requires approval", async () => {
       // Given
       const foundFiles: File[] = [
         {
@@ -52,11 +52,14 @@ describe("ApprovalService", () => {
       jest
         .spyOn(codebaseReader, "getTerraformFilesInFolder")
         .mockReturnValue(either.right(foundFiles))
-      jest.spyOn(Resource, "findTerraformResourcesInFile").mockReturnValue([
+      jest.spyOn(Resource, "findTerraformEntitiesInFile").mockReturnValue([
         {
           file: "main.tf",
-          type: resourceType,
-          name: resourceName,
+          entityInfo: {
+            internalType: "plain_resource",
+            providerType: resourceType,
+            userProvidedName: resourceName
+          },
           requireApproval: true
         }
       ])
@@ -89,7 +92,7 @@ describe("ApprovalService", () => {
       expect(codebaseReader.getTerraformFilesInFolder).toHaveBeenCalledWith(
         tfCodeBaseDir
       )
-      expect(Resource.findTerraformResourcesInFile).toHaveBeenCalledWith(
+      expect(Resource.findTerraformEntitiesInFile).toHaveBeenCalledWith(
         foundFiles[0]
       )
       expect(planReaderService.readPlan).toHaveBeenCalledWith(tfPlanPath)

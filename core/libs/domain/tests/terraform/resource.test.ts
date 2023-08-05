@@ -1,6 +1,6 @@
-import {findTerraformResourcesInFile} from "@libs/domain/terraform/resource"
+import {findTerraformEntitiesInFile} from "@libs/domain/terraform/resource"
 
-describe("findTerraformResourcesInFile", () => {
+describe("findTerraformEntitiesInFile", () => {
   it("should return an empty array when the file has no lines", () => {
     // Given
     const file = {
@@ -9,13 +9,13 @@ describe("findTerraformResourcesInFile", () => {
     }
 
     // When
-    const resources = findTerraformResourcesInFile(file)
+    const resources = findTerraformEntitiesInFile(file)
 
     // Expect
     expect(resources).toEqual([])
   })
 
-  it("should correctly identify the resources defined in the file", () => {
+  it("should correctly identify the plain resources defined in the file", () => {
     // Given
     const [type1, name1] = ["aws_s3_bucket", "bucket"]
     const [type2, name2] = ["google_bucket", "bucket2"]
@@ -33,26 +33,32 @@ describe("findTerraformResourcesInFile", () => {
     }
 
     // When
-    const resources = findTerraformResourcesInFile(file)
+    const resources = findTerraformEntitiesInFile(file)
 
     // Expect
     expect(resources).toEqual([
       {
         file: file.name,
-        type: type1,
-        name: name1,
+        entityInfo: {
+          internalType: "plain_resource",
+          providerType: type1,
+          userProvidedName: name1
+        },
         requireApproval: false
       },
       {
         file: file.name,
-        type: type2,
-        name: name2,
+        entityInfo: {
+          internalType: "plain_resource",
+          providerType: type2,
+          userProvidedName: name2
+        },
         requireApproval: false
       }
     ])
   })
 
-  it("should correctly identify the resources that require approval", () => {
+  it("should correctly identify the plain resources that require approval", () => {
     // Given
     const [type1, name1] = ["aws_s3_bucket", "bucket"]
     const [type2, name2] = ["google_bucket", "bucket2"]
@@ -71,26 +77,32 @@ describe("findTerraformResourcesInFile", () => {
     }
 
     // When
-    const resources = findTerraformResourcesInFile(file)
+    const resources = findTerraformEntitiesInFile(file)
 
     // Expect
     expect(resources).toEqual([
       {
         file: file.name,
-        type: type1,
-        name: name1,
+        entityInfo: {
+          internalType: "plain_resource",
+          providerType: type1,
+          userProvidedName: name1
+        },
         requireApproval: false
       },
       {
         file: file.name,
-        type: type2,
-        name: name2,
+        entityInfo: {
+          internalType: "plain_resource",
+          providerType: type2,
+          userProvidedName: name2
+        },
         requireApproval: true
       }
     ])
   })
 
-  it("should correctly identify the resources that require approval even if there are multiple spaces before and after the tag", () => {
+  it("should correctly identify the plain resources that require approval even if there are multiple spaces before and after the tag", () => {
     // Given
     const [type1, name1] = ["google_bucket", "bucket"]
     const [type2, name2] = ["google_bucket", "bucket2"]
@@ -112,26 +124,35 @@ describe("findTerraformResourcesInFile", () => {
     }
 
     // When
-    const resources = findTerraformResourcesInFile(file)
+    const resources = findTerraformEntitiesInFile(file)
 
     // Expect
     expect(resources).toEqual([
       {
         file: file.name,
-        type: type1,
-        name: name1,
+        entityInfo: {
+          internalType: "plain_resource",
+          providerType: type1,
+          userProvidedName: name1
+        },
         requireApproval: true
       },
       {
         file: file.name,
-        type: type2,
-        name: name2,
+        entityInfo: {
+          internalType: "plain_resource",
+          providerType: type2,
+          userProvidedName: name2
+        },
         requireApproval: true
       },
       {
         file: file.name,
-        type: type3,
-        name: name3,
+        entityInfo: {
+          internalType: "plain_resource",
+          providerType: type3,
+          userProvidedName: name3
+        },
         requireApproval: true
       }
     ])

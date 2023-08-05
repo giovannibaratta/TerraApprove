@@ -3,7 +3,7 @@ import {CodebaseReaderService} from "../codebase-reader/codebase-reader.service"
 import {chainW, isLeft} from "fp-ts/lib/Either"
 import {
   TerraformEntity,
-  findTerraformResourcesInFile
+  findTerraformEntitiesInFile
 } from "@libs/domain/terraform/resource"
 import {PlanReaderService} from "../plan-reader/plan-reader.service"
 import {pipe} from "fp-ts/lib/function"
@@ -28,7 +28,7 @@ export class ApprovalService {
       // Extract the terraform resource for each file in the folder
       chainW(files => {
         return either.right(
-          files.map(file => findTerraformResourcesInFile(file)).flat()
+          files.map(file => findTerraformEntitiesInFile(file)).flat()
         )
       })
     )
@@ -53,11 +53,13 @@ export class ApprovalService {
 
   private doesRequiredApproval(
     diff: TerraformDiff,
-    resources: TerraformEntity[]
+    entities: TerraformEntity[]
   ): boolean {
-    const resource = resources.find(
-      resource =>
-        resource.name === diff.name && resource.type === diff.resourceType
+    const resource = entities.find(
+      entity =>
+        entity.entityInfo.internalType === "plain_resource" &&
+        entity.entityInfo.userProvidedName === diff.name &&
+        entity.entityInfo.providerType === diff.resourceType
     )
 
     if (resource === undefined) {
