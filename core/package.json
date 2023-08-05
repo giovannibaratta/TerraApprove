@@ -4,7 +4,8 @@
     "lint": "yarn eslint --cache --fix .",
     "format:prettier": "yarn prettier --config .prettierrc . --write",
     "compile": "nest build",
-    "test": "yarn jest {libs/**/*.test.ts,main/**/*.test.ts}"
+    "test": "yarn jest {libs/**/*.test.ts,main/**/*.test.ts}",
+    "prepush-validation": "yarn lint && yarn compile && yarn test"
   },
   "name": "terraapprove",
   "version": "0.0.1",
