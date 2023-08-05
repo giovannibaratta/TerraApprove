@@ -2,7 +2,7 @@ import {Injectable} from "@nestjs/common"
 import {CodebaseReaderService} from "../codebase-reader/codebase-reader.service"
 import {chainW, isLeft} from "fp-ts/lib/Either"
 import {
-  TerraformResource,
+  TerraformEntity,
   findTerraformResourcesInFile
 } from "@libs/domain/terraform/resource"
 import {PlanReaderService} from "../plan-reader/plan-reader.service"
@@ -53,7 +53,7 @@ export class ApprovalService {
 
   private doesRequiredApproval(
     diff: TerraformDiff,
-    resources: TerraformResource[]
+    resources: TerraformEntity[]
   ): boolean {
     const resource = resources.find(
       resource =>

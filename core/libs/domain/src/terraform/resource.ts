@@ -1,6 +1,6 @@
 import {File} from "../file/file"
 
-export interface TerraformResource {
+export interface TerraformEntity {
   readonly file: string
   readonly type: string
   readonly name: string
@@ -12,9 +12,9 @@ const resourceRegex = /resource +"([^"]+)" +"([^"]+)" +{/
 
 // This function finds all the terraform resources defined in a file
 // and returns them as an array of TerraformResource
-export function findTerraformResourcesInFile(file: File): TerraformResource[] {
+export function findTerraformResourcesInFile(file: File): TerraformEntity[] {
   const {lines} = file
-  const resources: TerraformResource[] = []
+  const resources: TerraformEntity[] = []
 
   for (let lineIndex = 0; lineIndex < file.lines.length; lineIndex++) {
     const match = lines[lineIndex].match(resourceRegex)
