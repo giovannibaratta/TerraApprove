@@ -7,7 +7,7 @@ import {readFileSync, readdirSync, statSync} from "fs"
 type FileError = "not_a_directory" | "directory_not_found"
 
 @Injectable()
-export class FileHandler {
+export class CodebaseReaderService {
   constructor() {}
 
   private listFilesInFolder(folder: string): Either<FileError, string[]> {

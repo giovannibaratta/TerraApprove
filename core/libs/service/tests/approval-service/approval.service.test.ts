@@ -1,7 +1,7 @@
 import {ApprovalService} from "@libs/service/approval/approval.service"
 import {TestingModule, Test} from "@nestjs/testing"
-import {FileHandlerMock} from "../mocks/file-handler.service.mock"
-import {FileHandler} from "@libs/service/file-handler/file-handler"
+import {CodebaseReaderServiceMock} from "../mocks/codebase-reader.service.mock"
+import {CodebaseReaderService} from "@libs/service/codebase-reader/codebase-reader.service"
 import {PlanReaderService} from "@libs/service/plan-reader/plan-reader.service"
 import {PlanReaderServiceMock} from "../mocks/plan-reader.service.mock"
 import * as Resource from "@libs/domain/terraform/resource"
@@ -11,7 +11,7 @@ import {TerraformDiff} from "@libs/domain/terraform/diffs"
 
 describe("ApprovalService", () => {
   let approvalService: ApprovalService
-  let fileHandler: FileHandler
+  let codebaseReader: CodebaseReaderService
   let planReaderService: PlanReaderService
 
   beforeEach(async () => {
@@ -19,8 +19,8 @@ describe("ApprovalService", () => {
       providers: [
         ApprovalService,
         {
-          provide: FileHandler,
-          useClass: FileHandlerMock
+          provide: CodebaseReaderService,
+          useClass: CodebaseReaderServiceMock
         },
         {
           provide: PlanReaderService,
@@ -30,7 +30,7 @@ describe("ApprovalService", () => {
     }).compile()
 
     approvalService = module.get(ApprovalService)
-    fileHandler = module.get(FileHandler)
+    codebaseReader = module.get(CodebaseReaderService)
     planReaderService = module.get(PlanReaderService)
 
     jest.restoreAllMocks()
@@ -50,7 +50,7 @@ describe("ApprovalService", () => {
       const resourceName: string = "my_bucket"
 
       jest
-        .spyOn(fileHandler, "getTerraformFilesInFolder")
+        .spyOn(codebaseReader, "getTerraformFilesInFolder")
         .mockReturnValue(either.right(foundFiles))
       jest.spyOn(Resource, "findTerraformResourcesInFile").mockReturnValue([
         {
@@ -86,7 +86,7 @@ describe("ApprovalService", () => {
 
       // Expect
       expect(result).toBe(true)
-      expect(fileHandler.getTerraformFilesInFolder).toHaveBeenCalledWith(
+      expect(codebaseReader.getTerraformFilesInFolder).toHaveBeenCalledWith(
         tfCodeBaseDir
       )
       expect(Resource.findTerraformResourcesInFile).toHaveBeenCalledWith(

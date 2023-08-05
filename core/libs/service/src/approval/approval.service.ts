@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common"
-import {FileHandler} from "../file-handler/file-handler"
+import {CodebaseReaderService} from "../codebase-reader/codebase-reader.service"
 import {chainW, isLeft} from "fp-ts/lib/Either"
 import {
   TerraformResource,
@@ -13,7 +13,7 @@ import {TerraformDiff} from "@libs/domain/terraform/diffs"
 @Injectable()
 export class ApprovalService {
   constructor(
-    private readonly fileHandler: FileHandler,
+    private readonly codebaseReader: CodebaseReaderService,
     private readonly planReaderService: PlanReaderService
   ) {}
 
@@ -24,7 +24,7 @@ export class ApprovalService {
     const eitherTerraformResources = pipe(
       either.right(codeBaseDir),
       // Get all the terraform files in the folder
-      chainW(dir => this.fileHandler.getTerraformFilesInFolder(dir)),
+      chainW(dir => this.codebaseReader.getTerraformFilesInFolder(dir)),
       // Extract the terraform resource for each file in the folder
       chainW(files => {
         return either.right(
