@@ -24,9 +24,11 @@ describe("FilePlanReader", () => {
     const planLocation = "/plan.json"
     const resourceType = "aws_instance"
     const resourceName = "example"
+    const resourceAddress = "unique_resource_address"
     const planContent = {
       resource_changes: [
         {
+          address: resourceAddress,
           type: resourceType,
           name: resourceName,
           change: {
@@ -44,11 +46,46 @@ describe("FilePlanReader", () => {
     // Then
     expect(result).toMatchObject({
       right: {
-        [`${resourceType}.${resourceName}`]: {
+        [resourceAddress]: {
           providerType: resourceType,
           userProvidedName: resourceName,
           diffType: "create"
         }
+      }
+    })
+  })
+
+  it("should correctly extract the first level module name for a nested resource", async () => {
+    // Given
+    const planLocation = "/plan.json"
+    const firstLevelModuleName = "first_module"
+    const moduleAddress = `module.${firstLevelModuleName}.module.sub_module_name`
+
+    const planContent = {
+      resource_changes: [
+        {
+          address: "fq_resource_address",
+          type: "aws_instance",
+          name: "example",
+          module_address: moduleAddress,
+          change: {
+            actions: ["create"]
+          }
+        }
+      ]
+    }
+
+    fs.writeFileSync(planLocation, JSON.stringify(planContent))
+
+    // When
+    const result = await filePlanReader.readPlan(planLocation)
+
+    // Then
+    expect(result).toMatchObject({
+      right: {
+        fq_resource_address: expect.objectContaining({
+          firstLevelModule: firstLevelModuleName
+        })
       }
     })
   })
@@ -95,6 +132,7 @@ describe("FilePlanReader", () => {
       const planContent = {
         resource_changes: [
           {
+            address: "non_unique_resource_address",
             type: "aws_instance",
             name: "example",
             change: {
@@ -102,6 +140,7 @@ describe("FilePlanReader", () => {
             }
           },
           {
+            address: "non_unique_resource_address",
             type: "aws_instance",
             name: "example",
             change: {

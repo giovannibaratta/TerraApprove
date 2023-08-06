@@ -48,6 +48,7 @@ describe("ApprovalService", () => {
 
       const resourceType: string = "aws_s3_bucket"
       const resourceName: string = "my_bucket"
+      const resourceAddress: string = "aws_s3_bucket.my_bucket"
 
       jest
         .spyOn(codebaseReader, "getTerraformFilesInFolder")
@@ -65,13 +66,14 @@ describe("ApprovalService", () => {
       ])
 
       const diffFromPlan: TerraformDiff = {
+        fullyQualifiedAddress: resourceAddress,
         userProvidedName: resourceName,
         providerType: resourceType,
         diffType: "create"
       }
 
       const terraformDiffMap = {
-        [`${resourceType}.${resourceName}`]: diffFromPlan
+        [resourceAddress]: diffFromPlan
       }
 
       jest

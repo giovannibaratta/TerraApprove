@@ -74,9 +74,13 @@ export class FilePlanReader implements IPlanReader {
         )
         .map(resourceChange => {
           return {
+            fullyQualifiedAddress: resourceChange.address,
             providerType: resourceChange.type,
             userProvidedName: resourceChange.name,
-            diffType: mapActions(resourceChange.change.actions)
+            diffType: mapActions(resourceChange.change.actions),
+            firstLevelModule: extractFirstLevelModuleIfAvailable(
+              resourceChange.module_address
+            )
           }
         })
     } catch (e) {
@@ -86,9 +90,9 @@ export class FilePlanReader implements IPlanReader {
 
     try {
       const result = diffs.reduce((acc, curr) => {
-        const key = `${curr.providerType}.${curr.userProvidedName}`
+        const key = curr.fullyQualifiedAddress
         if (acc[key]) {
-          // The combination of resource type and resource name shoudl be unique,
+          // The combination of resource type and resource name should be unique,
           // so we have an ambiguous diff
           throw new Error(`Ambiguous diff found for ${key}`)
         }
@@ -102,6 +106,25 @@ export class FilePlanReader implements IPlanReader {
       return either.left("ambiguous_diff")
     }
   }
+}
+
+function extractFirstLevelModuleIfAvailable(
+  moduleAddress?: string
+): string | undefined {
+  /* The module address has the following structure:
+   * module.first_level_module_name.module.second_level_module_name.module.third_level_module_name.<...> */
+
+  if (!moduleAddress) {
+    return undefined
+  }
+
+  const moduleAddressComponents = moduleAddress.split(".")
+
+  if (moduleAddressComponents.length < 2) {
+    throw new Error("Invalid module address")
+  }
+
+  return moduleAddressComponents[1]
 }
 
 function mapActions(actions: Action[]): DiffType {
@@ -141,6 +164,7 @@ function mapActions(actions: Action[]): DiffType {
   return diffType
 }
 
+// https://developer.hashicorp.com/terraform/internals/json-format#plan-representation
 interface TerraformPlan {
   resource_changes: ResourceChange[]
 }
@@ -149,6 +173,8 @@ interface ResourceChange {
   type: string
   name: string
   change: Change
+  module_address?: string
+  address: string
 }
 
 interface Change {
@@ -167,13 +193,20 @@ const terraformPlanSchema: JSONSchemaType<TerraformPlan> = {
       items: {
         type: "object",
         additionalProperties: true,
-        required: ["type", "name", "change"],
+        required: ["type", "name", "change", "address"],
         properties: {
+          address: {
+            type: "string"
+          },
           type: {
             type: "string"
           },
           name: {
             type: "string"
+          },
+          module_address: {
+            type: "string",
+            nullable: true
           },
           change: {
             type: "object",
