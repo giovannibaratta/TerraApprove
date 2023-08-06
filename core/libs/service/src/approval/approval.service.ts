@@ -55,12 +55,7 @@ export class ApprovalService {
     diff: TerraformDiff,
     entities: TerraformEntity[]
   ): boolean {
-    const resource = entities.find(
-      entity =>
-        entity.entityInfo.internalType === "plain_resource" &&
-        entity.entityInfo.userProvidedName === diff.userProvidedName &&
-        entity.entityInfo.providerType === diff.providerType
-    )
+    const resource = this.findDiffCounterpartInEntities(diff, entities)
 
     if (resource === undefined) {
       throw new Error(
@@ -69,5 +64,28 @@ export class ApprovalService {
     }
 
     return resource.requireApproval
+  }
+
+  private findDiffCounterpartInEntities(
+    diff: TerraformDiff,
+    entities: TerraformEntity[]
+  ): TerraformEntity | undefined {
+    // If it is a diff in the root module, we need to check that the name and type match
+    const plainResourceMatch = (diff: TerraformDiff, entity: TerraformEntity) =>
+      diff.firstLevelModule === undefined &&
+      entity.entityInfo.internalType === "plain_resource" &&
+      entity.entityInfo.userProvidedName === diff.userProvidedName &&
+      entity.entityInfo.providerType === diff.providerType
+
+    // If the diff is defined in a sub module, we limit the check to the module name
+    const moduleEntityMatch = (diff: TerraformDiff, entity: TerraformEntity) =>
+      diff.firstLevelModule !== undefined &&
+      entity.entityInfo.internalType === "module" &&
+      entity.entityInfo.userProvidedName === diff.firstLevelModule
+
+    return entities.find(
+      entity =>
+        plainResourceMatch(diff, entity) || moduleEntityMatch(diff, entity)
+    )
   }
 }

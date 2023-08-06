@@ -99,5 +99,56 @@ describe("ApprovalService", () => {
       )
       expect(planReaderService.readPlan).toHaveBeenCalledWith(tfPlanPath)
     })
+
+    it("should return true if the plan contains a resource defined in a module that requires approval", async () => {
+      // Given
+      const foundFiles: File[] = [
+        {
+          name: "main.tf",
+          lines: ["something"]
+        }
+      ]
+
+      const moduleName = "my_module"
+
+      jest
+        .spyOn(codebaseReader, "getTerraformFilesInFolder")
+        .mockReturnValue(either.right(foundFiles))
+      jest.spyOn(Resource, "findTerraformEntitiesInFile").mockReturnValue([
+        {
+          file: "main.tf",
+          entityInfo: {
+            internalType: "module",
+            userProvidedName: moduleName
+          },
+          requireApproval: true
+        }
+      ])
+
+      const diffFromPlan: TerraformDiff = {
+        fullyQualifiedAddress: "fq_address",
+        userProvidedName: "my_bucket",
+        providerType: "aws_s3_bucket",
+        diffType: "create",
+        firstLevelModule: moduleName
+      }
+
+      const terraformDiffMap = {
+        [diffFromPlan.fullyQualifiedAddress]: diffFromPlan
+      }
+
+      jest
+        .spyOn(planReaderService, "readPlan")
+        .mockResolvedValue(either.right(terraformDiffMap))
+
+      // When
+      const result = await approvalService.isApprovalRequired(
+        "terraformCodeBaseDir",
+        "terraformPlanPath"
+      )
+
+      // Expect
+      expect(result).toBe(true)
+    })
   })
 })
