@@ -1,6 +1,6 @@
 export interface TerraformDiff {
-  readonly resourceType: string
-  readonly name: string
+  readonly providerType: string
+  readonly userProvidedName: string
   readonly diffType: DiffType
 }
 

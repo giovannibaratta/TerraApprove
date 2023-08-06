@@ -74,8 +74,8 @@ export class FilePlanReader implements IPlanReader {
         )
         .map(resourceChange => {
           return {
-            resourceType: resourceChange.type,
-            name: resourceChange.name,
+            providerType: resourceChange.type,
+            userProvidedName: resourceChange.name,
             diffType: mapActions(resourceChange.change.actions)
           }
         })
@@ -86,7 +86,7 @@ export class FilePlanReader implements IPlanReader {
 
     try {
       const result = diffs.reduce((acc, curr) => {
-        const key = `${curr.resourceType}.${curr.name}`
+        const key = `${curr.providerType}.${curr.userProvidedName}`
         if (acc[key]) {
           // The combination of resource type and resource name shoudl be unique,
           // so we have an ambiguous diff

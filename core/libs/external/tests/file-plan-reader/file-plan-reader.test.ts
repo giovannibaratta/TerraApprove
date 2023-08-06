@@ -45,8 +45,8 @@ describe("FilePlanReader", () => {
     expect(result).toMatchObject({
       right: {
         [`${resourceType}.${resourceName}`]: {
-          resourceType,
-          name: resourceName,
+          providerType: resourceType,
+          userProvidedName: resourceName,
           diffType: "create"
         }
       }

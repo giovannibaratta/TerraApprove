@@ -58,13 +58,13 @@ export class ApprovalService {
     const resource = entities.find(
       entity =>
         entity.entityInfo.internalType === "plain_resource" &&
-        entity.entityInfo.userProvidedName === diff.name &&
-        entity.entityInfo.providerType === diff.resourceType
+        entity.entityInfo.userProvidedName === diff.userProvidedName &&
+        entity.entityInfo.providerType === diff.providerType
     )
 
     if (resource === undefined) {
       throw new Error(
-        `Could not find resource ${diff.name} of type ${diff.resourceType}`
+        `Could not find resource ${diff.userProvidedName} of type ${diff.providerType}`
       )
     }
 

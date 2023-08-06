@@ -65,8 +65,8 @@ describe("ApprovalService", () => {
       ])
 
       const diffFromPlan: TerraformDiff = {
-        name: resourceName,
-        resourceType: resourceType,
+        userProvidedName: resourceName,
+        providerType: resourceType,
         diffType: "create"
       }
 
