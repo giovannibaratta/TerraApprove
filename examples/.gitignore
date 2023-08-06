@@ -1,4 +1,8 @@
-.terraform
-.terraform.lock.hcl
-terraform.tfstate
-terraform.tfstate.backup
+// Exclude evertything expect terraform and markdown files
+*
+
+!*.tf
+!*.md
+
+// Necessary to re-include directories excluded by the previous pattern
+!*/
