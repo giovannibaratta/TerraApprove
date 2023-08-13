@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common"
+import {Injectable, Logger} from "@nestjs/common"
 import {CodebaseReaderService} from "../codebase-reader/codebase-reader.service"
 import {chainW, isLeft} from "fp-ts/lib/Either"
 import {
@@ -34,21 +34,43 @@ export class ApprovalService {
     )
 
     if (isLeft(eitherTerraformResources)) {
+      Logger.error(
+        `Error while reading code base: ${eitherTerraformResources.left}`
+      )
       throw new Error(eitherTerraformResources.left)
     }
+
+    const terraformResources = eitherTerraformResources.right
+
+    Logger.log(
+      `Code base successfully read. Found ${terraformResources.length} resource(s).`
+    )
 
     const eitherTerraformDiffs = await this.planReaderService.readPlan(planFile)
 
     if (isLeft(eitherTerraformDiffs)) {
+      Logger.error(`Error while reading plan: ${eitherTerraformDiffs.left}`)
       throw new Error(eitherTerraformDiffs.left)
     }
 
-    const terraformResources = eitherTerraformResources.right
     const terraformDiffs = eitherTerraformDiffs.right
 
-    return Object.keys(terraformDiffs).some(key =>
-      this.doesRequiredApproval(terraformDiffs[key], terraformResources)
+    Logger.log(
+      `Plan successfully parsed. Found ${
+        Object.keys(terraformDiffs).length
+      } diff(s).`
     )
+
+    const resourcesThatRequiredApproval = Object.keys(terraformDiffs).filter(
+      key => this.doesRequiredApproval(terraformDiffs[key], terraformResources)
+    )
+
+    Logger.log(
+      `Found ${resourcesThatRequiredApproval.length} resource(s) that require approval:`
+    )
+    resourcesThatRequiredApproval.forEach(it => Logger.log(`- ${it}`))
+
+    return resourcesThatRequiredApproval.length > 0
   }
 
   private doesRequiredApproval(

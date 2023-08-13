@@ -1,4 +1,5 @@
 import {ApprovalService} from "@libs/service/approval/approval.service"
+import {Logger} from "@nestjs/common"
 import {Command, CommandRunner} from "nest-commander"
 
 @Command({
@@ -27,6 +28,8 @@ export class ApprovalCommand extends CommandRunner {
       codeBaseDir,
       terraformPlanFile
     )
+
+    Logger.log(`Approval required: ${approvalNeeded}`)
 
     if (approvalNeeded) {
       this.command.error("", {
