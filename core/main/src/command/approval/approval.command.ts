@@ -1,6 +1,7 @@
 import {ApprovalService} from "@libs/service/approval/approval.service"
 import {Logger} from "@nestjs/common"
-import {Command, CommandRunner} from "nest-commander"
+import {CustomLogger} from "main/src/logger/customer-logger"
+import {Command, CommandRunner, Option} from "nest-commander"
 
 @Command({
   name: "ApprovalCommand",
@@ -36,5 +37,17 @@ export class ApprovalCommand extends CommandRunner {
         exitCode: 1
       })
     }
+  }
+
+  @Option({
+    flags: "-d, --debug",
+    description: "Enable debug mode"
+  })
+  enableDebugMode() {
+    Logger.overrideLogger(
+      new CustomLogger({
+        debug: true
+      })
+    )
   }
 }

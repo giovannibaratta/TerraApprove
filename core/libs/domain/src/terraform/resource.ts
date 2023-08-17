@@ -81,3 +81,10 @@ const requireApprovalRegex = /^# *@RequireApproval\(\) *$/
 function doesLinesContainsApprovalTag(line: string): boolean {
   return line.match(requireApprovalRegex) !== null
 }
+
+export function printTerraformEntity(entity: TerraformEntity): string {
+  return `${entity.file}: ${JSON.stringify({
+    ...entity.entityInfo,
+    requireApproval: entity.requireApproval
+  })}`
+}

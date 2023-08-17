@@ -20,3 +20,7 @@ export type TerraformDiffMap = Record<
 >
 
 export type DiffType = "create" | "update" | "delete" | "replace"
+
+export function printTerraformDiff(diff: TerraformDiff): string {
+  return `${diff.fullyQualifiedAddress}: ${diff.diffType}`
+}

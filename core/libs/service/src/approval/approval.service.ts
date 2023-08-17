@@ -3,12 +3,17 @@ import {CodebaseReaderService} from "../codebase-reader/codebase-reader.service"
 import {chainW, isLeft} from "fp-ts/lib/Either"
 import {
   TerraformEntity,
-  findTerraformEntitiesInFile
+  findTerraformEntitiesInFile,
+  printTerraformEntity
 } from "@libs/domain/terraform/resource"
 import {PlanReaderService} from "../plan-reader/plan-reader.service"
 import {pipe} from "fp-ts/lib/function"
 import {either} from "fp-ts"
-import {TerraformDiff} from "@libs/domain/terraform/diffs"
+import {
+  TerraformDiff,
+  TerraformDiffMap,
+  printTerraformDiff
+} from "@libs/domain/terraform/diffs"
 
 @Injectable()
 export class ApprovalService {
@@ -42,9 +47,7 @@ export class ApprovalService {
 
     const terraformResources = eitherTerraformResources.right
 
-    Logger.log(
-      `Code base successfully read. Found ${terraformResources.length} resource(s).`
-    )
+    this.logCodeBaseSuccessfullyRead(terraformResources)
 
     const eitherTerraformDiffs = await this.planReaderService.readPlan(planFile)
 
@@ -55,11 +58,7 @@ export class ApprovalService {
 
     const terraformDiffs = eitherTerraformDiffs.right
 
-    Logger.log(
-      `Plan successfully parsed. Found ${
-        Object.keys(terraformDiffs).length
-      } diff(s).`
-    )
+    this.logTerraformPlanSuccessfullyRead(terraformDiffs)
 
     const resourcesThatRequiredApproval = Object.keys(terraformDiffs).filter(
       key => this.doesRequiredApproval(terraformDiffs[key], terraformResources)
@@ -108,6 +107,26 @@ export class ApprovalService {
     return entities.find(
       entity =>
         plainResourceMatch(diff, entity) || moduleEntityMatch(diff, entity)
+    )
+  }
+
+  private logCodeBaseSuccessfullyRead(terraformResources: TerraformEntity[]) {
+    Logger.log(
+      `Code base successfully read. Found ${terraformResources.length} resource(s).`
+    )
+    terraformResources.forEach(it =>
+      Logger.debug(`- ${printTerraformEntity(it)}`)
+    )
+  }
+
+  private logTerraformPlanSuccessfullyRead(terraformDiffs: TerraformDiffMap) {
+    Logger.log(
+      `Plan successfully parsed. Found ${
+        Object.keys(terraformDiffs).length
+      } diff(s).`
+    )
+    Object.values(terraformDiffs).forEach(it =>
+      Logger.debug(`- ${printTerraformDiff(it)}`)
     )
   }
 }
