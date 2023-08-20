@@ -1,11 +1,16 @@
 import {Option} from "fp-ts/lib/Option"
 import {File} from "../file/file"
-import {option} from "fp-ts"
+import {either, option} from "fp-ts"
+import {ApprovalAction, ApprovalType, ManualApproval} from "./approval"
+import {Either, isLeft} from "fp-ts/lib/Either"
+import Ajv, {JSONSchemaType, ValidateFunction} from "ajv"
+import {Logger} from "@nestjs/common"
+import {jsonrepair} from "jsonrepair"
 
 export interface TerraformEntity {
   readonly file: string
   readonly entityInfo: TerraformEntityType
-  readonly requireApproval: boolean
+  readonly requireApproval: ApprovalType
 }
 
 type TerraformEntityType = TerraformPlainResource | TerraformModule
@@ -29,7 +34,9 @@ const moduleRegex = /module +"([^"]+)" +{/
 
 // This function finds the supported terraform resources (e.g. resource, module) defined in a file
 // and returns them as an array
-export function findTerraformEntitiesInFile(file: File): TerraformEntity[] {
+export function findTerraformEntitiesInFile(
+  file: File
+): Either<"invalid_definition", TerraformEntity[]> {
   const {lines} = file
   const entities: TerraformEntity[] = []
 
@@ -37,19 +44,28 @@ export function findTerraformEntitiesInFile(file: File): TerraformEntity[] {
     const terraformEntityType = detectTerraformEntity(lines[lineIndex])
 
     if (option.isSome(terraformEntityType)) {
-      const requireApproval =
+      const eitherApprovalType: Either<"invalid_definition", ApprovalType> =
         // If the first line of the file contains a terraform resource, it means that it can't require approval
-        lineIndex > 0 && doesLinesContainsApprovalTag(lines[lineIndex - 1])
+        lineIndex > 0
+          ? extractApprovalTag(lines[lineIndex - 1])
+          : either.right({type: "no_approval"})
+
+      if (isLeft(eitherApprovalType)) {
+        Logger.error(
+          `Invalid approval tag in file ${file.name} on line ${lineIndex - 1}}`
+        )
+        return eitherApprovalType
+      }
 
       entities.push({
         file: file.name,
         entityInfo: terraformEntityType.value,
-        requireApproval
+        requireApproval: eitherApprovalType.right
       })
     }
   }
 
-  return entities
+  return either.right(entities)
 }
 
 function detectTerraformEntity(line: string): Option<TerraformEntityType> {
@@ -73,13 +89,52 @@ function detectTerraformEntity(line: string): Option<TerraformEntityType> {
   return option.none
 }
 
-// Regex that matches the pattern # @RequireApproval()
+// Regex that matches the pattern # @RequireApproval(<options>)
 // The decorator must be defined inside a comment otherwise
-// it will not be terraform compliant
-const requireApprovalRegex = /^# *@RequireApproval\(\) *$/
+// it will not be terraform compliant. The options is not validated
+// by this regex, but it is extracted as a group.
+const requireApprovalRegex = /^# *@RequireApproval\((.*)\) *$/
 
-function doesLinesContainsApprovalTag(line: string): boolean {
-  return line.match(requireApprovalRegex) !== null
+export function extractApprovalTag(
+  line: string
+): Either<"invalid_definition", ApprovalType> {
+  const matches = line.match(requireApprovalRegex)
+
+  if (!matches) {
+    return either.right({type: "no_approval"})
+  }
+
+  const rawOptions = matches[1].trim()
+
+  if (rawOptions !== "") {
+    let options
+
+    try {
+      // User jsonrepair to allow the user to use a lightweight syntax for the options
+      // for setting the options
+      options = JSON.parse(jsonrepair(rawOptions))
+    } catch (e) {
+      return either.left("invalid_definition")
+    }
+
+    const manualApprovalOptionsValidator: ValidateFunction<
+      Omit<ManualApproval, "type">
+    > = new Ajv({
+      allErrors: true
+    }).compile(manualApprovalSchema)
+
+    const isValid = manualApprovalOptionsValidator(options)
+    if (!isValid) {
+      return either.left("invalid_definition")
+    }
+
+    return either.right({
+      type: "manual_approval",
+      ...options
+    })
+  }
+
+  return either.right({type: "manual_approval"})
 }
 
 export function printTerraformEntity(entity: TerraformEntity): string {
@@ -87,4 +142,20 @@ export function printTerraformEntity(entity: TerraformEntity): string {
     ...entity.entityInfo,
     requireApproval: entity.requireApproval
   })}`
+}
+
+const manualApprovalSchema: JSONSchemaType<Omit<ManualApproval, "type">> = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    matchActions: {
+      type: "array",
+      nullable: true,
+      minItems: 1,
+      items: {
+        type: "string",
+        enum: Object.values(ApprovalAction)
+      }
+    }
+  }
 }

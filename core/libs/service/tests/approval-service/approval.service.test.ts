@@ -53,17 +53,19 @@ describe("ApprovalService", () => {
       jest
         .spyOn(codebaseReader, "getTerraformFilesInFolder")
         .mockReturnValue(either.right(foundFiles))
-      jest.spyOn(Resource, "findTerraformEntitiesInFile").mockReturnValue([
-        {
-          file: "main.tf",
-          entityInfo: {
-            internalType: "plain_resource",
-            providerType: resourceType,
-            userProvidedName: resourceName
-          },
-          requireApproval: true
-        }
-      ])
+      jest.spyOn(Resource, "findTerraformEntitiesInFile").mockReturnValue(
+        either.right([
+          {
+            file: "main.tf",
+            entityInfo: {
+              internalType: "plain_resource",
+              providerType: resourceType,
+              userProvidedName: resourceName
+            },
+            requireApproval: {type: "manual_approval"}
+          }
+        ])
+      )
 
       const diffFromPlan: TerraformDiff = {
         fullyQualifiedAddress: resourceAddress,
@@ -114,16 +116,18 @@ describe("ApprovalService", () => {
       jest
         .spyOn(codebaseReader, "getTerraformFilesInFolder")
         .mockReturnValue(either.right(foundFiles))
-      jest.spyOn(Resource, "findTerraformEntitiesInFile").mockReturnValue([
-        {
-          file: "main.tf",
-          entityInfo: {
-            internalType: "module",
-            userProvidedName: moduleName
-          },
-          requireApproval: true
-        }
-      ])
+      jest.spyOn(Resource, "findTerraformEntitiesInFile").mockReturnValue(
+        either.right([
+          {
+            file: "main.tf",
+            entityInfo: {
+              internalType: "module",
+              userProvidedName: moduleName
+            },
+            requireApproval: {type: "manual_approval"}
+          }
+        ])
+      )
 
       const diffFromPlan: TerraformDiff = {
         fullyQualifiedAddress: "fq_address",

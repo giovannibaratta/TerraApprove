@@ -32,9 +32,19 @@ export class ApprovalService {
       chainW(dir => this.codebaseReader.getTerraformFilesInFolder(dir)),
       // Extract the terraform resource for each file in the folder
       chainW(files => {
-        return either.right(
-          files.map(file => findTerraformEntitiesInFile(file)).flat()
-        )
+        const resources: TerraformEntity[] = []
+
+        for (const file of files) {
+          const eitherResourcesInFile = findTerraformEntitiesInFile(file)
+
+          if (isLeft(eitherResourcesInFile)) {
+            return eitherResourcesInFile
+          }
+
+          resources.push(...eitherResourcesInFile.right)
+        }
+
+        return either.right(resources)
       })
     )
 
@@ -84,7 +94,7 @@ export class ApprovalService {
       )
     }
 
-    return resource.requireApproval
+    return resource.requireApproval.type !== "no_approval"
   }
 
   private findDiffCounterpartInEntities(
