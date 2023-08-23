@@ -12,7 +12,7 @@ import Ajv, {JSONSchemaType, ValidateFunction} from "ajv"
 import {either} from "fp-ts"
 import {Either, chainW} from "fp-ts/lib/Either"
 import {pipe} from "fp-ts/lib/function"
-import {readFileSync} from "fs"
+import {readFile} from "../shared/file"
 
 @Injectable()
 export class FilePlanReader implements IPlanReader {
@@ -23,24 +23,12 @@ export class FilePlanReader implements IPlanReader {
   ): Promise<Either<ValidationError, TerraformDiffMap>> {
     const result = pipe(
       either.right(planLocation),
-      chainW(this.readFile),
+      chainW(readFile),
       chainW(this.validateFile),
       chainW(this.mapToTerraformDiffs)
     )
 
     return result
-  }
-
-  private readFile(planLocation: string): Either<"resource_not_found", string> {
-    let fileContent: string
-
-    try {
-      fileContent = readFileSync(planLocation, "utf8")
-    } catch (e) {
-      return either.left("resource_not_found")
-    }
-
-    return either.right(fileContent)
   }
 
   private validateFile(
