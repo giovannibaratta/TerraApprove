@@ -10,10 +10,12 @@ import {PlanReaderService} from "../plan-reader/plan-reader.service"
 import {pipe} from "fp-ts/lib/function"
 import {either} from "fp-ts"
 import {
+  DiffType,
   TerraformDiff,
   TerraformDiffMap,
   printTerraformDiff
 } from "@libs/domain/terraform/diffs"
+import {ApprovalAction} from "@libs/domain/terraform/approval"
 
 @Injectable()
 export class ApprovalService {
@@ -94,7 +96,30 @@ export class ApprovalService {
       )
     }
 
-    return resource.requireApproval.type !== "no_approval"
+    if (resource.requireApproval.type === "no_approval") return false
+
+    const matchingActions = resource.requireApproval.matchActions
+
+    return (
+      // If no actions are speficied, we assume that all actions require approval
+      matchingActions === undefined ||
+      this.mapDiffTypeToApprovalActions(diff.diffType).some(it =>
+        matchingActions.includes(it)
+      )
+    )
+  }
+
+  private mapDiffTypeToApprovalActions(diffType: DiffType): ApprovalAction[] {
+    switch (diffType) {
+      case "create":
+        return [ApprovalAction.CREATE]
+      case "update":
+        return [ApprovalAction.UPDATE_IN_PLACE]
+      case "delete":
+        return [ApprovalAction.DELETE]
+      case "replace":
+        return [ApprovalAction.DELETE, ApprovalAction.CREATE]
+    }
   }
 
   private findDiffCounterpartInEntities(
