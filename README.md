@@ -40,7 +40,7 @@ yarn generate:artifact
    terraform show -json tfplan > tfplan.json
    ```
 
-2. Run the application specifying  the path to the Terraform codebase & plan.
+2. Run the application specifying the path to the Terraform codebase & plan.
 
    ```bash
    # From the main directory
@@ -49,7 +49,40 @@ yarn generate:artifact
 
 3. Inspect the exit code to know if the plan can be applied with `-auto-approve` or if a manual approval is required.
 
+## RequireApproval decorator
+
+The `RequireApproval` decorator can be used to mark a resource that requires manual approval. The decorator can be used as follows:
+
+```hcl
+# RequireApproval()
+resource "aws_instance" "example" {
+  ...
+}
+```
+
+The decorator must be place on the line above the resource declaration. The decorator can be used on any resource type or modules (expect for data).
+
+### Decorator arguments
+
+The decorator accepts arguments to customize the behavior. The arguments are specified as a JSON object. The following arguments are supported:
+
+| Argument       | Description                                                                                                                            | Default behavior              |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `matchActions` | A list of actions that must be matched for the decorator to be applied. The possible values are `CREATE`, `UPDATE_IN_PLACE`, `DELETE`. | All actions requires approval |
+
+Example:
+
+```hcl
+# RequireApproval({
+   matchActions: ["CREATE"]
+})
+resource "aws_instance" "example" {
+  ...
+}
+```
+
 ## Alternatives
 
 This is a list of alternatives tools (definitely more mature than TerraApprove) that can be used to achieve the same (or similar) result:
-* https://www.openpolicyagent.org/docs/latest/terraform/
+
+- https://www.openpolicyagent.org/docs/latest/terraform/
