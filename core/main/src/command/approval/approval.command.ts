@@ -1,4 +1,5 @@
 import {ApprovalService} from "@libs/service/approval/approval.service"
+import {ConfigurationService} from "@libs/service/configuration/configuration.service"
 import {Logger} from "@nestjs/common"
 import {CustomLogger} from "main/src/logger/customer-logger"
 import {Command, CommandRunner, Option} from "nest-commander"
@@ -13,7 +14,10 @@ import {Command, CommandRunner, Option} from "nest-commander"
   }
 })
 export class ApprovalCommand extends CommandRunner {
-  constructor(private readonly approvalSerivce: ApprovalService) {
+  constructor(
+    private readonly configurationService: ConfigurationService,
+    private readonly approvalSerivce: ApprovalService
+  ) {
     super()
   }
 
@@ -21,6 +25,10 @@ export class ApprovalCommand extends CommandRunner {
     if (passedParameter.length !== 2) {
       throw new Error("Invalid number of arguments")
     }
+
+    // For now we support only configuration defined in this hardcoded file.
+    // In the future the configuration could be passed using a command line parameter
+    this.configurationService.readConfiguration("./.terraapprove.yaml")
 
     const codeBaseDir = passedParameter[0]
     const terraformPlanFile = passedParameter[1]

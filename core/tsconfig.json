@@ -16,5 +16,6 @@
       "@libs/testing": ["libs/testing/src"],
       "@libs/testing/*": ["libs/testing/src/*"]
     }
-  }
+  },
+  "exclude": ["node_modules", "build"]
 }
