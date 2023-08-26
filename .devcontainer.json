@@ -30,8 +30,6 @@
         "dbaeumer.vscode-eslint",
         "orta.vscode-jest",
         "yoavbls.pretty-ts-errors",
-        // Required by Yarn 3 (see https://yarnpkg.com/getting-started/editor-sdks#vscode)
-        "arcanis.vscode-zipfs"
       ],
       "settings": {
         "editor.formatOnSave": true,
