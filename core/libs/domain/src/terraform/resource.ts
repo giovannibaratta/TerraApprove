@@ -1,14 +1,13 @@
-import {Option} from "fp-ts/lib/Option"
-import {File} from "../file/file"
-import {either, option} from "fp-ts"
-import {ApprovalAction, ApprovalType, ManualApproval} from "./approval"
-import {Either, isLeft} from "fp-ts/lib/Either"
-import Ajv, {JSONSchemaType, ValidateFunction} from "ajv"
 import {Logger} from "@nestjs/common"
+import Ajv, {JSONSchemaType, ValidateFunction} from "ajv"
+import {either, option} from "fp-ts"
+import {Either, isLeft} from "fp-ts/lib/Either"
+import {Option} from "fp-ts/lib/Option"
 import {jsonrepair} from "jsonrepair"
+import {File} from "../file/file"
+import {ApprovalAction, ApprovalType, ManualApproval} from "./approval"
 
 export interface TerraformEntity {
-  readonly file: string
   readonly entityInfo: TerraformEntityType
   readonly requireApproval: ApprovalType
 }
@@ -58,7 +57,6 @@ export function findTerraformEntitiesInFile(
       }
 
       entities.push({
-        file: file.name,
         entityInfo: terraformEntityType.value,
         requireApproval: eitherApprovalType.right
       })
@@ -138,7 +136,7 @@ export function extractApprovalTag(
 }
 
 export function printTerraformEntity(entity: TerraformEntity): string {
-  return `${entity.file}: ${JSON.stringify({
+  return `${JSON.stringify({
     ...entity.entityInfo,
     requireApproval: entity.requireApproval
   })}`

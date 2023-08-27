@@ -6,7 +6,7 @@ interface NoApproval {
 
 export interface ManualApproval {
   readonly type: "manual_approval"
-  readonly matchActions?: ApprovalAction[]
+  readonly matchActions?: ReadonlyArray<ApprovalAction>
 }
 
 export enum ApprovalAction {

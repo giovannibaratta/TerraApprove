@@ -1,21 +1,19 @@
+import {Configuration} from "@libs/domain/configuration/configuration"
 import {Inject, Injectable, Logger} from "@nestjs/common"
+import {isLeft} from "fp-ts/lib/Either"
 import {
   CONFIGURATION_READER,
   IConfigurationReader
 } from "./configuration-reader"
-import {Configuration} from "@libs/domain/configuration/configuration"
-import {isLeft} from "fp-ts/lib/Either"
 
 @Injectable()
 export class ConfigurationService {
-  private configuration: Configuration | undefined
-
   constructor(
     @Inject(CONFIGURATION_READER)
     private readonly configurationReader: IConfigurationReader
   ) {}
 
-  readConfiguration(location: string): void {
+  readConfiguration(location: string): Configuration {
     const eitherConfiguration =
       this.configurationReader.readConfiguration(location)
 
@@ -26,8 +24,8 @@ export class ConfigurationService {
       )
     }
 
-    this.configuration = eitherConfiguration.right
-
-    Logger.debug(`Configuration: ${JSON.stringify(this.configuration)}`)
+    const configuration = eitherConfiguration.right
+    Logger.debug(`Configuration: ${JSON.stringify(configuration)}`)
+    return configuration
   }
 }

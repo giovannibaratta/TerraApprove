@@ -1,9 +1,10 @@
+import {ExternalModule} from "@libs/external/external.module"
 import {Module} from "@nestjs/common"
 import {ApprovalService} from "./approval/approval.service"
+import {BootstrappingService} from "./bootstrapping/bootstrapping.service"
 import {CodebaseReaderService} from "./codebase-reader/codebase-reader.service"
-import {PlanReaderService} from "./plan-reader/plan-reader.service"
-import {ExternalModule} from "@libs/external/external.module"
 import {ConfigurationService} from "./configuration/configuration.service"
+import {PlanReaderService} from "./plan-reader/plan-reader.service"
 
 @Module({
   imports: [ExternalModule],
@@ -11,8 +12,9 @@ import {ConfigurationService} from "./configuration/configuration.service"
     ApprovalService,
     CodebaseReaderService,
     PlanReaderService,
-    ConfigurationService
+    ConfigurationService,
+    BootstrappingService
   ],
-  exports: [ApprovalService, ConfigurationService]
+  exports: [ApprovalService, BootstrappingService]
 })
 export class ServiceModule {}

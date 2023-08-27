@@ -1,5 +1,5 @@
 import {ApprovalService} from "@libs/service/approval/approval.service"
-import {ConfigurationService} from "@libs/service/configuration/configuration.service"
+import {BootstrappingService} from "@libs/service/bootstrapping/bootstrapping.service"
 import {Logger} from "@nestjs/common"
 import {CustomLogger} from "main/src/logger/customer-logger"
 import {Command, CommandRunner, Option} from "nest-commander"
@@ -15,7 +15,7 @@ import {Command, CommandRunner, Option} from "nest-commander"
 })
 export class ApprovalCommand extends CommandRunner {
   constructor(
-    private readonly configurationService: ConfigurationService,
+    private readonly bootstrappingService: BootstrappingService,
     private readonly approvalSerivce: ApprovalService
   ) {
     super()
@@ -26,17 +26,19 @@ export class ApprovalCommand extends CommandRunner {
       throw new Error("Invalid number of arguments")
     }
 
-    // For now we support only configuration defined in this hardcoded file.
-    // In the future the configuration could be passed using a command line parameter
-    this.configurationService.readConfiguration("./.terraapprove.yaml")
-
     const codeBaseDir = passedParameter[0]
     const terraformPlanFile = passedParameter[1]
 
-    const approvalNeeded = await this.approvalSerivce.isApprovalRequired(
-      codeBaseDir,
-      terraformPlanFile
-    )
+    this.bootstrappingService.setTerraformCodeBaseLocation(codeBaseDir)
+    this.bootstrappingService.setTerraformPlanLocation(terraformPlanFile)
+
+    // For now we support only configuration defined in this hardcoded file.
+    // In the future the configuration could be passed using a command line parameter
+    this.bootstrappingService.setConfigurationLocation("./.terraapprove.yaml")
+
+    await this.bootstrappingService.bootstrap()
+
+    const approvalNeeded = await this.approvalSerivce.isApprovalRequired()
 
     Logger.log(`Approval required: ${approvalNeeded}`)
 

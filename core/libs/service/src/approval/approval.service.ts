@@ -1,79 +1,20 @@
-import {Injectable, Logger} from "@nestjs/common"
-import {CodebaseReaderService} from "../codebase-reader/codebase-reader.service"
-import {chainW, isLeft} from "fp-ts/lib/Either"
-import {
-  TerraformEntity,
-  findTerraformEntitiesInFile,
-  printTerraformEntity
-} from "@libs/domain/terraform/resource"
-import {PlanReaderService} from "../plan-reader/plan-reader.service"
-import {pipe} from "fp-ts/lib/function"
-import {either} from "fp-ts"
-import {
-  DiffType,
-  TerraformDiff,
-  TerraformDiffMap,
-  printTerraformDiff
-} from "@libs/domain/terraform/diffs"
 import {ApprovalAction} from "@libs/domain/terraform/approval"
+import {DiffType, TerraformDiff} from "@libs/domain/terraform/diffs"
+import {TerraformEntity} from "@libs/domain/terraform/resource"
+import {Injectable, Logger} from "@nestjs/common"
+import {BootstrappingService} from "../bootstrapping/bootstrapping.service"
 
 @Injectable()
 export class ApprovalService {
-  constructor(
-    private readonly codebaseReader: CodebaseReaderService,
-    private readonly planReaderService: PlanReaderService
-  ) {}
+  constructor(private readonly bootstrappingService: BootstrappingService) {}
 
-  async isApprovalRequired(
-    codeBaseDir: string,
-    planFile: string
-  ): Promise<boolean> {
-    const eitherTerraformResources = pipe(
-      either.right(codeBaseDir),
-      // Get all the terraform files in the folder
-      chainW(dir => this.codebaseReader.getTerraformFilesInFolder(dir)),
-      // Extract the terraform resource for each file in the folder
-      chainW(files => {
-        const resources: TerraformEntity[] = []
+  async isApprovalRequired(): Promise<boolean> {
+    const {terraformEntities, terraformDiffMap} =
+      await this.bootstrappingService.bootstrap()
 
-        for (const file of files) {
-          const eitherResourcesInFile = findTerraformEntitiesInFile(file)
-
-          if (isLeft(eitherResourcesInFile)) {
-            return eitherResourcesInFile
-          }
-
-          resources.push(...eitherResourcesInFile.right)
-        }
-
-        return either.right(resources)
-      })
-    )
-
-    if (isLeft(eitherTerraformResources)) {
-      Logger.error(
-        `Error while reading code base: ${eitherTerraformResources.left}`
-      )
-      throw new Error(eitherTerraformResources.left)
-    }
-
-    const terraformResources = eitherTerraformResources.right
-
-    this.logCodeBaseSuccessfullyRead(terraformResources)
-
-    const eitherTerraformDiffs = await this.planReaderService.readPlan(planFile)
-
-    if (isLeft(eitherTerraformDiffs)) {
-      Logger.error(`Error while reading plan: ${eitherTerraformDiffs.left}`)
-      throw new Error(eitherTerraformDiffs.left)
-    }
-
-    const terraformDiffs = eitherTerraformDiffs.right
-
-    this.logTerraformPlanSuccessfullyRead(terraformDiffs)
-
-    const resourcesThatRequiredApproval = Object.keys(terraformDiffs).filter(
-      key => this.doesRequiredApproval(terraformDiffs[key], terraformResources)
+    // From all the diffs, keep only the ones that requires approval
+    const resourcesThatRequiredApproval = Object.keys(terraformDiffMap).filter(
+      key => this.doesRequiredApproval(terraformDiffMap[key], terraformEntities)
     )
 
     Logger.log(
@@ -142,26 +83,6 @@ export class ApprovalService {
     return entities.find(
       entity =>
         plainResourceMatch(diff, entity) || moduleEntityMatch(diff, entity)
-    )
-  }
-
-  private logCodeBaseSuccessfullyRead(terraformResources: TerraformEntity[]) {
-    Logger.log(
-      `Code base successfully read. Found ${terraformResources.length} resource(s).`
-    )
-    terraformResources.forEach(it =>
-      Logger.debug(`- ${printTerraformEntity(it)}`)
-    )
-  }
-
-  private logTerraformPlanSuccessfullyRead(terraformDiffs: TerraformDiffMap) {
-    Logger.log(
-      `Plan successfully parsed. Found ${
-        Object.keys(terraformDiffs).length
-      } diff(s).`
-    )
-    Object.values(terraformDiffs).forEach(it =>
-      Logger.debug(`- ${printTerraformDiff(it)}`)
     )
   }
 }

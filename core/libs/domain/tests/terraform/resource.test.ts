@@ -43,7 +43,6 @@ describe("findTerraformEntitiesInFile", () => {
     expect(resources).toEqual(
       either.right([
         {
-          file: file.name,
           entityInfo: {
             internalType: "plain_resource",
             providerType: type1,
@@ -52,7 +51,6 @@ describe("findTerraformEntitiesInFile", () => {
           requireApproval: {type: "no_approval"}
         },
         {
-          file: file.name,
           entityInfo: {
             internalType: "plain_resource",
             providerType: type2,
@@ -89,7 +87,6 @@ describe("findTerraformEntitiesInFile", () => {
     expect(resources).toEqual(
       either.right([
         {
-          file: file.name,
           entityInfo: {
             internalType: "plain_resource",
             providerType: type1,
@@ -98,7 +95,6 @@ describe("findTerraformEntitiesInFile", () => {
           requireApproval: {type: "no_approval"}
         },
         {
-          file: file.name,
           entityInfo: {
             internalType: "plain_resource",
             providerType: type2,
@@ -138,7 +134,6 @@ describe("findTerraformEntitiesInFile", () => {
     expect(resources).toEqual(
       either.right([
         {
-          file: file.name,
           entityInfo: {
             internalType: "plain_resource",
             providerType: type1,
@@ -147,7 +142,6 @@ describe("findTerraformEntitiesInFile", () => {
           requireApproval: {type: "manual_approval"}
         },
         {
-          file: file.name,
           entityInfo: {
             internalType: "plain_resource",
             providerType: type2,
@@ -156,7 +150,6 @@ describe("findTerraformEntitiesInFile", () => {
           requireApproval: {type: "manual_approval"}
         },
         {
-          file: file.name,
           entityInfo: {
             internalType: "plain_resource",
             providerType: type3,
