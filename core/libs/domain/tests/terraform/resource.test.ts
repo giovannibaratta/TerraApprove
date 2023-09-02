@@ -185,6 +185,31 @@ describe("findTerraformEntitiesInFile", () => {
     // Expect
     expect(resources).toEqual(either.right([]))
   })
+
+  it("should ignore modules that are commented", () => {
+    // Given
+    const file = {
+      name: "file",
+      lines: [
+        ' # module "something" {',
+        "}",
+        '# module "something" {',
+        "}",
+        '#module "something" {',
+        "}",
+        '### module "something" {',
+        "}",
+        '/* module "something" {',
+        "}"
+      ]
+    }
+
+    // When
+    const resources = findTerraformEntitiesInFile(file)
+
+    // Expect
+    expect(resources).toEqual(either.right([]))
+  })
 })
 
 describe("extractApprovalTag", () => {

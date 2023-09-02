@@ -30,7 +30,8 @@ interface TerraformModule {
 const resourceRegex = /^ *resource +"([^"]+)" +"([^"]+)" +{/
 
 // Regex that matches the pattern module "module name" {
-const moduleRegex = /module +"([^"]+)" +{/
+// Exclude modules that are commented out
+const moduleRegex = /^ *module +"([^"]+)" +{/
 
 // This function finds the supported terraform resources (e.g. resource, module) defined in a file
 // and returns them as an array
