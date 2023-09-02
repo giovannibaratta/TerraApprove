@@ -1,0 +1,3 @@
+requireApproval:
+  - fullyQualifiedAddress: "null_resource.do_nothing_2"
+    actions: ["DELETE"]

@@ -81,6 +81,16 @@ resource "aws_instance" "example" {
 }
 ```
 
+### How to handle approval for deleted resources
+
+Deleted resources might not be part of the code base, hence we need another way to protect them. These resources can be protected specifying the fully qualified address in a file named `.terraapprove.yaml`. The file must be placed in the root folder of the codebase.
+
+```yaml
+requireApproval:
+  - fullyQualifiedAddress: "null_resource.do_nothing_2"
+    actions: ["DELETE"]
+```
+
 ## Alternatives
 
 This is a list of alternatives tools (definitely more mature than TerraApprove) that can be used to achieve the same (or similar) result:
