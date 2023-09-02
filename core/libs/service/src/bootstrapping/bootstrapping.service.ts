@@ -109,6 +109,8 @@ export class BootstrappingService {
       if (entitiesIdentifiers.has(uniqueIdentifier)) {
         throw new Error(`Duplicate entity found: ${uniqueIdentifier}`)
       }
+
+      entitiesIdentifiers.add(uniqueIdentifier)
     }
   }
 
