@@ -1,7 +1,10 @@
 import {ApprovalService} from "@libs/service/approval/approval.service"
 import {BootstrappingService} from "@libs/service/bootstrapping/bootstrapping.service"
 import {Logger} from "@nestjs/common"
-import {CustomLogger} from "main/src/logger/customer-logger"
+import {
+  CustomLogger,
+  CustomLoggerOptions
+} from "main/src/logger/customer-logger"
 import {Command, CommandRunner, Option} from "nest-commander"
 
 @Command({
@@ -14,6 +17,11 @@ import {Command, CommandRunner, Option} from "nest-commander"
   }
 })
 export class ApprovalCommand extends CommandRunner {
+  private loggerDefaultConfig: CustomLoggerOptions = {
+    debug: false,
+    timestamp: false
+  }
+
   constructor(
     private readonly bootstrappingService: BootstrappingService,
     private readonly approvalSerivce: ApprovalService
@@ -22,6 +30,8 @@ export class ApprovalCommand extends CommandRunner {
   }
 
   async run(passedParameter: string[]): Promise<void> {
+    this.overrideLogger()
+
     if (passedParameter.length !== 2) {
       throw new Error("Invalid number of arguments")
     }
@@ -54,10 +64,18 @@ export class ApprovalCommand extends CommandRunner {
     description: "Enable debug mode"
   })
   enableDebugMode() {
-    Logger.overrideLogger(
-      new CustomLogger({
-        debug: true
-      })
-    )
+    this.loggerDefaultConfig.debug = true
+  }
+
+  @Option({
+    flags: "--timestamp",
+    description: "Print timestamp near messages"
+  })
+  enableTimestamps() {
+    this.loggerDefaultConfig.timestamp = true
+  }
+
+  private overrideLogger() {
+    Logger.overrideLogger(new CustomLogger(this.loggerDefaultConfig))
   }
 }

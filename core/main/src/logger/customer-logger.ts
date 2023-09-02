@@ -4,13 +4,15 @@ const NEST_COMPONENTS_TO_SUPPRESSS = ["InstanceLoader", "NestFactory"]
 
 export class CustomLogger extends ConsoleLogger {
   private isDebugMode = false
+  private printTimestamp = false
 
-  constructor(options?: {debug?: boolean}) {
+  constructor(options?: CustomLoggerOptions) {
     super("", {
       timestamp: true
     })
 
     this.isDebugMode = options?.debug ?? false
+    this.printTimestamp = options?.timestamp ?? false
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -41,8 +43,14 @@ export class CustomLogger extends ConsoleLogger {
     contextMessage: string,
     timestampDiff: string
   ): string {
-    const timestmap = this.getTimestamp()
-    const optionalTimestampDiff = logLevel === "debug" ? timestampDiff : ""
-    return `${timestmap} ${optionalTimestampDiff} ${message}\n`
+    const timestmap = this.printTimestamp ? `${this.getTimestamp()} ` : ""
+    const optionalTimestampDiff =
+      logLevel === "debug" && this.printTimestamp ? `${timestampDiff} ` : ""
+    return `${timestmap}${optionalTimestampDiff}${message}\n`
   }
+}
+
+export interface CustomLoggerOptions {
+  debug?: boolean
+  timestamp?: boolean
 }
