@@ -160,6 +160,31 @@ describe("findTerraformEntitiesInFile", () => {
       ])
     )
   })
+
+  it("should ignore plain resources that are commented", () => {
+    // Given
+    const file = {
+      name: "file",
+      lines: [
+        ' # resource "something" "else" {',
+        "}",
+        '# resource "something" "else" {',
+        "}",
+        '#resource "something" "else" {',
+        "}",
+        '### resource "something" "else" {',
+        "}",
+        '/* resource "something" "else" {',
+        "}"
+      ]
+    }
+
+    // When
+    const resources = findTerraformEntitiesInFile(file)
+
+    // Expect
+    expect(resources).toEqual(either.right([]))
+  })
 })
 
 describe("extractApprovalTag", () => {

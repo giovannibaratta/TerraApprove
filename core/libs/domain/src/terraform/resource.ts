@@ -26,7 +26,8 @@ interface TerraformModule {
 }
 
 // Regex that matches the pattern resource "resource type" "resource name" {
-const resourceRegex = /resource +"([^"]+)" +"([^"]+)" +{/
+// Exclude resources that are commented out
+const resourceRegex = /^ *resource +"([^"]+)" +"([^"]+)" +{/
 
 // Regex that matches the pattern module "module name" {
 const moduleRegex = /module +"([^"]+)" +{/
