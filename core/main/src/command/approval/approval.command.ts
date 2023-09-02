@@ -44,7 +44,9 @@ export class ApprovalCommand extends CommandRunner {
 
     // For now we support only configuration defined in this hardcoded file.
     // In the future the configuration could be passed using a command line parameter
-    this.bootstrappingService.setConfigurationLocation("./.terraapprove.yaml")
+    this.bootstrappingService.setConfigurationLocation(
+      `${codeBaseDir}/.terraapprove.yaml`
+    )
 
     await this.bootstrappingService.bootstrap()
 
