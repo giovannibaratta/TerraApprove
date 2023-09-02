@@ -32,9 +32,12 @@ export class ApprovalService {
     const resource = this.findDiffCounterpartInEntities(diff, entities)
 
     if (resource === undefined) {
-      throw new Error(
-        `Could not find resource ${diff.userProvidedName} of type ${diff.providerType}`
-      )
+      // The resource might not be available in the code base for several reason:
+      // - (legit) the resource has been deleted
+      // - (non legit) the diff has not been generated from the specified code base
+      // For now we will not cover the non legit scenarios, but in the future it might
+      // be better to add some error handling here.
+      return false
     }
 
     if (resource.requireApproval.type === "no_approval") return false
