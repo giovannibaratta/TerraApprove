@@ -48,8 +48,6 @@ export class ApprovalCommand extends CommandRunner {
       `${codeBaseDir}/.terraapprove.yaml`
     )
 
-    await this.bootstrappingService.bootstrap()
-
     const approvalNeeded = await this.approvalSerivce.isApprovalRequired()
 
     Logger.log(`Approval required: ${approvalNeeded}`)
