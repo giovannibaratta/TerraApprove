@@ -40,6 +40,10 @@ export function findTerraformEntitiesInFile(
 ): Either<"invalid_definition", TerraformEntity[]> {
   const {lines} = file
   const entities: TerraformEntity[] = []
+  // Used to optimize the search of the approval tag. Instead of performing
+  // the search on the whole file, we perform it on the lines between the
+  // last found entity and the current one.
+  let lastFoundEntity = 0
 
   for (let lineIndex = 0; lineIndex < file.lines.length; lineIndex++) {
     const terraformEntityType = detectTerraformEntity(lines[lineIndex])
@@ -48,12 +52,12 @@ export function findTerraformEntitiesInFile(
       const eitherApprovalType: Either<"invalid_definition", ApprovalType> =
         // If the first line of the file contains a terraform resource, it means that it can't require approval
         lineIndex > 0
-          ? extractApprovalTag(lines[lineIndex - 1])
+          ? extractApprovalTag(lines.slice(lastFoundEntity, lineIndex))
           : either.right({type: "no_approval"})
 
       if (isLeft(eitherApprovalType)) {
         Logger.error(
-          `Invalid approval tag in file ${file.name} on line ${lineIndex - 1}}`
+          `Invalid approval tag in file ${file.name} for resource on line ${lineIndex}}`
         )
         return eitherApprovalType
       }
@@ -62,6 +66,8 @@ export function findTerraformEntitiesInFile(
         entityInfo: terraformEntityType.value,
         requireApproval: eitherApprovalType.right
       })
+
+      lastFoundEntity = lineIndex
     }
   }
 
@@ -95,46 +101,74 @@ function detectTerraformEntity(line: string): Option<TerraformEntityType> {
 // by this regex, but it is extracted as a group.
 const requireApprovalRegex = /^# *@RequireApproval\((.*)\) *$/
 
+// Regex that matches the pattern <everything expect a comment>}<whatever>
+// This regex is used to find the closing bracket of a resource definition.
+const closingBracketRegex = /^[^#]+}.*$/
+
+/**
+ * Perform a reversed search in the previous line to find the approval tag.
+ * The search stops when
+ * - a line that is not a comment and a closing bracket is found. This is based on the
+ *   assumption that no valid terraform code can be placed between the closing bracket
+ *   and the resource definition but the assumption has not been verified.
+ * - the approval tag is found
+ * @param lines previous lines. The order of the lines should preserve the
+ * original order
+ */
 export function extractApprovalTag(
-  line: string
+  lines: string[]
 ): Either<"invalid_definition", ApprovalType> {
-  const matches = line.match(requireApprovalRegex)
+  // Scan all the lines in reverse order and search for ending bracket or approval tag
+  for (let lineIndex = lines.length - 1; lineIndex >= 0; lineIndex--) {
+    const line = lines[lineIndex]
 
-  if (!matches) {
-    return either.right({type: "no_approval"})
-  }
-
-  const rawOptions = matches[1].trim()
-
-  if (rawOptions !== "") {
-    let options
-
-    try {
-      // User jsonrepair to allow the user to use a lightweight syntax for the options
-      // for setting the options
-      options = JSON.parse(jsonrepair(rawOptions))
-    } catch (e) {
-      return either.left("invalid_definition")
+    // If the first match that we find is a closing bracket, it means that no approval
+    // tag was defined between the previous resource and the current one
+    if (closingBracketRegex.test(line)) {
+      return either.right({type: "no_approval"})
     }
 
-    const manualApprovalOptionsValidator: ValidateFunction<
-      Omit<ManualApproval, "type">
-    > = new Ajv({
-      allErrors: true
-    }).compile(manualApprovalSchema)
+    const tagMatches = line.match(requireApprovalRegex)
 
-    const isValid = manualApprovalOptionsValidator(options)
-    if (!isValid) {
-      return either.left("invalid_definition")
+    if (tagMatches) {
+      // We matched the approval tag. We need to extract the options
+      const rawOptions = tagMatches[1].trim()
+
+      if (rawOptions !== "") {
+        let options
+
+        try {
+          // User jsonrepair to allow the user to use a lightweight syntax
+          // for setting the options
+          options = JSON.parse(jsonrepair(rawOptions))
+        } catch (e) {
+          return either.left("invalid_definition")
+        }
+
+        // Validate that the options schema is valid
+        const manualApprovalOptionsValidator: ValidateFunction<
+          Omit<ManualApproval, "type">
+        > = new Ajv({
+          allErrors: true
+        }).compile(manualApprovalSchema)
+
+        const isValid = manualApprovalOptionsValidator(options)
+        if (!isValid) {
+          return either.left("invalid_definition")
+        }
+
+        return either.right({
+          type: "manual_approval",
+          ...options
+        })
+      }
+
+      return either.right({type: "manual_approval"})
     }
-
-    return either.right({
-      type: "manual_approval",
-      ...options
-    })
   }
 
-  return either.right({type: "manual_approval"})
+  // No matches have been found. The tag is not defined
+  return either.right({type: "no_approval"})
 }
 
 export function printTerraformEntity(entity: TerraformEntity): string {

@@ -215,32 +215,68 @@ describe("findTerraformEntitiesInFile", () => {
 describe("extractApprovalTag", () => {
   it("should return an error when the options defined in the tag are not valid", () => {
     // Given
-    const line = "# @RequireApproval(some_invalid_option)"
+    const lines = ["# @RequireApproval(some_invalid_option)"]
 
     // When
-    const result = extractApprovalTag(line)
+    const result = extractApprovalTag(lines)
 
     // Expect
     expect(result).toEqual(either.left("invalid_definition"))
   })
 
-  it("should return a no_approval object when the line does not contain the decorator", () => {
+  it("should return a no_approval object when the lines do not contain the decorator", () => {
     // Given
-    const line = "some random line"
+    const lines = ["some random line", "", "   ", "#", "####"]
 
     // When
-    const result = extractApprovalTag(line)
+    const result = extractApprovalTag(lines)
 
     // Expect
     expect(result).toEqual(either.right({type: "no_approval"}))
   })
 
-  it("should return a manual_approval object when the line contains the decorator with no options", () => {
+  it("should return no_approval object if the decorator is defined before the closing bracket", () => {
     // Given
-    const line = "# @RequireApproval()"
+    const lines = [
+      "# @RequireApproval()",
+      "  } # some comment",
+      "# more comments",
+      "  "
+    ]
 
     // When
-    const result = extractApprovalTag(line)
+    const result = extractApprovalTag(lines)
+
+    // Expect
+    expect(result).toEqual(either.right({type: "no_approval"}))
+  })
+
+  it("should detect the decorator if it is defined after the closing bracket", () => {
+    // Given
+    const lines = [
+      "  } # some comment",
+      "# more comments",
+      "  ",
+      "# @RequireApproval()"
+    ]
+
+    // When
+    const result = extractApprovalTag(lines)
+
+    // Expect
+    expect(result).toEqual(
+      either.right({
+        type: "manual_approval"
+      })
+    )
+  })
+
+  it("should return a manual_approval object when the line contains the decorator with no options", () => {
+    // Given
+    const lines = ["# @RequireApproval()"]
+
+    // When
+    const result = extractApprovalTag(lines)
 
     // Expect
     expect(result).toEqual(either.right({type: "manual_approval"}))
@@ -248,11 +284,12 @@ describe("extractApprovalTag", () => {
 
   it("should return a manual_approval object when the line contains the decorator with the manual option", () => {
     // Given
-    const line =
+    const lines = [
       '# @RequireApproval({matchActions: ["CREATE", "UPDATE_IN_PLACE", "DELETE"]})'
+    ]
 
     // When
-    const result = extractApprovalTag(line)
+    const result = extractApprovalTag(lines)
 
     // Expect
     expect(result).toEqual(
@@ -265,11 +302,12 @@ describe("extractApprovalTag", () => {
 
   it("should return an error if one of the actions defined in the manual_approval decorator is not valid", () => {
     // Given
-    const line =
+    const lines = [
       '# @RequireApproval({matchActions: ["CREATE", "UPDATE_IN_PLACE", "INVALID_ACTION"]})'
+    ]
 
     // When
-    const result = extractApprovalTag(line)
+    const result = extractApprovalTag(lines)
 
     // Expect
     expect(result).toEqual(either.left("invalid_definition"))
@@ -277,10 +315,10 @@ describe("extractApprovalTag", () => {
 
   it("should return an error if matchActions is not an array", () => {
     // Given
-    const line = '# @RequireApproval({matchActions: "CREATE"})'
+    const lines = ['# @RequireApproval({matchActions: "CREATE"})']
 
     // When
-    const result = extractApprovalTag(line)
+    const result = extractApprovalTag(lines)
 
     // Expect
     expect(result).toEqual(either.left("invalid_definition"))
@@ -288,10 +326,10 @@ describe("extractApprovalTag", () => {
 
   it("should return an error if matchActions is empty", () => {
     // Given
-    const line = "# @RequireApproval({matchActions: []})"
+    const lines = ["# @RequireApproval({matchActions: []})"]
 
     // When
-    const result = extractApprovalTag(line)
+    const result = extractApprovalTag(lines)
 
     // Expect
     expect(result).toEqual(either.left("invalid_definition"))

@@ -60,7 +60,7 @@ resource "aws_instance" "example" {
 }
 ```
 
-The decorator must be place on the line above the resource declaration. The decorator can be used on any resource type or modules (expect for data).
+:memo: The decorator must be placed between the previous resource (the line following the closing bracket `}` ) and the declaration of resource that must be protected. The decorator can be used on any resource type or modules (expect for data).
 
 ### Decorator arguments
 
