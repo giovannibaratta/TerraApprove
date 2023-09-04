@@ -2,7 +2,7 @@
 
 TerraApprove is a tool that can be integrated in a CI/CD pipeline and can be used to reduce the risk of applying a Terraform plan that can cause undesired changes. All the resources that require special attention (e.g. stateful resources) can be tagged with a decorator. TerraApprove will then check if the plan contains any of these resources and will produce an output that can be used to decide if the plan can be applied with `-auto-approve` or if manual approval is required.
 
-> :warning: It's up to the user to implement the necessary logic to actual require the manual approval.
+> :warning: It's up to the user to implement the necessary logic to ask the user for approval.
 
 ## Why TerraApprove
 
