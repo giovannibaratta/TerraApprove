@@ -18,6 +18,14 @@ export class ConfigurationService {
       this.configurationReader.readConfiguration(location)
 
     if (isLeft(eitherConfiguration)) {
+      if (eitherConfiguration.left === "resource_not_found") {
+        Logger.debug(`Configuration not found at ${location}`)
+
+        return {
+          requireApprovalItems: []
+        }
+      }
+
       Logger.error(`Unable to read configuration: ${eitherConfiguration.left}`)
       throw new Error(
         `Unable to read configuration: ${eitherConfiguration.left}`
