@@ -73,9 +73,7 @@ The decorator accepts arguments to customize the behavior. The arguments are spe
 Example:
 
 ```hcl
-# RequireApproval({
-   matchActions: ["CREATE"]
-})
+# RequireApproval({ matchActions: ["CREATE"]})
 resource "aws_instance" "example" {
   ...
 }
