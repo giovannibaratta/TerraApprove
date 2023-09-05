@@ -1,10 +1,15 @@
 #!/bin/bash
 
-# exit when any command fails
 set -e
+
+echo "Prepare environment for intalling lefthook..."
+
+/bin/bash  ./.devcontainer/configure_apt.sh
 
 curl -1sLf \
   'https://dl.cloudsmith.io/public/evilmartians/lefthook/setup.deb.sh' \
   | sudo -E bash
 
-sudo apt-get install lefthook=1.4.6
+sudo apt-get install -y lefthook=1.4.6
+
+echo "Lefthook setup completed"

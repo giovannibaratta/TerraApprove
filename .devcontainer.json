@@ -2,8 +2,9 @@
   "name": "TerraApprove",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "onCreateCommand": {
-    "install-yarn": "/bin/bash ./.devcontainer/install_yarn.sh",
-    "install-lefthook": "/bin/bash ./.devcontainer/install_lefthook.sh"
+    "install-yarn": "/bin/bash ./.devcontainer/install_yarn.sh || echo 'Script install_yarn failed'",
+    "install-lefthook": "/bin/bash ./.devcontainer/install_lefthook.sh || echo 'Script install_lefthook failed'",
+    "install-jekyll": "/bin/bash ./.devcontainer/install_jekyll.sh || echo 'Script install_jekyll failed'"
   },
   "features": {
     // Add docker in docker support
@@ -30,6 +31,7 @@
         "dbaeumer.vscode-eslint",
         "orta.vscode-jest",
         "yoavbls.pretty-ts-errors",
+        "github.vscode-github-actions"
       ],
       "settings": {
         "editor.formatOnSave": true,
