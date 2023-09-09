@@ -5,5 +5,8 @@
     "**/.yarn": true
   },
   "jest.jestCommandLine": "yarn test",
-  "jest.rootPath": "core"
+  "jest.rootPath": "core",
+
+  "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.cursorBlinking": true
 }
