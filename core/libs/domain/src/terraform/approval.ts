@@ -1,6 +1,6 @@
 export type DecoratorType = NoDecorator | ManualApproval | SafeToApply
 
-interface NoDecorator {
+export interface NoDecorator {
   readonly type: "no_decorator"
 }
 

@@ -251,7 +251,7 @@ describe("extractDecorator", () => {
     expect(result).toEqual(either.right({type: "no_decorator"}))
   })
 
-  it("should detect the decorator if it is defined after the closing bracket", () => {
+  it("should detect the RequireApproval decorator if it is defined after the closing bracket", () => {
     // Given
     const lines = [
       "  } # some comment",
@@ -271,7 +271,7 @@ describe("extractDecorator", () => {
     )
   })
 
-  it("should return a manual_approval object when the line contains the decorator with no options", () => {
+  it("should return a manual_approval object when the line contains the RequireApproval decorator with no options", () => {
     // Given
     const lines = ["# @RequireApproval()"]
 
@@ -282,7 +282,7 @@ describe("extractDecorator", () => {
     expect(result).toEqual(either.right({type: "manual_approval"}))
   })
 
-  it("should return a manual_approval object when the line contains the decorator with the manual option", () => {
+  it("should return a manual_approval object when the line contains the RequireApproval decorator with the manual option", () => {
     // Given
     const lines = [
       '# @RequireApproval({matchActions: ["CREATE", "UPDATE_IN_PLACE", "DELETE"]})'
@@ -333,5 +333,25 @@ describe("extractDecorator", () => {
 
     // Expect
     expect(result).toEqual(either.left("invalid_definition"))
+  })
+
+  it("should detect the SafeToApply decorator if it is defined after the closing bracket", () => {
+    // Given
+    const lines = [
+      "  } # some comment",
+      "# more comments",
+      "  ",
+      "# @SafeToApply()"
+    ]
+
+    // When
+    const result = extractDecorator(lines)
+
+    // Expect
+    expect(result).toEqual(
+      either.right({
+        type: "safe_to_apply"
+      })
+    )
   })
 })

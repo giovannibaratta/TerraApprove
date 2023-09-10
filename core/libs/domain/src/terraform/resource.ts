@@ -2,10 +2,16 @@ import {Logger} from "@nestjs/common"
 import Ajv, {JSONSchemaType, ValidateFunction} from "ajv"
 import {either, option} from "fp-ts"
 import {Either, isLeft} from "fp-ts/lib/Either"
-import {Option} from "fp-ts/lib/Option"
+import {Option, isSome} from "fp-ts/lib/Option"
 import {jsonrepair} from "jsonrepair"
 import {File} from "../file/file"
-import {ApprovalAction, DecoratorType, ManualApproval} from "./approval"
+import {
+  ApprovalAction,
+  DecoratorType,
+  ManualApproval,
+  NoDecorator,
+  SafeToApply
+} from "./approval"
 
 export interface TerraformEntity {
   readonly entityInfo: TerraformEntityType
@@ -95,11 +101,15 @@ function detectTerraformEntity(line: string): Option<TerraformEntityType> {
   return option.none
 }
 
-// Regex that matches the pattern # @RequireApproval(<options>)
+// Generate a regex that matches the pattern # @<specified tag>(<options>)
 // The decorator must be defined inside a comment otherwise
-// it will not be terraform compliant. The options is not validated
-// by this regex, but it is extracted as a group.
-const requireApprovalRegex = /^# *@RequireApproval\((.*)\) *$/
+// it will not be terraform compliant. The options are not validated
+// by this regex, but they are extracted as a group.
+const decoratorRegexGenerator = (tag: string) =>
+  new RegExp("^# *@" + tag + "\\((.*)\\) *$")
+
+const requireApprovalRegex = decoratorRegexGenerator("RequireApproval")
+const safeToApplyRegex = decoratorRegexGenerator("SafeToApply")
 
 // Regex that matches the pattern <everything expect a comment>}<whatever>
 // This regex is used to find the closing bracket of a resource definition.
@@ -128,47 +138,99 @@ export function extractDecorator(
       return either.right({type: "no_decorator"})
     }
 
-    const tagMatches = line.match(requireApprovalRegex)
+    const eitherOptionalMatch = matchSupportedDecorator(line)
 
-    if (tagMatches) {
-      // We matched the approval tag. We need to extract the options
-      const rawOptions = tagMatches[1].trim()
+    if (isLeft(eitherOptionalMatch)) {
+      // There is a validation error
+      return eitherOptionalMatch
+    }
 
-      if (rawOptions !== "") {
-        let options
-
-        try {
-          // User jsonrepair to allow the user to use a lightweight syntax
-          // for setting the options
-          options = JSON.parse(jsonrepair(rawOptions))
-        } catch (e) {
-          return either.left("invalid_definition")
-        }
-
-        // Validate that the options schema is valid
-        const manualApprovalOptionsValidator: ValidateFunction<
-          Omit<ManualApproval, "type">
-        > = new Ajv({
-          allErrors: true
-        }).compile(manualApprovalSchema)
-
-        const isValid = manualApprovalOptionsValidator(options)
-        if (!isValid) {
-          return either.left("invalid_definition")
-        }
-
-        return either.right({
-          type: "manual_approval",
-          ...options
-        })
-      }
-
-      return either.right({type: "manual_approval"})
+    if (isSome(eitherOptionalMatch.right)) {
+      // A supported tag has been found
+      return either.right(eitherOptionalMatch.right.value)
     }
   }
 
   // No matches have been found. The tag is not defined
   return either.right({type: "no_decorator"})
+}
+
+function matchSupportedDecorator(
+  line: string
+): Either<"invalid_definition", Option<Exclude<DecoratorType, NoDecorator>>> {
+  let matches: RegExpMatchArray | null = line.match(requireApprovalRegex)
+
+  if (matches) {
+    const optionalOptions = getOptionalParamsFromDecorator(
+      matches[1].trim(),
+      manualApprovalSchema
+    )
+
+    if (isLeft(optionalOptions)) {
+      return optionalOptions
+    }
+
+    return either.right(
+      option.some({
+        type: "manual_approval",
+        ...(isSome(optionalOptions.right) && optionalOptions.right.value)
+      })
+    )
+  }
+
+  matches = line.match(safeToApplyRegex)
+
+  if (matches) {
+    const optionalOptions = getOptionalParamsFromDecorator(
+      matches[1].trim(),
+      safeToApplySchema
+    )
+
+    if (isLeft(optionalOptions)) {
+      return optionalOptions
+    }
+
+    return either.right(
+      option.some({
+        type: "safe_to_apply",
+        ...(isSome(optionalOptions.right) && optionalOptions.right.value)
+      })
+    )
+  }
+
+  return either.right(option.none)
+}
+
+function getOptionalParamsFromDecorator<T extends DecoratorType>(
+  rawOptionalParams: string,
+  schema: JSONSchemaType<Omit<T, "type">>
+): Either<"invalid_definition", Option<Omit<T, "type">>> {
+  if (rawOptionalParams !== "") {
+    let options
+
+    try {
+      // User jsonrepair to allow the user to use a lightweight syntax
+      // for setting the options
+      options = JSON.parse(jsonrepair(rawOptionalParams))
+    } catch (e) {
+      return either.left("invalid_definition")
+    }
+
+    // Validate that the options schema is valid
+    const decoratorOptionsValidator: ValidateFunction<Omit<T, "type">> =
+      new Ajv({
+        allErrors: true
+      }).compile(schema)
+
+    const isValid = decoratorOptionsValidator(options)
+    if (!isValid) {
+      return either.left("invalid_definition")
+    }
+
+    return either.right(option.some(options))
+  }
+
+  return either.right(option.none)
 }
 
 export function printTerraformEntity(entity: TerraformEntity): string {
@@ -192,4 +254,10 @@ const manualApprovalSchema: JSONSchemaType<Omit<ManualApproval, "type">> = {
       }
     }
   }
+}
+
+const safeToApplySchema: JSONSchemaType<Omit<SafeToApply, "type">> = {
+  type: "object",
+  additionalProperties: false,
+  properties: {}
 }
