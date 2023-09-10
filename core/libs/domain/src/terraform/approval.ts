@@ -1,4 +1,4 @@
-export type DecoratorType = NoDecorator | ManualApproval
+export type DecoratorType = NoDecorator | ManualApproval | SafeToApply
 
 interface NoDecorator {
   readonly type: "no_decorator"
@@ -7,6 +7,10 @@ interface NoDecorator {
 export interface ManualApproval {
   readonly type: "manual_approval"
   readonly matchActions?: ReadonlyArray<ApprovalAction>
+}
+
+export interface SafeToApply {
+  readonly type: "safe_to_apply"
 }
 
 export enum ApprovalAction {

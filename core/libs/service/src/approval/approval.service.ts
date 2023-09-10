@@ -41,6 +41,8 @@ export class ApprovalService {
     }
 
     if (resource.decorator.type === "no_decorator") return false
+    if (resource.decorator.type === "safe_to_apply")
+      throw new Error("Type not supported")
 
     const matchingActions = resource.decorator.matchActions
 
