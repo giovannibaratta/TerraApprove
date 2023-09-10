@@ -89,7 +89,7 @@ describe("BootstrappingService", () => {
                 providerType,
                 userProvidedName
               },
-              requireApproval: {type: "manual_approval"}
+              decorator: {type: "manual_approval"}
             }
           ])
         )
@@ -137,7 +137,7 @@ describe("BootstrappingService", () => {
                 internalType: "module",
                 userProvidedName: moduleName
               },
-              requireApproval: {type: "manual_approval"}
+              decorator: {type: "manual_approval"}
             }
           ])
         )

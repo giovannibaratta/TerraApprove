@@ -1,7 +1,7 @@
-export type ApprovalType = NoApproval | ManualApproval
+export type DecoratorType = NoDecorator | ManualApproval
 
-interface NoApproval {
-  readonly type: "no_approval"
+interface NoDecorator {
+  readonly type: "no_decorator"
 }
 
 export interface ManualApproval {

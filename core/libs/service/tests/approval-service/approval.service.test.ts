@@ -42,7 +42,7 @@ describe("ApprovalService", () => {
             providerType: resourceType,
             userProvidedName: resourceName
           },
-          requireApproval: {type: "manual_approval"}
+          decorator: {type: "manual_approval"}
         }
       ]
 
@@ -79,7 +79,7 @@ describe("ApprovalService", () => {
             internalType: "module",
             userProvidedName: moduleName
           },
-          requireApproval: {type: "manual_approval"}
+          decorator: {type: "manual_approval"}
         }
       ]
 
@@ -120,7 +120,7 @@ describe("ApprovalService", () => {
             providerType: resourceType,
             userProvidedName: resourceName
           },
-          requireApproval: {
+          decorator: {
             type: "manual_approval",
             matchActions: [ApprovalAction.CREATE]
           }
@@ -163,7 +163,7 @@ describe("ApprovalService", () => {
             providerType: resourceType,
             userProvidedName: resourceName
           },
-          requireApproval: {
+          decorator: {
             type: "manual_approval",
             matchActions: [ApprovalAction.DELETE]
           }

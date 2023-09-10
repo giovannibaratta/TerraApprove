@@ -5,11 +5,11 @@ import {Either, isLeft} from "fp-ts/lib/Either"
 import {Option} from "fp-ts/lib/Option"
 import {jsonrepair} from "jsonrepair"
 import {File} from "../file/file"
-import {ApprovalAction, ApprovalType, ManualApproval} from "./approval"
+import {ApprovalAction, DecoratorType, ManualApproval} from "./approval"
 
 export interface TerraformEntity {
   readonly entityInfo: TerraformEntityType
-  readonly requireApproval: ApprovalType
+  readonly decorator: DecoratorType
 }
 
 type TerraformEntityType = TerraformPlainResource | TerraformModule
@@ -49,22 +49,22 @@ export function findTerraformEntitiesInFile(
     const terraformEntityType = detectTerraformEntity(lines[lineIndex])
 
     if (option.isSome(terraformEntityType)) {
-      const eitherApprovalType: Either<"invalid_definition", ApprovalType> =
+      const eitherDecorator: Either<"invalid_definition", DecoratorType> =
         // If the first line of the file contains a terraform resource, it means that it can't require approval
         lineIndex > 0
-          ? extractApprovalTag(lines.slice(lastFoundEntity, lineIndex))
-          : either.right({type: "no_approval"})
+          ? extractDecorator(lines.slice(lastFoundEntity, lineIndex))
+          : either.right({type: "no_decorator"})
 
-      if (isLeft(eitherApprovalType)) {
+      if (isLeft(eitherDecorator)) {
         Logger.error(
           `Invalid approval tag in file ${file.name} for resource on line ${lineIndex}}`
         )
-        return eitherApprovalType
+        return eitherDecorator
       }
 
       entities.push({
         entityInfo: terraformEntityType.value,
-        requireApproval: eitherApprovalType.right
+        decorator: eitherDecorator.right
       })
 
       lastFoundEntity = lineIndex
@@ -115,9 +115,9 @@ const closingBracketRegex = /^[^#]+}.*$/
  * @param lines previous lines. The order of the lines should preserve the
  * original order
  */
-export function extractApprovalTag(
+export function extractDecorator(
   lines: string[]
-): Either<"invalid_definition", ApprovalType> {
+): Either<"invalid_definition", DecoratorType> {
   // Scan all the lines in reverse order and search for ending bracket or approval tag
   for (let lineIndex = lines.length - 1; lineIndex >= 0; lineIndex--) {
     const line = lines[lineIndex]
@@ -125,7 +125,7 @@ export function extractApprovalTag(
     // If the first match that we find is a closing bracket, it means that no approval
     // tag was defined between the previous resource and the current one
     if (closingBracketRegex.test(line)) {
-      return either.right({type: "no_approval"})
+      return either.right({type: "no_decorator"})
     }
 
     const tagMatches = line.match(requireApprovalRegex)
@@ -168,13 +168,13 @@ export function extractApprovalTag(
   }
 
   // No matches have been found. The tag is not defined
-  return either.right({type: "no_approval"})
+  return either.right({type: "no_decorator"})
 }
 
 export function printTerraformEntity(entity: TerraformEntity): string {
   return `${JSON.stringify({
     ...entity.entityInfo,
-    requireApproval: entity.requireApproval
+    decorator: entity.decorator
   })}`
 }
 

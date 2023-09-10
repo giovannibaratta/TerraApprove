@@ -20,7 +20,7 @@ describe("requireApprovalItemToTerraformEntity", () => {
         internalType: "module",
         userProvidedName: "my_module"
       },
-      requireApproval: {
+      decorator: {
         type: "manual_approval",
         matchActions: []
       }
@@ -44,7 +44,7 @@ describe("requireApprovalItemToTerraformEntity", () => {
         providerType: "aws_s3_bucket",
         userProvidedName: "my_bucket"
       },
-      requireApproval: {
+      decorator: {
         type: "manual_approval",
         matchActions: []
       }

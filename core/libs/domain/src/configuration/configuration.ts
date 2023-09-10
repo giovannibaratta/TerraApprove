@@ -26,7 +26,7 @@ export function requireApprovalItemToTerraformEntity(
         internalType: "module",
         userProvidedName: splitAddress[1]
       },
-      requireApproval: {
+      decorator: {
         type: "manual_approval",
         matchActions
       }
@@ -39,7 +39,7 @@ export function requireApprovalItemToTerraformEntity(
       providerType: splitAddress[0],
       userProvidedName: splitAddress[1]
     },
-    requireApproval: {
+    decorator: {
       type: "manual_approval",
       matchActions
     }

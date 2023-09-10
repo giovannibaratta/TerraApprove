@@ -40,9 +40,9 @@ export class ApprovalService {
       return false
     }
 
-    if (resource.requireApproval.type === "no_approval") return false
+    if (resource.decorator.type === "no_decorator") return false
 
-    const matchingActions = resource.requireApproval.matchActions
+    const matchingActions = resource.decorator.matchActions
 
     return (
       // If no actions are speficied, we assume that all actions require approval

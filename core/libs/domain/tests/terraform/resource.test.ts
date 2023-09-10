@@ -1,5 +1,5 @@
 import {
-  extractApprovalTag,
+  extractDecorator,
   findTerraformEntitiesInFile
 } from "@libs/domain/terraform/resource"
 import {either} from "fp-ts"
@@ -48,7 +48,7 @@ describe("findTerraformEntitiesInFile", () => {
             providerType: type1,
             userProvidedName: name1
           },
-          requireApproval: {type: "no_approval"}
+          decorator: {type: "no_decorator"}
         },
         {
           entityInfo: {
@@ -56,7 +56,7 @@ describe("findTerraformEntitiesInFile", () => {
             providerType: type2,
             userProvidedName: name2
           },
-          requireApproval: {type: "no_approval"}
+          decorator: {type: "no_decorator"}
         }
       ])
     )
@@ -92,7 +92,7 @@ describe("findTerraformEntitiesInFile", () => {
             providerType: type1,
             userProvidedName: name1
           },
-          requireApproval: {type: "no_approval"}
+          decorator: {type: "no_decorator"}
         },
         {
           entityInfo: {
@@ -100,7 +100,7 @@ describe("findTerraformEntitiesInFile", () => {
             providerType: type2,
             userProvidedName: name2
           },
-          requireApproval: {type: "manual_approval"}
+          decorator: {type: "manual_approval"}
         }
       ])
     )
@@ -139,7 +139,7 @@ describe("findTerraformEntitiesInFile", () => {
             providerType: type1,
             userProvidedName: name1
           },
-          requireApproval: {type: "manual_approval"}
+          decorator: {type: "manual_approval"}
         },
         {
           entityInfo: {
@@ -147,7 +147,7 @@ describe("findTerraformEntitiesInFile", () => {
             providerType: type2,
             userProvidedName: name2
           },
-          requireApproval: {type: "manual_approval"}
+          decorator: {type: "manual_approval"}
         },
         {
           entityInfo: {
@@ -155,7 +155,7 @@ describe("findTerraformEntitiesInFile", () => {
             providerType: type3,
             userProvidedName: name3
           },
-          requireApproval: {type: "manual_approval"}
+          decorator: {type: "manual_approval"}
         }
       ])
     )
@@ -212,30 +212,30 @@ describe("findTerraformEntitiesInFile", () => {
   })
 })
 
-describe("extractApprovalTag", () => {
+describe("extractDecorator", () => {
   it("should return an error when the options defined in the tag are not valid", () => {
     // Given
     const lines = ["# @RequireApproval(some_invalid_option)"]
 
     // When
-    const result = extractApprovalTag(lines)
+    const result = extractDecorator(lines)
 
     // Expect
     expect(result).toEqual(either.left("invalid_definition"))
   })
 
-  it("should return a no_approval object when the lines do not contain the decorator", () => {
+  it("should return a no_decorator object when the lines do not contain the decorator", () => {
     // Given
     const lines = ["some random line", "", "   ", "#", "####"]
 
     // When
-    const result = extractApprovalTag(lines)
+    const result = extractDecorator(lines)
 
     // Expect
-    expect(result).toEqual(either.right({type: "no_approval"}))
+    expect(result).toEqual(either.right({type: "no_decorator"}))
   })
 
-  it("should return no_approval object if the decorator is defined before the closing bracket", () => {
+  it("should return no_decorator object if the decorator is defined before the closing bracket", () => {
     // Given
     const lines = [
       "# @RequireApproval()",
@@ -245,10 +245,10 @@ describe("extractApprovalTag", () => {
     ]
 
     // When
-    const result = extractApprovalTag(lines)
+    const result = extractDecorator(lines)
 
     // Expect
-    expect(result).toEqual(either.right({type: "no_approval"}))
+    expect(result).toEqual(either.right({type: "no_decorator"}))
   })
 
   it("should detect the decorator if it is defined after the closing bracket", () => {
@@ -261,7 +261,7 @@ describe("extractApprovalTag", () => {
     ]
 
     // When
-    const result = extractApprovalTag(lines)
+    const result = extractDecorator(lines)
 
     // Expect
     expect(result).toEqual(
@@ -276,7 +276,7 @@ describe("extractApprovalTag", () => {
     const lines = ["# @RequireApproval()"]
 
     // When
-    const result = extractApprovalTag(lines)
+    const result = extractDecorator(lines)
 
     // Expect
     expect(result).toEqual(either.right({type: "manual_approval"}))
@@ -289,7 +289,7 @@ describe("extractApprovalTag", () => {
     ]
 
     // When
-    const result = extractApprovalTag(lines)
+    const result = extractDecorator(lines)
 
     // Expect
     expect(result).toEqual(
@@ -307,7 +307,7 @@ describe("extractApprovalTag", () => {
     ]
 
     // When
-    const result = extractApprovalTag(lines)
+    const result = extractDecorator(lines)
 
     // Expect
     expect(result).toEqual(either.left("invalid_definition"))
@@ -318,7 +318,7 @@ describe("extractApprovalTag", () => {
     const lines = ['# @RequireApproval({matchActions: "CREATE"})']
 
     // When
-    const result = extractApprovalTag(lines)
+    const result = extractDecorator(lines)
 
     // Expect
     expect(result).toEqual(either.left("invalid_definition"))
@@ -329,7 +329,7 @@ describe("extractApprovalTag", () => {
     const lines = ["# @RequireApproval({matchActions: []})"]
 
     // When
-    const result = extractApprovalTag(lines)
+    const result = extractDecorator(lines)
 
     // Expect
     expect(result).toEqual(either.left("invalid_definition"))
