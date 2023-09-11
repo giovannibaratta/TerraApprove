@@ -2,6 +2,8 @@
 
 TerraApprove is a project created to experiment with new technologies (e.g. GitHub Copilot, devcontainers) and project management activities on something that is a little more than a toy project.
 
+See [here](https://giovannibaratta.github.io/TerraApprove/) for the list of supported features.
+
 ## Folder structure
 
 The folder structure is as follows:
