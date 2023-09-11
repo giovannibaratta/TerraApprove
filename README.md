@@ -1,1 +1,24 @@
-jekyll/README.md
+# TerraApprove
+
+TerraApprove is a project created to experiment with new technologies (e.g. GitHub Copilot, devcontainers) and project management activities on something that is a little more than a toy project.
+
+## Folder structure
+
+The folder structure is as follows:
+
+```bash
+.
+├── artifacts # Contains the artifacts (executables, ...) of the project
+├── core # Contains the source code of the application
+└── examples # Contains examples of how the application can be used
+```
+
+## How to build
+
+The project can be built using the following command:
+
+```bash
+cd core
+yarn install
+yarn generate:artifact
+```
