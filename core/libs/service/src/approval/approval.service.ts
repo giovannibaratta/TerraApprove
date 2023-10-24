@@ -1,7 +1,8 @@
 import {TerraformDiff, TerraformDiffMap} from "@libs/domain/terraform/diffs"
 import {
   TerraformEntity,
-  isDiffActionIncludedInEntityDecorator
+  isDiffActionIncludedInEntityDecorator,
+  printShortTerraformEntity
 } from "@libs/domain/terraform/resource"
 import {Injectable, Logger} from "@nestjs/common"
 import {BootstrappingService} from "../bootstrapping/bootstrapping.service"
@@ -36,7 +37,9 @@ export class ApprovalService {
     Logger.log(
       `Found ${resourcesThatRequiredApproval.length} resource(s) that require approval:`
     )
-    resourcesThatRequiredApproval.forEach(it => Logger.log(`- ${it}`))
+    resourcesThatRequiredApproval.forEach(it =>
+      Logger.log(`- ${printShortTerraformEntity(it[1])}`)
+    )
 
     return resourcesThatRequiredApproval.length > 0
   }
@@ -88,7 +91,9 @@ export class ApprovalService {
     Logger.log(
       `Found ${resourcesThatAreNotSafeToApply.length} resource(s) that are not safe to apply:`
     )
-    resourcesThatAreNotSafeToApply.forEach(it => Logger.log(`- ${it}`))
+    resourcesThatAreNotSafeToApply.forEach(it =>
+      Logger.log(`- ${printShortTerraformEntity(it[1])}`)
+    )
 
     return resourcesThatAreNotSafeToApply.length > 0
   }

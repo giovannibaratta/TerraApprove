@@ -234,6 +234,12 @@ function getOptionalParamsFromDecorator<T extends DecoratorType>(
   return either.right(option.none)
 }
 
+export function printShortTerraformEntity(entity: TerraformEntity): string {
+  if (entity.entityInfo.internalType === "module")
+    return `${entity.entityInfo.internalType} ${entity.entityInfo.userProvidedName}`
+  return `${entity.entityInfo.providerType}.${entity.entityInfo.userProvidedName}`
+}
+
 export function printTerraformEntity(entity: TerraformEntity): string {
   return `${JSON.stringify({
     ...entity.entityInfo,
