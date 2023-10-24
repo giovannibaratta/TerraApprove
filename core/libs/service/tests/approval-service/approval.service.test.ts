@@ -63,7 +63,9 @@ describe("ApprovalService", () => {
       })
 
       // When
-      const result = await approvalService.isApprovalRequired()
+      const result = await approvalService.isApprovalRequired({
+        mode: "require_approval"
+      })
 
       // Expect
       expect(result).toBe(true)
@@ -101,7 +103,9 @@ describe("ApprovalService", () => {
       })
 
       // When
-      const result = await approvalService.isApprovalRequired()
+      const result = await approvalService.isApprovalRequired({
+        mode: "require_approval"
+      })
 
       // Expect
       expect(result).toBe(true)
@@ -144,7 +148,9 @@ describe("ApprovalService", () => {
       })
 
       // When
-      const result = await approvalService.isApprovalRequired()
+      const result = await approvalService.isApprovalRequired({
+        mode: "require_approval"
+      })
 
       // Expect
       expect(result).toBe(true)
@@ -187,10 +193,102 @@ describe("ApprovalService", () => {
       })
 
       // When
-      const result = await approvalService.isApprovalRequired()
+      const result = await approvalService.isApprovalRequired({
+        mode: "require_approval"
+      })
 
       // Expect
       expect(result).toBe(false)
+    })
+
+    describe("safe to apply mode", () => {
+      it("should return true if the plan contains resource that are not safe to apply", async () => {
+        // Given
+        const resourceType: string = "aws_s3_bucket"
+        const resourceName: string = "my_bucket"
+        const resourceAddress: string = "aws_s3_bucket.my_bucket"
+
+        const terraformEntities: TerraformEntity[] = [
+          {
+            entityInfo: {
+              internalType: "plain_resource",
+              providerType: resourceType,
+              userProvidedName: resourceName
+            },
+            decorator: {
+              type: "no_decorator"
+            }
+          }
+        ]
+
+        const diffFromPlan: TerraformDiff = {
+          fullyQualifiedAddress: resourceAddress,
+          userProvidedName: resourceName,
+          providerType: resourceType,
+          diffType: "create"
+        }
+
+        const terraformDiffMap = {
+          [resourceAddress]: diffFromPlan
+        }
+
+        jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
+          terraformDiffMap,
+          terraformEntities
+        })
+
+        // When
+        const result = await approvalService.isApprovalRequired({
+          mode: "safe_to_apply"
+        })
+
+        // Expect
+        expect(result).toBe(true)
+      })
+
+      it("should return false if the plan contains only resources that are safe to apply", async () => {
+        // Given
+        const resourceType: string = "aws_s3_bucket"
+        const resourceName: string = "my_bucket"
+        const resourceAddress: string = "aws_s3_bucket.my_bucket"
+
+        const terraformEntities: TerraformEntity[] = [
+          {
+            entityInfo: {
+              internalType: "plain_resource",
+              providerType: resourceType,
+              userProvidedName: resourceName
+            },
+            decorator: {
+              type: "safe_to_apply"
+            }
+          }
+        ]
+
+        const diffFromPlan: TerraformDiff = {
+          fullyQualifiedAddress: resourceAddress,
+          userProvidedName: resourceName,
+          providerType: resourceType,
+          diffType: "create"
+        }
+
+        const terraformDiffMap = {
+          [resourceAddress]: diffFromPlan
+        }
+
+        jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
+          terraformDiffMap,
+          terraformEntities
+        })
+
+        // When
+        const result = await approvalService.isApprovalRequired({
+          mode: "safe_to_apply"
+        })
+
+        // Expect
+        expect(result).toBe(false)
+      })
     })
   })
 })

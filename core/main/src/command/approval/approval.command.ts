@@ -48,7 +48,9 @@ export class ApprovalCommand extends CommandRunner {
       `${codeBaseDir}/.terraapprove.yaml`
     )
 
-    const approvalNeeded = await this.approvalSerivce.isApprovalRequired()
+    const approvalNeeded = await this.approvalSerivce.isApprovalRequired({
+      mode: "require_approval"
+    })
 
     Logger.log(`Approval required: ${approvalNeeded}`)
 

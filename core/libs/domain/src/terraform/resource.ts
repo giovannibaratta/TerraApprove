@@ -12,6 +12,7 @@ import {
   NoDecorator,
   SafeToApply
 } from "./approval"
+import {DiffType, TerraformDiff} from "./diffs"
 
 export interface TerraformEntity {
   readonly entityInfo: TerraformEntityType
@@ -260,4 +261,33 @@ const safeToApplySchema: JSONSchemaType<Omit<SafeToApply, "type">> = {
   type: "object",
   additionalProperties: false,
   properties: {}
+}
+
+export function isDiffActionIncludedInEntityDecorator(
+  decorator: DecoratorType,
+  diff: TerraformDiff
+): boolean {
+  const matchingActions: undefined | ReadonlyArray<ApprovalAction> =
+    decorator.type === "manual_approval" ? decorator.matchActions : undefined
+
+  return (
+    // If no actions are speficied, we assume that all actions require approval
+    matchingActions === undefined ||
+    mapDiffTypeToApprovalActions(diff.diffType).some(it =>
+      matchingActions.includes(it)
+    )
+  )
+}
+
+function mapDiffTypeToApprovalActions(diffType: DiffType): ApprovalAction[] {
+  switch (diffType) {
+    case "create":
+      return [ApprovalAction.CREATE]
+    case "update":
+      return [ApprovalAction.UPDATE_IN_PLACE]
+    case "delete":
+      return [ApprovalAction.DELETE]
+    case "replace":
+      return [ApprovalAction.DELETE, ApprovalAction.CREATE]
+  }
 }

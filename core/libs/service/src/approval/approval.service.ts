@@ -1,6 +1,8 @@
-import {ApprovalAction} from "@libs/domain/terraform/approval"
-import {DiffType, TerraformDiff} from "@libs/domain/terraform/diffs"
-import {TerraformEntity} from "@libs/domain/terraform/resource"
+import {TerraformDiff, TerraformDiffMap} from "@libs/domain/terraform/diffs"
+import {
+  TerraformEntity,
+  isDiffActionIncludedInEntityDecorator
+} from "@libs/domain/terraform/resource"
 import {Injectable, Logger} from "@nestjs/common"
 import {BootstrappingService} from "../bootstrapping/bootstrapping.service"
 
@@ -8,13 +10,27 @@ import {BootstrappingService} from "../bootstrapping/bootstrapping.service"
 export class ApprovalService {
   constructor(private readonly bootstrappingService: BootstrappingService) {}
 
-  async isApprovalRequired(): Promise<boolean> {
+  async isApprovalRequired(params: IsApprovalRequiredParams): Promise<boolean> {
+    if (params.mode === "require_approval") return this.requireApprovalMode()
+    if (params.mode === "safe_to_apply") return this.safeToApplyMode()
+
+    throw new Error("Mode not supported")
+  }
+
+  private async requireApprovalMode(): Promise<boolean> {
     const {terraformEntities, terraformDiffMap} =
       await this.bootstrappingService.bootstrap()
 
+    const diffsEntityPairs = this.generateDiffEntityPairs(
+      terraformDiffMap,
+      terraformEntities
+    )
+
     // From all the diffs, keep only the ones that requires approval
-    const resourcesThatRequiredApproval = Object.keys(terraformDiffMap).filter(
-      key => this.doesRequiredApproval(terraformDiffMap[key], terraformEntities)
+    const resourcesThatRequiredApproval = diffsEntityPairs.filter(
+      pair =>
+        pair[1].decorator.type === "manual_approval" &&
+        isDiffActionIncludedInEntityDecorator(pair[1].decorator, pair[0])
     )
 
     Logger.log(
@@ -25,47 +41,56 @@ export class ApprovalService {
     return resourcesThatRequiredApproval.length > 0
   }
 
-  private doesRequiredApproval(
-    diff: TerraformDiff,
-    entities: TerraformEntity[]
-  ): boolean {
-    const resource = this.findDiffCounterpartInEntities(diff, entities)
-
-    if (resource === undefined) {
-      // The resource might not be available in the code base for several reason:
-      // - (legit) the resource has been deleted
-      // - (non legit) the diff has not been generated from the specified code base
-      // For now we will not cover the non legit scenarios, but in the future it might
-      // be better to add some error handling here.
-      return false
-    }
-
-    if (resource.decorator.type === "no_decorator") return false
-    if (resource.decorator.type === "safe_to_apply")
-      throw new Error("Type not supported")
-
-    const matchingActions = resource.decorator.matchActions
-
-    return (
-      // If no actions are speficied, we assume that all actions require approval
-      matchingActions === undefined ||
-      this.mapDiffTypeToApprovalActions(diff.diffType).some(it =>
-        matchingActions.includes(it)
+  private generateDiffEntityPairs(
+    terraformDiffMap: TerraformDiffMap,
+    terraformEntities: TerraformEntity[]
+  ) {
+    return Object.keys(terraformDiffMap).reduce<
+      [TerraformDiff, TerraformEntity][]
+    >((acc, diffKey) => {
+      const counterpart = this.findDiffCounterpartInEntities(
+        terraformDiffMap[diffKey],
+        terraformEntities
       )
-    )
+
+      if (counterpart) {
+        acc.push([terraformDiffMap[diffKey], counterpart])
+        return acc
+      }
+
+      if (terraformDiffMap[diffKey].diffType !== "delete") {
+        Logger.log(`Could not find counterpart for diff ${diffKey}`)
+        throw new Error(
+          `Could not find counterpart for diff ${diffKey}. The plan might be for the wrong code base.`
+        )
+      }
+
+      // For now we will not cover the scenario where the deleted resources are from the
+      // wrong code base. In the future it might be better adapt this error handling.
+      return acc
+    }, [])
   }
 
-  private mapDiffTypeToApprovalActions(diffType: DiffType): ApprovalAction[] {
-    switch (diffType) {
-      case "create":
-        return [ApprovalAction.CREATE]
-      case "update":
-        return [ApprovalAction.UPDATE_IN_PLACE]
-      case "delete":
-        return [ApprovalAction.DELETE]
-      case "replace":
-        return [ApprovalAction.DELETE, ApprovalAction.CREATE]
-    }
+  private async safeToApplyMode(): Promise<boolean> {
+    const {terraformEntities, terraformDiffMap} =
+      await this.bootstrappingService.bootstrap()
+
+    const diffsEntityPairs = this.generateDiffEntityPairs(
+      terraformDiffMap,
+      terraformEntities
+    )
+
+    // From all the diffs, remove all the ones that are safe to apply
+    const resourcesThatAreNotSafeToApply = diffsEntityPairs.filter(
+      pair => pair[1].decorator.type !== "safe_to_apply"
+    )
+
+    Logger.log(
+      `Found ${resourcesThatAreNotSafeToApply.length} resource(s) that are not safe to apply:`
+    )
+    resourcesThatAreNotSafeToApply.forEach(it => Logger.log(`- ${it}`))
+
+    return resourcesThatAreNotSafeToApply.length > 0
   }
 
   private findDiffCounterpartInEntities(
@@ -91,3 +116,9 @@ export class ApprovalService {
     )
   }
 }
+
+export interface IsApprovalRequiredParams {
+  mode: Mode
+}
+
+type Mode = "require_approval" | "safe_to_apply"
