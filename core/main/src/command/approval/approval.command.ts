@@ -22,6 +22,8 @@ export class ApprovalCommand extends CommandRunner {
     timestamp: false
   }
 
+  private operationMode: "standard" | "reverse" = "standard"
+
   constructor(
     private readonly bootstrappingService: BootstrappingService,
     private readonly approvalSerivce: ApprovalService
@@ -48,8 +50,11 @@ export class ApprovalCommand extends CommandRunner {
       `${codeBaseDir}/.terraapprove.yaml`
     )
 
+    Logger.log(`Operating mode: ${this.operationMode}`)
+
     const approvalNeeded = await this.approvalSerivce.isApprovalRequired({
-      mode: "require_approval"
+      mode:
+        this.operationMode === "standard" ? "require_approval" : "safe_to_apply"
     })
 
     Logger.log(`Approval required: ${approvalNeeded}`)
@@ -59,6 +64,23 @@ export class ApprovalCommand extends CommandRunner {
         exitCode: 1
       })
     }
+  }
+
+  @Option({
+    flags: "--standard",
+    description:
+      "Use the standard mode (detect RequireApproval decorator). This is the default mode."
+  })
+  enableStandardMode() {
+    this.operationMode = "standard"
+  }
+
+  @Option({
+    flags: "--reverse",
+    description: "Use the reverse mode (detect SafeToApply decorator)"
+  })
+  enableReverseMode() {
+    this.operationMode = "reverse"
   }
 
   @Option({
