@@ -79,6 +79,19 @@ requireApproval:
     actions: ["DELETE"]
 ```
 
+## SafeToApply decorator
+
+The `SafeToApply` decorator can be used to mark a resource that is safe to apply. If the resource is found in the plan, the application will not consider it as a resource that requires approval. If the plan contains only resources that are safe to apply, the application will exit with code `0`. This might be useful if the code base contains resource that changes often and even if they are misconfigured do not produce any harm.
+
+The decorator can be used as follows:
+
+```hcl
+# SafeToApply()
+resource "aws_instance" "example" {
+  ...
+}
+```
+
 ## Alternatives
 
 This is a list of alternative tools (definitely more mature than TerraApprove) that can be used to achieve the same (or similar) results:
