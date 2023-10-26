@@ -3,6 +3,7 @@
 
 !*.tf
 !*.md
+!.terraapprove.yaml
 
 // Necessary to re-include directories excluded by the previous pattern
 !*/
