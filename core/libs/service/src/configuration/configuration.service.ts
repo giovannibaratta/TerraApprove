@@ -6,6 +6,13 @@ import {
   IConfigurationReader
 } from "./configuration-reader"
 
+const DEFAULT_CONFIGURATION: Configuration = {
+  requireApprovalItems: [],
+  global: {
+    requireApprovalActions: []
+  }
+}
+
 @Injectable()
 export class ConfigurationService {
   constructor(
@@ -21,9 +28,7 @@ export class ConfigurationService {
       if (eitherConfiguration.left === "resource_not_found") {
         Logger.debug(`Configuration not found at ${location}`)
 
-        return {
-          requireApprovalItems: []
-        }
+        return DEFAULT_CONFIGURATION
       }
 
       Logger.error(`Unable to read configuration: ${eitherConfiguration.left}`)

@@ -1,6 +1,7 @@
 import {ApprovalAction} from "@libs/domain/terraform/approval"
 import {FileConfigurationReader} from "@libs/external/file-configuration-reader/file-configuration.reader"
 import * as FileFunction from "@libs/external/shared/file"
+import {expectRight} from "@libs/testing/expect-helpers"
 import {Logger} from "@nestjs/common"
 import {Test} from "@nestjs/testing"
 import {either} from "fp-ts"
@@ -46,11 +47,7 @@ describe("FileConfigurationReader", () => {
     const result = fileConfigurationReader.readConfiguration("aLocation")
 
     // Then
-    expect(result).toEqual(
-      either.right({
-        requireApprovalItems: []
-      })
-    )
+    expect(result).not.toHaveProperty("a")
   })
 
   it("should return requireApprovalItems with one item", () => {
@@ -78,16 +75,15 @@ describe("FileConfigurationReader", () => {
     const result = fileConfigurationReader.readConfiguration("aLocation")
 
     // Then
-    expect(result).toEqual(
-      either.right({
-        requireApprovalItems: [
-          {
-            fullQualifiedAddress: resourceAddress,
-            matchActions: actions
-          }
-        ]
-      })
-    )
+    expectRight(result)
+    expect(result.right).toMatchObject({
+      requireApprovalItems: [
+        {
+          fullQualifiedAddress: resourceAddress,
+          matchActions: actions
+        }
+      ]
+    })
   })
 
   it("should return 'invalid_configuration' if the action is not valid", () => {

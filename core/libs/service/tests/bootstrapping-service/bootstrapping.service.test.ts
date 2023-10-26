@@ -10,6 +10,7 @@ import {either} from "fp-ts"
 import {CodebaseReaderServiceMock} from "../mocks/codebase-reader.service.mock"
 import {ConfigurationServiceMock} from "../mocks/configuration.service.mock"
 import {PlanReaderServiceMock} from "../mocks/plan-reader.service.mock"
+import {mockConfiguration} from "@libs/testing/mocks/configuration.mock"
 
 describe("BootstrappingService", () => {
   let bootstrappingService: BootstrappingService
@@ -59,102 +60,114 @@ describe("BootstrappingService", () => {
       bootstrappingService.setTerraformPlanLocation("plan/location")
     })
 
-    it("should throw an error if duplicate resources of type plain resource are found", async () => {
-      // Given
-      jest
-        .spyOn(planReaderService, "readPlan")
-        .mockResolvedValue(either.right({}))
-      jest
-        .spyOn(codebaseReaderService, "getTerraformFilesInFolder")
-        .mockReturnValue(
-          either.right([
-            // we need at least one file to be returned
-            {
-              name: "resource.tf",
-              lines: []
-            }
-          ])
+    it(
+      "should throw an error if the resource of type plain resource is defined both " +
+        "in the code base and in the configuration",
+      async () => {
+        // Given
+        jest
+          .spyOn(planReaderService, "readPlan")
+          .mockResolvedValue(either.right({}))
+        jest
+          .spyOn(codebaseReaderService, "getTerraformFilesInFolder")
+          .mockReturnValue(
+            either.right([
+              // we need at least one file to be returned
+              {
+                name: "resource.tf",
+                lines: []
+              }
+            ])
+          )
+
+        const providerType = "aws_s3_bucket"
+        const userProvidedName = "my_bucket"
+
+        jest
+          .spyOn(ResourceFunctions, "findTerraformEntitiesInFile")
+          .mockReturnValue(
+            either.right([
+              {
+                entityInfo: {
+                  internalType: "plain_resource",
+                  providerType,
+                  userProvidedName
+                },
+                decorator: {type: "manual_approval"}
+              }
+            ])
+          )
+
+        jest.spyOn(configurationService, "readConfiguration").mockReturnValue(
+          mockConfiguration({
+            requireApprovalItems: [
+              {
+                fullQualifiedAddress: `${providerType}.${userProvidedName}`,
+                matchActions: [ApprovalAction.CREATE]
+              }
+            ]
+          })
         )
 
-      const providerType = "aws_s3_bucket"
-      const userProvidedName = "my_bucket"
+        // When
+        await expect(bootstrappingService.bootstrap()).rejects.toThrow(
+          `Duplicate entity found: plain_resource.${providerType}.${userProvidedName}`
+        )
+      }
+    )
 
-      jest
-        .spyOn(ResourceFunctions, "findTerraformEntitiesInFile")
-        .mockReturnValue(
-          either.right([
-            {
-              entityInfo: {
-                internalType: "plain_resource",
-                providerType,
-                userProvidedName
-              },
-              decorator: {type: "manual_approval"}
-            }
-          ])
+    it(
+      "should throw an error if the resource of type plain module is defined both " +
+        "in the code base and in the configuration",
+      async () => {
+        // Given
+        jest
+          .spyOn(planReaderService, "readPlan")
+          .mockResolvedValue(either.right({}))
+        jest
+          .spyOn(codebaseReaderService, "getTerraformFilesInFolder")
+          .mockReturnValue(
+            either.right([
+              // we need at least one file to be returned
+              {
+                name: "resource.tf",
+                lines: []
+              }
+            ])
+          )
+
+        const moduleName = "my_module"
+
+        jest
+          .spyOn(ResourceFunctions, "findTerraformEntitiesInFile")
+          .mockReturnValue(
+            either.right([
+              {
+                entityInfo: {
+                  internalType: "module",
+                  userProvidedName: moduleName
+                },
+                decorator: {type: "manual_approval"}
+              }
+            ])
+          )
+
+        jest.spyOn(configurationService, "readConfiguration").mockReturnValue(
+          mockConfiguration({
+            requireApprovalItems: [
+              {
+                fullQualifiedAddress: `module.${moduleName}.something.else`,
+                matchActions: [ApprovalAction.CREATE]
+              }
+            ]
+          })
         )
 
-      jest.spyOn(configurationService, "readConfiguration").mockReturnValue({
-        requireApprovalItems: [
-          {
-            fullQualifiedAddress: `${providerType}.${userProvidedName}`,
-            matchActions: [ApprovalAction.CREATE]
-          }
-        ]
-      })
-
-      // When
-      await expect(bootstrappingService.bootstrap()).rejects.toThrow(
-        `Duplicate entity found: plain_resource.${providerType}.${userProvidedName}`
-      )
-    })
-
-    it("should throw an error if duplicate resources of type module are found", async () => {
-      // Given
-      jest
-        .spyOn(planReaderService, "readPlan")
-        .mockResolvedValue(either.right({}))
-      jest
-        .spyOn(codebaseReaderService, "getTerraformFilesInFolder")
-        .mockReturnValue(
-          either.right([
-            // we need at least one file to be returned
-            {
-              name: "resource.tf",
-              lines: []
-            }
-          ])
+        // When
+        await expect(bootstrappingService.bootstrap()).rejects.toThrow(
+          `Duplicate entity found: module.${moduleName}`
         )
-
-      const moduleName = "my_module"
-
-      jest
-        .spyOn(ResourceFunctions, "findTerraformEntitiesInFile")
-        .mockReturnValue(
-          either.right([
-            {
-              entityInfo: {
-                internalType: "module",
-                userProvidedName: moduleName
-              },
-              decorator: {type: "manual_approval"}
-            }
-          ])
-        )
-
-      jest.spyOn(configurationService, "readConfiguration").mockReturnValue({
-        requireApprovalItems: [
-          {
-            fullQualifiedAddress: `module.${moduleName}.something.else`,
-            matchActions: [ApprovalAction.CREATE]
-          }
-        ]
-      })
-
-      // When
-      await expect(bootstrappingService.bootstrap()).rejects.toThrow(
-        `Duplicate entity found: module.${moduleName}`
-      )
-    })
+      }
+    )
   })
 })

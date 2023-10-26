@@ -3,6 +3,13 @@ import {TerraformEntity} from "../terraform/resource"
 
 export interface Configuration {
   readonly requireApprovalItems: RequireApprovalItem[]
+  readonly global: GlobalConfiguration
+}
+
+export interface GlobalConfiguration {
+  // List of actions that always require approval if they are found
+  // in the plan.
+  readonly requireApprovalActions: ReadonlyArray<ApprovalAction>
 }
 
 export interface RequireApprovalItem {

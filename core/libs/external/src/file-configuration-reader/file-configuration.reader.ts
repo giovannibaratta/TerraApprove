@@ -10,7 +10,7 @@ import {
 import {Injectable, Logger} from "@nestjs/common"
 import Ajv, {JSONSchemaType, ValidateFunction} from "ajv"
 import {either} from "fp-ts"
-import {Either, chainW} from "fp-ts/lib/Either"
+import {Either, chainW, isLeft} from "fp-ts/lib/Either"
 import {pipe} from "fp-ts/lib/function"
 import {readFile, yamlToJson} from "../shared/file"
 
@@ -51,12 +51,31 @@ export class FileConfigurationReader implements IConfigurationReader {
   private mapToConfiguration(
     externalModel: ConfigurationYamlModel
   ): Either<"invalid_configuration", Configuration> {
-    if (externalModel.requireApproval === undefined)
-      return either.right({requireApprovalItems: []})
+    const eitherRequireApprovalItems = this.extractRequireApprovalItems(
+      externalModel.requireApproval
+    )
+
+    if (isLeft(eitherRequireApprovalItems)) return eitherRequireApprovalItems
+
+    const globalRequiredApprovalActions =
+      externalModel.global?.requireApproval?.allResources?.actions ?? []
+
+    return either.right({
+      requireApprovalItems: eitherRequireApprovalItems.right,
+      global: {
+        requireApprovalActions: globalRequiredApprovalActions
+      }
+    })
+  }
+
+  private extractRequireApprovalItems(
+    items: ConfigurationYamlModel["requireApproval"]
+  ): Either<"invalid_configuration", RequireApprovalItem[]> {
+    if (items === undefined) return either.right([])
 
     const requireApprovalItems = new Map<String, RequireApprovalItem>()
 
-    for (const item of externalModel.requireApproval) {
+    for (const item of items) {
       const existingItem = requireApprovalItems.get(item.fullyQualifiedAddress)
 
       if (existingItem) {
@@ -72,9 +91,7 @@ export class FileConfigurationReader implements IConfigurationReader {
       })
     }
 
-    return either.right({
-      requireApprovalItems: Array.from(requireApprovalItems.values())
-    })
+    return either.right(Array.from(requireApprovalItems.values()))
   }
 }
 
@@ -84,6 +101,39 @@ const configurationSchema: JSONSchemaType<ConfigurationYamlModel> = {
   additionalProperties: false,
   required: [],
   properties: {
+    global: {
+      nullable: true,
+      type: "object",
+      additionalProperties: false,
+      required: [],
+      properties: {
+        requireApproval: {
+          nullable: true,
+          type: "object",
+          additionalProperties: false,
+          required: [],
+          properties: {
+            allResources: {
+              nullable: true,
+              type: "object",
+              additionalProperties: false,
+              required: [],
+              properties: {
+                actions: {
+                  type: "array",
+                  minItems: 0,
+                  uniqueItems: true,
+                  items: {
+                    type: "string",
+                    enum: Object.values(ApprovalAction)
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     requireApproval: {
       nullable: true,
       type: "array",
@@ -115,4 +165,12 @@ interface ConfigurationYamlModel {
     fullyQualifiedAddress: string
     actions: ApprovalAction[]
   }[]
+
+  global?: {
+    requireApproval?: {
+      allResources?: {
+        actions: ApprovalAction[]
+      }
+    }
+  }
 }
