@@ -86,6 +86,39 @@ describe("FileConfigurationReader", () => {
     })
   })
 
+  it("should return a global object containing required approval actions", () => {
+    // Given
+    const actions = [ApprovalAction.CREATE, ApprovalAction.UPDATE_IN_PLACE]
+    const yamlToJsonContent = {
+      global: {
+        requireApproval: {
+          allResources: {
+            actions: actions
+          }
+        }
+      }
+    }
+
+    jest
+      .spyOn(FileFunction, "readFile")
+      .mockReturnValueOnce(either.right("aContent"))
+
+    jest
+      .spyOn(FileFunction, "yamlToJson")
+      .mockReturnValueOnce(either.right(yamlToJsonContent))
+
+    // When
+    const result = fileConfigurationReader.readConfiguration("aLocation")
+
+    // Then
+    expectRight(result)
+    expect(result.right).toMatchObject({
+      global: {
+        requireApprovalActions: actions
+      }
+    })
+  })
+
   it("should return 'invalid_configuration' if the action is not valid", () => {
     // Given
 
