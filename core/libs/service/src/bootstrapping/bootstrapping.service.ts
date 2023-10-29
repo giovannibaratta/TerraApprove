@@ -1,4 +1,7 @@
-import {requireApprovalItemToTerraformEntity} from "@libs/domain/configuration/configuration"
+import {
+  Configuration,
+  requireApprovalItemToTerraformEntity
+} from "@libs/domain/configuration/configuration"
 import {
   TerraformDiffMap,
   printTerraformDiff
@@ -56,18 +59,22 @@ export class BootstrappingService {
   async bootstrap(): Promise<{
     terraformDiffMap: TerraformDiffMap
     terraformEntities: TerraformEntity[]
+    configuration: Configuration
   }> {
+    const configuration = this.readConfiguration()
     const terraformDiffMap = await this.collectTerraformDiffMap()
-    const terraformEntities = await this.collectTerraformEntities()
-    return {terraformDiffMap, terraformEntities}
+    const terraformEntities = await this.collectTerraformEntities(configuration)
+    return {terraformDiffMap, terraformEntities, configuration}
   }
 
-  private async collectTerraformEntities(): Promise<TerraformEntity[]> {
+  private async collectTerraformEntities(
+    configuration: Configuration
+  ): Promise<TerraformEntity[]> {
     const entitiesFromCodebase =
       await this.collectTerraformEntitiesFromCodeBase()
 
     const entitiesFromConfiguration =
-      this.collectTerraformEntitiesFromConfiguration()
+      this.collectTerraformEntitiesFromConfiguration(configuration)
 
     this.throwIfConflictIsDetected(
       entitiesFromCodebase,
@@ -114,15 +121,20 @@ export class BootstrappingService {
     }
   }
 
-  private collectTerraformEntitiesFromConfiguration(): TerraformEntity[] {
+  private readConfiguration(): Configuration {
     if (this.configurationLocation === undefined) {
       throw new Error("Configuration location not set")
     }
 
-    const entitiesFromConfiguration =
-      this.configurationService.readConfiguration(
-        this.configurationLocation
-      ).requireApprovalItems
+    return this.configurationService.readConfiguration(
+      this.configurationLocation
+    )
+  }
+
+  private collectTerraformEntitiesFromConfiguration(
+    configuration: Configuration
+  ): TerraformEntity[] {
+    const entitiesFromConfiguration = configuration.requireApprovalItems
 
     return entitiesFromConfiguration.map(it =>
       requireApprovalItemToTerraformEntity(it)

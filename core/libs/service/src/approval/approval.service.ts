@@ -1,4 +1,8 @@
-import {TerraformDiff, TerraformDiffMap} from "@libs/domain/terraform/diffs"
+import {
+  TerraformDiff,
+  TerraformDiffMap,
+  mapDiffTypeToActions
+} from "@libs/domain/terraform/diffs"
 import {
   TerraformEntity,
   isDiffActionIncludedInEntityDecorator,
@@ -19,8 +23,11 @@ export class ApprovalService {
   }
 
   private async requireApprovalMode(): Promise<boolean> {
-    const {terraformEntities, terraformDiffMap} =
+    const {terraformEntities, terraformDiffMap, configuration} =
       await this.bootstrappingService.bootstrap()
+
+    const actionaThatAlwaysRequireApproval =
+      configuration.global.requireApprovalActions
 
     const diffsEntityPairs = this.generateDiffEntityPairs(
       terraformDiffMap,
@@ -30,8 +37,14 @@ export class ApprovalService {
     // From all the diffs, keep only the ones that requires approval
     const resourcesThatRequiredApproval = diffsEntityPairs.filter(
       pair =>
-        pair[1].decorator.type === "manual_approval" &&
-        isDiffActionIncludedInEntityDecorator(pair[1].decorator, pair[0])
+        // Verify first if one of the action to achieve the diffType is in the list of actions that
+        // always require approval. If this is the case the resource requires approval.
+        mapDiffTypeToActions(pair[0].diffType).some(it =>
+          actionaThatAlwaysRequireApproval.includes(it)
+        ) ||
+        // If no match is found check is there is a specific decorator associated to the resource.
+        (pair[1].decorator.type === "manual_approval" &&
+          isDiffActionIncludedInEntityDecorator(pair[1].decorator, pair[0]))
     )
 
     Logger.log(

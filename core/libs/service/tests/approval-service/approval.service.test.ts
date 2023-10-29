@@ -4,6 +4,7 @@ import {ApprovalService} from "@libs/service/approval/approval.service"
 import {BootstrappingService} from "@libs/service/bootstrapping/bootstrapping.service"
 import {Test, TestingModule} from "@nestjs/testing"
 import {BootstrappingServiceMock} from "../mocks/bootstrapping.service.mock"
+import {mockConfiguration} from "@libs/testing/mocks/configuration.mock"
 
 describe("ApprovalService", () => {
   let approvalService: ApprovalService
@@ -58,7 +59,8 @@ describe("ApprovalService", () => {
 
       jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
         terraformDiffMap,
-        terraformEntities
+        terraformEntities,
+        configuration: mockConfiguration()
       })
 
       // When
@@ -98,7 +100,8 @@ describe("ApprovalService", () => {
 
       jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
         terraformDiffMap,
-        terraformEntities
+        terraformEntities,
+        configuration: mockConfiguration()
       })
 
       // When
@@ -143,7 +146,8 @@ describe("ApprovalService", () => {
 
       jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
         terraformDiffMap,
-        terraformEntities
+        terraformEntities,
+        configuration: mockConfiguration()
       })
 
       // When
@@ -188,7 +192,8 @@ describe("ApprovalService", () => {
 
       jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
         terraformDiffMap,
-        terraformEntities
+        terraformEntities,
+        configuration: mockConfiguration()
       })
 
       // When
@@ -198,6 +203,57 @@ describe("ApprovalService", () => {
 
       // Expect
       expect(result).toBe(false)
+    })
+
+    describe("require approval mode", () => {
+      it("should return true if the plan contains a diff type included in the global match actions", async () => {
+        // Given
+        const resourceType: string = "aws_s3_bucket"
+        const resourceName: string = "my_bucket"
+        const resourceAddress: string = "aws_s3_bucket.my_bucket"
+
+        const terraformEntities: TerraformEntity[] = [
+          {
+            entityInfo: {
+              internalType: "plain_resource",
+              providerType: resourceType,
+              userProvidedName: resourceName
+            },
+            decorator: {
+              type: "no_decorator"
+            }
+          }
+        ]
+
+        const diffFromPlan: TerraformDiff = {
+          fullyQualifiedAddress: resourceAddress,
+          userProvidedName: resourceName,
+          providerType: resourceType,
+          diffType: "create"
+        }
+
+        const terraformDiffMap = {
+          [resourceAddress]: diffFromPlan
+        }
+
+        jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
+          terraformDiffMap,
+          terraformEntities,
+          configuration: mockConfiguration({
+            global: {
+              requireApprovalActions: [Action.CREATE]
+            }
+          })
+        })
+
+        // When
+        const result = await approvalService.isApprovalRequired({
+          mode: "require_approval"
+        })
+
+        // Expect
+        expect(result).toBe(true)
+      })
     })
 
     describe("safe to apply mode", () => {
@@ -233,7 +289,8 @@ describe("ApprovalService", () => {
 
         jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
           terraformDiffMap,
-          terraformEntities
+          terraformEntities,
+          configuration: mockConfiguration()
         })
 
         // When
@@ -277,7 +334,8 @@ describe("ApprovalService", () => {
 
         jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
           terraformDiffMap,
-          terraformEntities
+          terraformEntities,
+          configuration: mockConfiguration()
         })
 
         // When
