@@ -2,4 +2,4 @@ global:
   requireApproval:
     allResources:
       actions: # Supported values are "CREATE", "UPDATE_IN_PLACE", "DELETE"
-        - "DELETE"
+        - "CREATE"

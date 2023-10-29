@@ -92,6 +92,24 @@ resource "aws_instance" "example" {
 }
 ```
 
+## Global rules
+
+The application supports global rules that can be used to mark all the resources without specifying a decorator. The rules must be added to the `.terraapprove.yaml` file in the root folder of the codebase.
+
+### Standard mode
+
+When using the standard mode, The `requireApproval` parameter can be used to specify the list of actions that always require approval. If in the plan there is at least one resource that specify on the action listed in the parameter, the application will exit with code `1` indicating that an approval is required.
+
+```yaml
+.terraapprove.yaml
+
+global:
+  requireApproval:
+    allResources:
+      actions: # Supported values are "CREATE", "UPDATE_IN_PLACE", "DELETE"
+        - "DELETE"
+```
+
 ## Alternatives
 
 This is a list of alternative tools (definitely more mature than TerraApprove) that can be used to achieve the same (or similar) results:
