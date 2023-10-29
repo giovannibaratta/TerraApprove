@@ -21,6 +21,25 @@ export type TerraformDiffMap = Record<
 
 export type DiffType = "create" | "update" | "delete" | "replace"
 
+export enum Action {
+  CREATE = "CREATE",
+  UPDATE_IN_PLACE = "UPDATE_IN_PLACE",
+  DELETE = "DELETE"
+}
+
+export function mapDiffTypeToActions(diffType: DiffType): Action[] {
+  switch (diffType) {
+    case "create":
+      return [Action.CREATE]
+    case "update":
+      return [Action.UPDATE_IN_PLACE]
+    case "delete":
+      return [Action.DELETE]
+    case "replace":
+      return [Action.CREATE, Action.DELETE]
+  }
+}
+
 export function printTerraformDiff(diff: TerraformDiff): string {
   return `${diff.fullyQualifiedAddress}: ${diff.diffType}`
 }

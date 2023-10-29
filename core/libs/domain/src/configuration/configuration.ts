@@ -1,4 +1,4 @@
-import {ApprovalAction} from "../terraform/approval"
+import {Action} from "../terraform/diffs"
 import {TerraformEntity} from "../terraform/resource"
 
 export interface Configuration {
@@ -9,12 +9,12 @@ export interface Configuration {
 export interface GlobalConfiguration {
   // List of actions that always require approval if they are found
   // in the plan.
-  readonly requireApprovalActions: ReadonlyArray<ApprovalAction>
+  readonly requireApprovalActions: ReadonlyArray<Action>
 }
 
 export interface RequireApprovalItem {
   readonly fullQualifiedAddress: string
-  readonly matchActions: ReadonlyArray<ApprovalAction>
+  readonly matchActions: ReadonlyArray<Action>
 }
 
 export function requireApprovalItemToTerraformEntity(

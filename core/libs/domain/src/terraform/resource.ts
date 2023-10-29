@@ -6,13 +6,12 @@ import {Option, isSome} from "fp-ts/lib/Option"
 import {jsonrepair} from "jsonrepair"
 import {File} from "../file/file"
 import {
-  ApprovalAction,
   DecoratorType,
   ManualApproval,
   NoDecorator,
   SafeToApply
 } from "./approval"
-import {DiffType, TerraformDiff} from "./diffs"
+import {Action, TerraformDiff, mapDiffTypeToActions} from "./diffs"
 
 export interface TerraformEntity {
   readonly entityInfo: TerraformEntityType
@@ -257,7 +256,7 @@ const manualApprovalSchema: JSONSchemaType<Omit<ManualApproval, "type">> = {
       minItems: 1,
       items: {
         type: "string",
-        enum: Object.values(ApprovalAction)
+        enum: Object.values(Action)
       }
     }
   }
@@ -273,27 +272,12 @@ export function isDiffActionIncludedInEntityDecorator(
   decorator: DecoratorType,
   diff: TerraformDiff
 ): boolean {
-  const matchingActions: undefined | ReadonlyArray<ApprovalAction> =
+  const matchingActions: undefined | ReadonlyArray<Action> =
     decorator.type === "manual_approval" ? decorator.matchActions : undefined
 
   return (
     // If no actions are speficied, we assume that all actions require approval
     matchingActions === undefined ||
-    mapDiffTypeToApprovalActions(diff.diffType).some(it =>
-      matchingActions.includes(it)
-    )
+    mapDiffTypeToActions(diff.diffType).some(it => matchingActions.includes(it))
   )
-}
-
-function mapDiffTypeToApprovalActions(diffType: DiffType): ApprovalAction[] {
-  switch (diffType) {
-    case "create":
-      return [ApprovalAction.CREATE]
-    case "update":
-      return [ApprovalAction.UPDATE_IN_PLACE]
-    case "delete":
-      return [ApprovalAction.DELETE]
-    case "replace":
-      return [ApprovalAction.DELETE, ApprovalAction.CREATE]
-  }
 }

@@ -2,7 +2,6 @@ import {
   Configuration,
   RequireApprovalItem
 } from "@libs/domain/configuration/configuration"
-import {ApprovalAction} from "@libs/domain/terraform/approval"
 import {
   IConfigurationReader,
   ReadConfigurationError
@@ -13,6 +12,7 @@ import {either} from "fp-ts"
 import {Either, chainW, isLeft} from "fp-ts/lib/Either"
 import {pipe} from "fp-ts/lib/function"
 import {readFile, yamlToJson} from "../shared/file"
+import {Action} from "@libs/domain/terraform/diffs"
 
 @Injectable()
 export class FileConfigurationReader implements IConfigurationReader {
@@ -125,7 +125,7 @@ const configurationSchema: JSONSchemaType<ConfigurationYamlModel> = {
                   uniqueItems: true,
                   items: {
                     type: "string",
-                    enum: Object.values(ApprovalAction)
+                    enum: Object.values(Action)
                   }
                 }
               }
@@ -151,7 +151,7 @@ const configurationSchema: JSONSchemaType<ConfigurationYamlModel> = {
             uniqueItems: true,
             items: {
               type: "string",
-              enum: Object.values(ApprovalAction)
+              enum: Object.values(Action)
             }
           }
         }
@@ -163,13 +163,13 @@ const configurationSchema: JSONSchemaType<ConfigurationYamlModel> = {
 interface ConfigurationYamlModel {
   requireApproval?: {
     fullyQualifiedAddress: string
-    actions: ApprovalAction[]
+    actions: Action[]
   }[]
 
   global?: {
     requireApproval?: {
       allResources?: {
-        actions: ApprovalAction[]
+        actions: Action[]
       }
     }
   }

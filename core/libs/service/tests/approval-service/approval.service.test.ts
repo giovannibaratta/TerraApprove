@@ -1,5 +1,4 @@
-import {ApprovalAction} from "@libs/domain/terraform/approval"
-import {TerraformDiff} from "@libs/domain/terraform/diffs"
+import {Action, TerraformDiff} from "@libs/domain/terraform/diffs"
 import {TerraformEntity} from "@libs/domain/terraform/resource"
 import {ApprovalService} from "@libs/service/approval/approval.service"
 import {BootstrappingService} from "@libs/service/bootstrapping/bootstrapping.service"
@@ -126,7 +125,7 @@ describe("ApprovalService", () => {
           },
           decorator: {
             type: "manual_approval",
-            matchActions: [ApprovalAction.CREATE]
+            matchActions: [Action.CREATE]
           }
         }
       ]
@@ -171,7 +170,7 @@ describe("ApprovalService", () => {
           },
           decorator: {
             type: "manual_approval",
-            matchActions: [ApprovalAction.DELETE]
+            matchActions: [Action.DELETE]
           }
         }
       ]

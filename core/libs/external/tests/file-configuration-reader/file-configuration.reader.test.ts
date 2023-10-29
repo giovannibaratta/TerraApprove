@@ -1,4 +1,4 @@
-import {ApprovalAction} from "@libs/domain/terraform/approval"
+import {Action} from "@libs/domain/terraform/diffs"
 import {FileConfigurationReader} from "@libs/external/file-configuration-reader/file-configuration.reader"
 import * as FileFunction from "@libs/external/shared/file"
 import {expectRight} from "@libs/testing/expect-helpers"
@@ -53,7 +53,7 @@ describe("FileConfigurationReader", () => {
   it("should return requireApprovalItems with one item", () => {
     // Given
     const resourceAddress = "aFullyQualifiedAddress"
-    const actions = [ApprovalAction.CREATE, ApprovalAction.UPDATE_IN_PLACE]
+    const actions = [Action.CREATE, Action.UPDATE_IN_PLACE]
     const yamlToJsonContent = {
       requireApproval: [
         {
@@ -88,7 +88,7 @@ describe("FileConfigurationReader", () => {
 
   it("should return a global object containing required approval actions", () => {
     // Given
-    const actions = [ApprovalAction.CREATE, ApprovalAction.UPDATE_IN_PLACE]
+    const actions = [Action.CREATE, Action.UPDATE_IN_PLACE]
     const yamlToJsonContent = {
       global: {
         requireApproval: {
@@ -153,11 +153,11 @@ describe("FileConfigurationReader", () => {
       requireApproval: [
         {
           fullyQualifiedAddress: resourceAddress,
-          actions: [ApprovalAction.CREATE]
+          actions: [Action.CREATE]
         },
         {
           fullyQualifiedAddress: resourceAddress,
-          actions: [ApprovalAction.UPDATE_IN_PLACE]
+          actions: [Action.UPDATE_IN_PLACE]
         }
       ]
     }

@@ -1,4 +1,3 @@
-import {ApprovalAction} from "@libs/domain/terraform/approval"
 import * as ResourceFunctions from "@libs/domain/terraform/resource"
 import {BootstrappingService} from "@libs/service/bootstrapping/bootstrapping.service"
 import {CodebaseReaderService} from "@libs/service/codebase-reader/codebase-reader.service"
@@ -11,6 +10,7 @@ import {CodebaseReaderServiceMock} from "../mocks/codebase-reader.service.mock"
 import {ConfigurationServiceMock} from "../mocks/configuration.service.mock"
 import {PlanReaderServiceMock} from "../mocks/plan-reader.service.mock"
 import {mockConfiguration} from "@libs/testing/mocks/configuration.mock"
+import {Action} from "@libs/domain/terraform/diffs"
 
 describe("BootstrappingService", () => {
   let bootstrappingService: BootstrappingService
@@ -103,7 +103,7 @@ describe("BootstrappingService", () => {
             requireApprovalItems: [
               {
                 fullQualifiedAddress: `${providerType}.${userProvidedName}`,
-                matchActions: [ApprovalAction.CREATE]
+                matchActions: [Action.CREATE]
               }
             ]
           })
@@ -157,7 +157,7 @@ describe("BootstrappingService", () => {
             requireApprovalItems: [
               {
                 fullQualifiedAddress: `module.${moduleName}.something.else`,
-                matchActions: [ApprovalAction.CREATE]
+                matchActions: [Action.CREATE]
               }
             ]
           })
