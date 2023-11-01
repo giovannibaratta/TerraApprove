@@ -7,7 +7,7 @@
     "compile": "nest build",
     "test": "yarn jest {libs/**/*.test.ts,main/**/*.test.ts}",
     "prepush-validation": "yarn lint && yarn compile && yarn test",
-    "generate:artifact": "(rm ../artifacts/terraapprove || true) && yarn pkg --targets node18-linux --output ../artifacts/terraapprove --compress GZip ./build/main/src/main.js"
+    "generate:artifact": "(rm ../artifacts/terraapprove 2>/dev/null || true) && yarn pkg --targets node18-linux --output ../artifacts/terraapprove --compress GZip ./build/main/src/main.js"
   },
   "name": "terraapprove",
   "version": "0.0.1",

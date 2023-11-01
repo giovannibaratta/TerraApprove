@@ -1,0 +1,44 @@
+name: Build and Publish Artifact
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Yarn install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+          dir: core
+
+      - name: Compile application
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: compile
+          dir: core
+
+      - name: Build artifact
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: generate:artifact
+          dir: core
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/terraapprove
