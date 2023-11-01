@@ -1,0 +1,56 @@
+name: Build and Publish Artifact
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Set Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Yarn install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+          dir: core
+
+      - name: Compile application
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: compile
+          dir: core
+
+      - name: Build artifact
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: generate:artifact
+          dir: core
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/terraapprove
+          tag_name: ${{ inputs.tag }}
