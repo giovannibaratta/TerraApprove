@@ -11,7 +11,7 @@
     "generate:artifact": "(rm ../artifacts/terraapprove 2>/dev/null || true) && yarn pkg --targets node18-linux --output ../artifacts/terraapprove --compress GZip ./build/main/src/main.js"
   },
   "name": "terraapprove",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "https://github.com/giovannibaratta/TerraApprove",
   "author": "Giovanni Baratta",
   "license": "MIT",
