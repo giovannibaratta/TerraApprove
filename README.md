@@ -26,3 +26,12 @@ cd core
 yarn install
 yarn generate:artifact
 ```
+
+## How to release a new version
+
+Tag a commit, push it to the main branch and manually run the GitHub Action "Build and Publish Artifact" specifying the tag.
+
+```bash
+git tag -a vX.Y.Z -m "Release vX.Y.Z"
+git push origin vX.Y.Z
+```
