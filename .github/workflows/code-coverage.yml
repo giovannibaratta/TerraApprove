@@ -1,0 +1,36 @@
+on: ["push", "pull_request"]
+
+name: Code coverage
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v1
+
+    - name: Set Node.js 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+
+    - name: Yarn install
+      uses: borales/actions-yarn@v4
+      with:
+        cmd: install
+        dir: core
+
+    - name: Compile application
+      uses: borales/actions-yarn@v4
+      with:
+        cmd: test:coverage
+        dir: core
+
+    - name: Upload code coverage
+      uses: coverallsapp/github-action@v2
+      with:
+        file: core/coverage/lcov.info
+        format: lcov
+        
