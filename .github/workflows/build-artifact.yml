@@ -1,13 +1,9 @@
 name: Build and Publish Artifact
 
-# on:
-#   push:
-#     branches:
-#       - main
-
 on:
   workflow_dispatch:
     inputs:
+      # Tag of the commit that be used to build the artifact that must be published
       tag:
         description: "Tag"
         required: true
