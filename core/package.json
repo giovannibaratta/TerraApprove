@@ -6,6 +6,7 @@
     "format:prettier": "yarn prettier --config .prettierrc . --write",
     "compile": "nest build",
     "test": "yarn jest {libs/**/*.test.ts,main/**/*.test.ts}",
+    "test:coverage": "yarn test --coverage",
     "prepush-validation": "yarn lint && yarn compile && yarn test",
     "generate:artifact": "(rm ../artifacts/terraapprove 2>/dev/null || true) && yarn pkg --targets node18-linux --output ../artifacts/terraapprove --compress GZip ./build/main/src/main.js"
   },

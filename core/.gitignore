@@ -15,3 +15,5 @@ build/*
 .eslintcache
 
 .terraapprove.yaml
+
+coverage

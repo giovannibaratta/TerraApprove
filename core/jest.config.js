@@ -1,12 +1,10 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
-module.exports = {
+const mainSettings = {
   testEnvironment: "node",
   transform: {
     "^.+\\.(t|j)sx?$": [
       "ts-jest",
       {
         // SKip type check
-
         isolatedModules: true
       }
     ]
@@ -20,4 +18,23 @@ module.exports = {
       "<rootDir>/libs/domain/tests/$1"
     ]
   }
+}
+
+const testSettings = {
+  coverageDirectory: "<rootDir>/coverage",
+  coverageReporters: ["text", "lcov", "html"],
+  collectCoverageFrom: [
+    "**/*.ts",
+    // Source code exclusions
+    "!**/testing/**",
+    // Artifacts and other exclusions
+    "!**/node_modules/**",
+    "!**/*.mock.ts",
+    "!build/**"
+  ]
+}
+
+module.exports = {
+  ...mainSettings,
+  ...testSettings
 }
