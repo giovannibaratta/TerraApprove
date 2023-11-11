@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/giovannibaratta/TerraApprove/badge.svg?branch=main)](https://coveralls.io/github/giovannibaratta/TerraApprove?branch=main)
+[![codebeat badge](https://codebeat.co/badges/4958e7a7-5e47-4210-8beb-167ed55078e8)](https://codebeat.co/projects/github-com-giovannibaratta-terraapprove-main) [![Coverage Status](https://coveralls.io/repos/github/giovannibaratta/TerraApprove/badge.svg?branch=main)](https://coveralls.io/github/giovannibaratta/TerraApprove?branch=main)
 
 # TerraApprove
 
