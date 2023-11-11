@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/giovannibaratta/TerraApprove/badge.svg?branch=main)](https://coveralls.io/github/giovannibaratta/TerraApprove?branch=main)
+
 # TerraApprove
 
 TerraApprove is a project created to experiment with new technologies (e.g. GitHub Copilot, devcontainers) and project management activities on something that is a little more than a toy project.
