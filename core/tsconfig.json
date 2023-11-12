@@ -7,6 +7,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "paths": {
+      "@app": ["main/src"],
+      "@app/*": ["main/src/*"],
       "@libs/domain": ["libs/domain/src"],
       "@libs/domain/*": ["libs/domain/src/*"],
       "@libs/service": ["libs/service/src"],

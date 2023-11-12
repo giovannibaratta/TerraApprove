@@ -1,10 +1,7 @@
+import {CustomLoggerOptions, CustomLogger} from "@app/logger/customer-logger"
 import {ApprovalService} from "@libs/service/approval/approval.service"
 import {BootstrappingService} from "@libs/service/bootstrapping/bootstrapping.service"
 import {Logger} from "@nestjs/common"
-import {
-  CustomLogger,
-  CustomLoggerOptions
-} from "main/src/logger/customer-logger"
 import {Command, CommandRunner, Option} from "nest-commander"
 
 @Command({
