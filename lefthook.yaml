@@ -10,3 +10,10 @@ pre-commit:
     test-typescript-app:
       root: core
       run: yarn test
+
+pre-push:
+  parallel: true
+  commands:
+    run-e2e-tests:
+      root: core
+      run: yarn test:e2e
