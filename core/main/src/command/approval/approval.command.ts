@@ -35,30 +35,38 @@ export class ApprovalCommand extends CommandRunner {
       throw new Error("Invalid number of arguments")
     }
 
-    const codeBaseDir = passedParameter[0]
-    const terraformPlanFile = passedParameter[1]
+    try {
+      const codeBaseDir = passedParameter[0]
+      const terraformPlanFile = passedParameter[1]
 
-    this.bootstrappingService.setTerraformCodeBaseLocation(codeBaseDir)
-    this.bootstrappingService.setTerraformPlanLocation(terraformPlanFile)
+      this.bootstrappingService.setTerraformCodeBaseLocation(codeBaseDir)
+      this.bootstrappingService.setTerraformPlanLocation(terraformPlanFile)
 
-    // For now we support only configuration defined in this hardcoded file.
-    // In the future the configuration could be passed using a command line parameter
-    this.bootstrappingService.setConfigurationLocation(
-      `${codeBaseDir}/.terraapprove.yaml`
-    )
+      // For now we support only configuration defined in this hardcoded file.
+      // In the future the configuration could be passed using a command line parameter
+      this.bootstrappingService.setConfigurationLocation(
+        `${codeBaseDir}/.terraapprove.yaml`
+      )
 
-    Logger.log(`Operating mode: ${this.operationMode}`)
+      Logger.log(`Operating mode: ${this.operationMode}`)
 
-    const approvalNeeded = await this.approvalSerivce.isApprovalRequired({
-      mode:
-        this.operationMode === "standard" ? "require_approval" : "safe_to_apply"
-    })
+      const approvalNeeded = await this.approvalSerivce.isApprovalRequired({
+        mode:
+          this.operationMode === "standard"
+            ? "require_approval"
+            : "safe_to_apply"
+      })
 
-    Logger.log(`Approval required: ${approvalNeeded}`)
+      Logger.log(`Approval required: ${approvalNeeded}`)
 
-    if (approvalNeeded) {
+      if (approvalNeeded) {
+        this.command.error("", {
+          exitCode: 1
+        })
+      }
+    } catch (_) {
       this.command.error("", {
-        exitCode: 1
+        exitCode: 2
       })
     }
   }
