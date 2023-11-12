@@ -10,6 +10,6 @@ curl -1sLf \
   'https://dl.cloudsmith.io/public/evilmartians/lefthook/setup.deb.sh' \
   | sudo -E bash
 
-sudo apt-get install -y lefthook=1.4.6
+sudo apt-get install -y lefthook=1.5.2
 
 echo "Lefthook setup completed"
