@@ -24,7 +24,7 @@ The project can be built using the following command:
 ```bash
 cd core
 yarn install
-yarn generate:artifact
+yarn generate:artifacts
 ```
 
 ## How to release a new version

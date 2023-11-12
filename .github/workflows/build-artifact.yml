@@ -42,11 +42,13 @@ jobs:
       - name: Build artifact
         uses: borales/actions-yarn@v4
         with:
-          cmd: generate:artifact
+          cmd: generate:artifacts
           dir: core
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/terraapprove
+          files: |
+            artifacts/terraapprove-linux
+            artifacts/terraapprove-alpine
           tag_name: ${{ inputs.tag }}
