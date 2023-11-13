@@ -15,5 +15,13 @@ pre-push:
   parallel: true
   commands:
     run-e2e-tests:
+      run: lefthook run e2e-tests
+
+# The root property add an implicit filter to lefthook, files outside the root folder
+# will not trigger the hook. For this reason the command must be split and can not be included
+# in the pre-push hook.
+e2e-tests:
+  commands:
+    run-test:
       root: core
       run: yarn test:e2e
