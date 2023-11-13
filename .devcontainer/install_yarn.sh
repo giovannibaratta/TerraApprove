@@ -8,3 +8,7 @@ set -e
 "$NVM_BIN/corepack" prepare yarn@stable --activate
 
 echo "Yarn setup completed"
+
+cd core
+
+yarn install
