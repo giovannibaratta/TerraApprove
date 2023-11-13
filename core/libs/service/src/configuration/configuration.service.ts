@@ -25,13 +25,16 @@ export class ConfigurationService {
       this.configurationReader.readConfiguration(location)
 
     if (isLeft(eitherConfiguration)) {
+      Logger.debug(`Unable to read configuration: ${eitherConfiguration.left}`)
       if (eitherConfiguration.left === "resource_not_found") {
         Logger.debug(`Configuration not found at ${location}`)
 
         return DEFAULT_CONFIGURATION
       }
 
-      Logger.error(`Unable to read configuration: ${eitherConfiguration.left}`)
+      Logger.error(
+        `Unprocessable error while trying to read configuration: ${eitherConfiguration.left}`
+      )
       throw new Error(
         `Unable to read configuration: ${eitherConfiguration.left}`
       )
