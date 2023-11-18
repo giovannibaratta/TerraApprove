@@ -33,11 +33,24 @@ TerraApprove is a tool that can be integrated in a CI/CD pipeline and can be use
 2. Run the application specifying the path to the Terraform codebase & plan.
 
    ```bash
-   # From the main directory
-   ./artifacts/terraapprove ./examples/simple ./examples/simple/tfplan.json
+   terraapprove ./examples/simple ./examples/simple/tfplan.json
    ```
 
 3. Inspect the exit code to know if the plan can be applied with `-auto-approve` or if a manual approval is required.
+
+## Operating modes
+
+The application supports two operating modes:
+* Standard mode, this is the default mode.
+* Safe to apply mode, can be enabled using the flag `--reverse`.
+
+### Standard mode
+
+In this mode, all the resources are considered **safe** to apply by default except the ones that are tagged with `RequireApproval` or are specified in the global rules.
+
+### Safe to apply mode
+
+In this mode, all the resources are considered **unsafe** by default to apply except the ones that are tagged with `SafeToApply` or are specified in the global rules.
 
 ## RequireApproval decorator
 
