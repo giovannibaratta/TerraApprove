@@ -69,9 +69,9 @@ resource "aws_instance" "example" {
 
 The decorator accepts arguments to customize the behavior. The arguments are specified as a JSON object. The following arguments are supported:
 
-| Argument       | Description                                                                                                                            | Default behavior              |
+| Argument       | Description                                                                                                                            | If not set              |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| `matchActions` | A list of actions that must be matched for the decorator to be applied. The possible values are `CREATE`, `UPDATE_IN_PLACE`, `DELETE`. | All actions requires approval |
+| `matchActions` | A list of actions that must be matched for the decorator to be applied. The possible values are `CREATE`, `UPDATE_IN_PLACE`, `DELETE`. | All actions require approval |
 
 Example:
 
@@ -100,6 +100,23 @@ The decorator can be used as follows:
 
 ```hcl
 # SafeToApply()
+resource "aws_instance" "example" {
+  ...
+}
+```
+
+### Decorator arguments
+
+The decorator accepts arguments to customize the behavior. The arguments are specified as a JSON object. The following arguments are supported:
+
+| Argument       | Description                                                                                                                            | If not set              |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `matchActions` | A list of actions that must be matched for the decorator to be applied. The possible values are `CREATE`, `UPDATE_IN_PLACE`, `DELETE`. | All actions are safe to apply |
+
+Example:
+
+```hcl
+# SafeToApply({ matchActions: ["CREATE"]})
 resource "aws_instance" "example" {
   ...
 }
