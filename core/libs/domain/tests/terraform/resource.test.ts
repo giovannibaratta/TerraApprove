@@ -354,4 +354,22 @@ describe("extractDecorator", () => {
       })
     )
   })
+
+  it("should return a SafeToApply decorator and populate the matchActions property", () => {
+    // Given
+    const lines = [
+      '# @SafeToApply({matchActions: ["CREATE", "UPDATE_IN_PLACE", "DELETE"]})'
+    ]
+
+    // When
+    const result = extractDecorator(lines)
+
+    // Expect
+    expect(result).toEqual(
+      either.right({
+        type: "safe_to_apply",
+        matchActions: ["CREATE", "UPDATE_IN_PLACE", "DELETE"]
+      })
+    )
+  })
 })
