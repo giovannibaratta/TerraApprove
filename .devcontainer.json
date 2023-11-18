@@ -31,7 +31,8 @@
         "dbaeumer.vscode-eslint",
         "orta.vscode-jest",
         "yoavbls.pretty-ts-errors",
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "donjayamanne.githistory"
       ],
       "settings": {
         "editor.formatOnSave": true,
