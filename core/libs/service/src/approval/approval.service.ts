@@ -98,7 +98,17 @@ export class ApprovalService {
 
     // From all the diffs, remove all the ones that are safe to apply
     const resourcesThatAreNotSafeToApply = diffsEntityPairs.filter(
-      pair => pair[1].decorator.type !== "safe_to_apply"
+      pair =>
+        // The resources is not tagged, by default it is not safe to apply and must included in the result.
+        pair[1].decorator.type !== "safe_to_apply" ||
+        // The resources is tagged. If no actions is specified it is safe to apply and we can exclude it.
+        // If the resource specify a limited set of actions that are safe to apply, we need to check that
+        // every actions that will be perfomed are included in the list of safe actions.
+        (pair[1].decorator.matchActions &&
+          !areAllItemsIncluded(
+            pair[1].decorator.matchActions,
+            mapDiffTypeToActions(pair[0].diffType)
+          ))
     )
 
     Logger.log(
@@ -133,6 +143,13 @@ export class ApprovalService {
         plainResourceMatch(diff, entity) || moduleEntityMatch(diff, entity)
     )
   }
+}
+
+function areAllItemsIncluded<T>(
+  items: ReadonlyArray<T>,
+  itemsToCheck: ReadonlyArray<T>
+): boolean {
+  return itemsToCheck.every(it => items.includes(it))
 }
 
 export interface IsApprovalRequiredParams {
