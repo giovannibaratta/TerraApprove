@@ -116,7 +116,7 @@ const safeToApplyRegex = decoratorRegexGenerator("SafeToApply")
 const closingBracketRegex = /^[^#]+}.*$/
 
 /**
- * Perform a reversed search in the previous line to find the approval tag.
+ * Perform a reversed search in the previous lines to find the approval tag.
  * The search stops when
  * - a line that is not a comment and a closing bracket is found. This is based on the
  *   assumption that no valid terraform code can be placed between the closing bracket
