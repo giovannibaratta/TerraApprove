@@ -265,7 +265,17 @@ const manualApprovalSchema: JSONSchemaType<Omit<ManualApproval, "type">> = {
 const safeToApplySchema: JSONSchemaType<Omit<SafeToApply, "type">> = {
   type: "object",
   additionalProperties: false,
-  properties: {}
+  properties: {
+    matchActions: {
+      type: "array",
+      nullable: true,
+      minItems: 1,
+      items: {
+        type: "string",
+        enum: Object.values(Action)
+      }
+    }
+  }
 }
 
 export function isDiffActionIncludedInEntityDecorator(

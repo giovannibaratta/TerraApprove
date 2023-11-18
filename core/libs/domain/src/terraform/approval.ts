@@ -13,4 +13,5 @@ export interface ManualApproval {
 
 export interface SafeToApply {
   readonly type: "safe_to_apply"
+  readonly matchActions?: ReadonlyArray<Action>
 }
