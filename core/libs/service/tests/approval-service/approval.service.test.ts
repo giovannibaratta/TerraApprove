@@ -302,50 +302,54 @@ describe("ApprovalService", () => {
         expect(result).toBe(true)
       })
 
-      it("should return false if the plan contains only resources that are safe to apply", async () => {
-        // Given
-        const resourceType: string = "aws_s3_bucket"
-        const resourceName: string = "my_bucket"
-        const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      it(
+        "should return false if the plan contains only " +
+          "resources that are safe to apply (defined in the decorator)",
+        async () => {
+          // Given
+          const resourceType: string = "aws_s3_bucket"
+          const resourceName: string = "my_bucket"
+          const resourceAddress: string = "aws_s3_bucket.my_bucket"
 
-        const terraformEntities: TerraformEntity[] = [
-          {
-            entityInfo: {
-              internalType: "plain_resource",
-              providerType: resourceType,
-              userProvidedName: resourceName
-            },
-            decorator: {
-              type: "safe_to_apply"
+          const terraformEntities: TerraformEntity[] = [
+            {
+              entityInfo: {
+                internalType: "plain_resource",
+                providerType: resourceType,
+                userProvidedName: resourceName
+              },
+              decorator: {
+                type: "safe_to_apply"
+              }
             }
+          ]
+
+          const diffFromPlan: TerraformDiff = {
+            fullyQualifiedAddress: resourceAddress,
+            userProvidedName: resourceName,
+            providerType: resourceType,
+            diffType: "create"
           }
-        ]
 
-        const diffFromPlan: TerraformDiff = {
-          fullyQualifiedAddress: resourceAddress,
-          userProvidedName: resourceName,
-          providerType: resourceType,
-          diffType: "create"
+          const terraformDiffMap = {
+            [resourceAddress]: diffFromPlan
+          }
+
+          jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
+            terraformDiffMap,
+            terraformEntities,
+            configuration: mockConfiguration()
+          })
+
+          // When
+          const result = await approvalService.isApprovalRequired({
+            mode: "safe_to_apply"
+          })
+
+          // Expect
+          expect(result).toBe(false)
         }
-
-        const terraformDiffMap = {
-          [resourceAddress]: diffFromPlan
-        }
-
-        jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-          terraformDiffMap,
-          terraformEntities,
-          configuration: mockConfiguration()
-        })
-
-        // When
-        const result = await approvalService.isApprovalRequired({
-          mode: "safe_to_apply"
-        })
-
-        // Expect
-        expect(result).toBe(false)
-      })
+      )
 
       it("should return false if the plan contains only actions specified in the decorator", async () => {
         // Given
