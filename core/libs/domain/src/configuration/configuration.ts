@@ -10,6 +10,9 @@ export interface GlobalConfiguration {
   // List of actions that always require approval if they are found
   // in the plan.
   readonly requireApprovalActions?: ReadonlyArray<Action>
+  // List of actions that are safe to apply if they are found in the
+  // plan.
+  readonly safeToApplyActions?: ReadonlyArray<Action>
 }
 
 export interface RequireApprovalItem {
