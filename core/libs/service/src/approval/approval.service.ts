@@ -1,5 +1,6 @@
 import {Configuration} from "@libs/domain/configuration/configuration"
 import {
+  Action,
   DiffType,
   TerraformDiff,
   TerraformDiffMap,
@@ -12,6 +13,7 @@ import {
 } from "@libs/domain/terraform/resource"
 import {Injectable, Logger} from "@nestjs/common"
 import {BootstrappingService} from "../bootstrapping/bootstrapping.service"
+import {getSafeToApplyActionsFromDecorator} from "@libs/domain/terraform/approval"
 
 @Injectable()
 export class ApprovalService {
@@ -102,7 +104,7 @@ export class ApprovalService {
   }
 
   private async safeToApplyMode(): Promise<boolean> {
-    const {terraformEntities, terraformDiffMap} =
+    const {terraformEntities, terraformDiffMap, configuration} =
       await this.bootstrappingService.bootstrap()
 
     const diffsEntityPairs = this.generateDiffEntityPairs(
@@ -111,19 +113,20 @@ export class ApprovalService {
     )
 
     // From all the diffs, remove all the ones that are safe to apply
-    const resourcesThatAreNotSafeToApply = diffsEntityPairs.filter(
-      pair =>
-        // The resources is not tagged, by default it is not safe to apply and must included in the result.
-        pair[1].decorator.type !== "safe_to_apply" ||
-        // The resources is tagged. If no actions is specified it is safe to apply and we can exclude it.
-        // If the resource specify a limited set of actions that are safe to apply, we need to check that
-        // every actions that will be perfomed are included in the list of safe actions.
-        (pair[1].decorator.matchActions &&
-          !areAllItemsIncluded(
-            pair[1].decorator.matchActions,
-            mapDiffTypeToActions(pair[0].diffType)
-          ))
-    )
+    const resourcesThatAreNotSafeToApply = diffsEntityPairs.filter(pair => {
+      // Merge the safe to apply actions defined at the global level and the ones defined at the resource level
+      const safeActionsForResource: Action[] = [
+        ...(configuration.global.safeToApplyActions ?? []),
+        ...getSafeToApplyActionsFromDecorator(pair[1].decorator)
+      ]
+
+      // It all the actions that will be perfomed to apply the plan are not included in the safe-list,
+      // it means that there is a potential unsafe action for the resource and we need to ask for approval.
+      return !areAllItemsIncluded(
+        safeActionsForResource,
+        mapDiffTypeToActions(pair[0].diffType)
+      )
+    })
 
     Logger.log(
       `Found ${resourcesThatAreNotSafeToApply.length} resource(s) that are not safe to apply:`
