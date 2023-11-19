@@ -58,7 +58,7 @@ export class FileConfigurationReader implements IConfigurationReader {
     if (isLeft(eitherRequireApprovalItems)) return eitherRequireApprovalItems
 
     const globalRequiredApprovalActions =
-      externalModel.global?.requireApproval?.allResources?.actions ?? []
+      externalModel.global?.requireApproval?.allResources?.actions
 
     return either.right({
       requireApprovalItems: eitherRequireApprovalItems.right,

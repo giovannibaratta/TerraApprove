@@ -8,9 +8,7 @@ import {
 
 const DEFAULT_CONFIGURATION: Configuration = {
   requireApprovalItems: [],
-  global: {
-    requireApprovalActions: []
-  }
+  global: {}
 }
 
 @Injectable()

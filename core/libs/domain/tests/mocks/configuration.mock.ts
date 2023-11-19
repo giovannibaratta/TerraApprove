@@ -5,9 +5,7 @@ export function mockConfiguration(
 ): Configuration {
   const baseObj: Configuration = {
     requireApprovalItems: [],
-    global: {
-      requireApprovalActions: []
-    }
+    global: {}
   }
 
   return {
