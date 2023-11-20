@@ -119,6 +119,39 @@ describe("FileConfigurationReader", () => {
     })
   })
 
+  it("should return a global object containing safe to apply actions", () => {
+    // Given
+    const actions = [Action.CREATE, Action.UPDATE_IN_PLACE]
+    const yamlToJsonContent = {
+      global: {
+        safeToApply: {
+          allResources: {
+            actions: actions
+          }
+        }
+      }
+    }
+
+    jest
+      .spyOn(FileFunction, "readFile")
+      .mockReturnValueOnce(either.right("aContent"))
+
+    jest
+      .spyOn(FileFunction, "yamlToJson")
+      .mockReturnValueOnce(either.right(yamlToJsonContent))
+
+    // When
+    const result = fileConfigurationReader.readConfiguration("aLocation")
+
+    // Then
+    expectRight(result)
+    expect(result.right).toMatchObject({
+      global: {
+        safeToApplyActions: actions
+      }
+    })
+  })
+
   it("should return 'invalid_configuration' if the action is not valid", () => {
     // Given
 

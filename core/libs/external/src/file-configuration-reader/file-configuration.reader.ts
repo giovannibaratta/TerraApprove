@@ -60,10 +60,14 @@ export class FileConfigurationReader implements IConfigurationReader {
     const globalRequiredApprovalActions =
       externalModel.global?.requireApproval?.allResources?.actions
 
+    const globalSafeToApplyActions =
+      externalModel.global?.safeToApply?.allResources?.actions
+
     return either.right({
       requireApprovalItems: eitherRequireApprovalItems.right,
       global: {
-        requireApprovalActions: globalRequiredApprovalActions
+        requireApprovalActions: globalRequiredApprovalActions,
+        safeToApplyActions: globalSafeToApplyActions
       }
     })
   }
@@ -131,6 +135,31 @@ const configurationSchema: JSONSchemaType<ConfigurationYamlModel> = {
               }
             }
           }
+        },
+        safeToApply: {
+          nullable: true,
+          type: "object",
+          additionalProperties: false,
+          required: [],
+          properties: {
+            allResources: {
+              nullable: true,
+              type: "object",
+              additionalProperties: false,
+              required: [],
+              properties: {
+                actions: {
+                  type: "array",
+                  minItems: 1,
+                  uniqueItems: true,
+                  items: {
+                    type: "string",
+                    enum: Object.values(Action)
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -168,6 +197,12 @@ interface ConfigurationYamlModel {
 
   global?: {
     requireApproval?: {
+      allResources?: {
+        actions: Action[]
+      }
+    }
+
+    safeToApply?: {
       allResources?: {
         actions: Action[]
       }
