@@ -8,6 +8,9 @@ jekyll_dependencies=(
     zlib1g-dev
 )
 
+parallel_dependencies=(
+    parallel=20210822+ds-2
+)
 
 lefthook_dependencies=(
     lefthook=1.5.2
@@ -24,6 +27,7 @@ curl -1sLf \
 
 sudo apt-get install -y \
     "${jekyll_dependencies[@]}" \
+    "${parallel_dependencies[@]}" \
     "${lefthook_dependencies[@]}"
 
 # Notify other scripts that all the dependencies are installed
