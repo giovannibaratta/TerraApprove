@@ -2,9 +2,9 @@
   "name": "TerraApprove",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "onCreateCommand": {
+    "install-dependencies": "/bin/bash ./.devcontainer/install_dependencies.sh || echo 'Failing to install dependencies'",
     "install-yarn": "/bin/bash ./.devcontainer/install_yarn.sh || echo 'Script install_yarn failed'",
-    "install-lefthook": "/bin/bash ./.devcontainer/install_lefthook.sh || echo 'Script install_lefthook failed'",
-    "install-jekyll": "/bin/bash ./.devcontainer/install_jekyll.sh || echo 'Script install_jekyll failed'"
+    "configure-jekyll": "/bin/bash ./.devcontainer/configure_jekyll.sh || echo 'Jekyll configuration failed'"
   },
   "features": {
     // Add docker in docker support
