@@ -140,6 +140,20 @@ global:
         - "DELETE"
 ```
 
+### Safe to apply mode
+
+When using the safe to apply mode, The `safeToApply` parameter can be used to specify the list of actions that are always safe to apply. If in the plan there are only resources that specify the action listed in the parameter, the application will exit with code `0` indicating that the plan can be applied with `-auto-approve`.
+
+```yaml
+.terraapprove.yaml
+
+global:
+  safeToApply:
+    allResources:
+      actions: # Supported values are "CREATE", "UPDATE_IN_PLACE", "DELETE"
+        - "CREATE"
+```
+
 ## Alternatives
 
 This is a list of alternative tools (definitely more mature than TerraApprove) that can be used to achieve the same (or similar) results:
