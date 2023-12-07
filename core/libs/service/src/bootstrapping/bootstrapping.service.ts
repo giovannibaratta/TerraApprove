@@ -19,6 +19,12 @@ import {CodebaseReaderService} from "../codebase-reader/codebase-reader.service"
 import {ConfigurationService} from "../configuration/configuration.service"
 import {PlanReaderService} from "../plan-reader/plan-reader.service"
 
+export type BootstapResult = {
+  terraformDiffMap: TerraformDiffMap
+  terraformEntities: TerraformEntity[]
+  configuration: Configuration
+}
+
 @Injectable()
 export class BootstrappingService {
   private terraformPlanLocation: string | undefined = undefined
@@ -56,11 +62,7 @@ export class BootstrappingService {
    * and the diff from the plan. If the location of these resources have
    * not been set, an error is thrown.
    */
-  async bootstrap(): Promise<{
-    terraformDiffMap: TerraformDiffMap
-    terraformEntities: TerraformEntity[]
-    configuration: Configuration
-  }> {
+  async bootstrap(): Promise<BootstapResult> {
     const configuration = this.readConfiguration()
     const terraformDiffMap = await this.collectTerraformDiffMap()
     const terraformEntities = await this.collectTerraformEntities(configuration)
