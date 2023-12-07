@@ -1,32 +1,19 @@
-import {Configuration} from "@libs/domain/configuration/configuration"
-import {
-  Action,
-  DiffType,
-  TerraformDiff,
-  TerraformDiffMap,
-  mapDiffTypeToActions
-} from "@libs/domain/terraform/diffs"
-import {
-  TerraformEntity,
-  isDiffActionIncludedInEntityDecorator,
-  printShortTerraformEntity
-} from "@libs/domain/terraform/resource"
+import {TerraformDiff, TerraformDiffMap} from "@libs/domain/terraform/diffs"
+import {TerraformEntity} from "@libs/domain/terraform/resource"
 import {Injectable, Logger} from "@nestjs/common"
 import {BootstrappingService} from "../bootstrapping/bootstrapping.service"
-import {getSafeToApplyActionsFromDecorator} from "@libs/domain/terraform/approval"
+import {RequireApprovalModeUseCase} from "./require-approval-mode.use-case"
+import {SafeToApplyModeUseCase} from "./safe-to-apply-mode.use-case"
 
 @Injectable()
 export class ApprovalService {
-  constructor(private readonly bootstrappingService: BootstrappingService) {}
+  constructor(
+    private readonly bootstrappingService: BootstrappingService,
+    private readonly requireApprovalModeUseCase: RequireApprovalModeUseCase,
+    private readonly safeToApplyModeUseCase: SafeToApplyModeUseCase
+  ) {}
 
   async isApprovalRequired(params: IsApprovalRequiredParams): Promise<boolean> {
-    if (params.mode === "require_approval") return this.requireApprovalMode()
-    if (params.mode === "safe_to_apply") return this.safeToApplyMode()
-
-    throw new Error("Mode not supported")
-  }
-
-  private async requireApprovalMode(): Promise<boolean> {
     const {terraformEntities, terraformDiffMap, configuration} =
       await this.bootstrappingService.bootstrap()
 
@@ -35,42 +22,19 @@ export class ApprovalService {
       terraformEntities
     )
 
-    // From all the diffs, keep only the ones that requires approval
-    const resourcesThatRequiredApproval = diffsEntityPairs.filter(
-      pair =>
-        // Verify first if one of the action to achieve the diffType is in the list of actions that
-        // always require approval. If this is the case the resource requires approval.
-        this.doesContainActionThatAlwaysRequireApproval(
-          configuration,
-          pair[0].diffType
-        ) ||
-        // If no match is found check is there is a specific decorator associated to the resource.
-        (pair[1].decorator.type === "manual_approval" &&
-          isDiffActionIncludedInEntityDecorator(pair[1].decorator, pair[0]))
-    )
+    if (params.mode === "require_approval")
+      return this.requireApprovalModeUseCase.isApprovalRequired({
+        configuration,
+        diffsEntityPairs
+      })
 
-    Logger.log(
-      `Found ${resourcesThatRequiredApproval.length} resource(s) that require approval:`
-    )
-    resourcesThatRequiredApproval.forEach(it =>
-      Logger.log(`- ${printShortTerraformEntity(it[1])}`)
-    )
+    if (params.mode === "safe_to_apply")
+      return this.safeToApplyModeUseCase.isApprovalRequired({
+        configuration,
+        diffsEntityPairs
+      })
 
-    return resourcesThatRequiredApproval.length > 0
-  }
-
-  private doesContainActionThatAlwaysRequireApproval(
-    configuration: Configuration,
-    diffType: DiffType
-  ): boolean {
-    const actionaThatAlwaysRequireApproval =
-      configuration.global.requireApprovalActions
-    const actions = mapDiffTypeToActions(diffType)
-
-    return (
-      actionaThatAlwaysRequireApproval !== undefined &&
-      actions.some(it => actionaThatAlwaysRequireApproval.includes(it))
-    )
+    throw new Error("Mode not supported")
   }
 
   private generateDiffEntityPairs(
@@ -103,41 +67,6 @@ export class ApprovalService {
     }, [])
   }
 
-  private async safeToApplyMode(): Promise<boolean> {
-    const {terraformEntities, terraformDiffMap, configuration} =
-      await this.bootstrappingService.bootstrap()
-
-    const diffsEntityPairs = this.generateDiffEntityPairs(
-      terraformDiffMap,
-      terraformEntities
-    )
-
-    // From all the diffs, remove all the ones that are safe to apply
-    const resourcesThatAreNotSafeToApply = diffsEntityPairs.filter(pair => {
-      // Merge the safe to apply actions defined at the global level and the ones defined at the resource level
-      const safeActionsForResource: Action[] = [
-        ...(configuration.global.safeToApplyActions ?? []),
-        ...getSafeToApplyActionsFromDecorator(pair[1].decorator)
-      ]
-
-      // It all the actions that will be perfomed to apply the plan are not included in the safe-list,
-      // it means that there is a potential unsafe action for the resource and we need to ask for approval.
-      return !areAllItemsIncluded(
-        safeActionsForResource,
-        mapDiffTypeToActions(pair[0].diffType)
-      )
-    })
-
-    Logger.log(
-      `Found ${resourcesThatAreNotSafeToApply.length} resource(s) that are not safe to apply:`
-    )
-    resourcesThatAreNotSafeToApply.forEach(it =>
-      Logger.log(`- ${printShortTerraformEntity(it[1])}`)
-    )
-
-    return resourcesThatAreNotSafeToApply.length > 0
-  }
-
   private findDiffCounterpartInEntities(
     diff: TerraformDiff,
     entities: TerraformEntity[]
@@ -160,13 +89,6 @@ export class ApprovalService {
         plainResourceMatch(diff, entity) || moduleEntityMatch(diff, entity)
     )
   }
-}
-
-function areAllItemsIncluded<T>(
-  items: ReadonlyArray<T>,
-  itemsToCheck: ReadonlyArray<T>
-): boolean {
-  return itemsToCheck.every(it => items.includes(it))
 }
 
 export interface IsApprovalRequiredParams {

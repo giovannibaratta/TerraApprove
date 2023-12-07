@@ -5,6 +5,8 @@ import {BootstrappingService} from "@libs/service/bootstrapping/bootstrapping.se
 import {Test, TestingModule} from "@nestjs/testing"
 import {BootstrappingServiceMock} from "../mocks/bootstrapping.service.mock"
 import {mockConfiguration} from "@libs/testing/mocks/configuration.mock"
+import {RequireApprovalModeUseCase} from "@libs/service/approval/require-approval-mode.use-case"
+import {SafeToApplyModeUseCase} from "@libs/service/approval/safe-to-apply-mode.use-case"
 
 describe("ApprovalService", () => {
   let approvalService: ApprovalService
@@ -17,7 +19,9 @@ describe("ApprovalService", () => {
         {
           provide: BootstrappingService,
           useClass: BootstrappingServiceMock
-        }
+        },
+        RequireApprovalModeUseCase,
+        SafeToApplyModeUseCase
       ]
     }).compile()
 
