@@ -1,16 +1,25 @@
-import {Action, TerraformDiff} from "@libs/domain/terraform/diffs"
-import {TerraformEntity} from "@libs/domain/terraform/resource"
-import {ApprovalService} from "@libs/service/approval/approval.service"
-import {BootstrappingService} from "@libs/service/bootstrapping/bootstrapping.service"
-import {Test, TestingModule} from "@nestjs/testing"
-import {BootstrappingServiceMock} from "../mocks/bootstrapping.service.mock"
-import {mockConfiguration} from "@libs/testing/mocks/configuration.mock"
+import {
+  ApprovalService,
+  IsApprovalRequiredParams
+} from "@libs/service/approval/approval.service"
 import {RequireApprovalModeUseCase} from "@libs/service/approval/require-approval-mode.use-case"
 import {SafeToApplyModeUseCase} from "@libs/service/approval/safe-to-apply-mode.use-case"
+import {
+  BootstapResult,
+  BootstrappingService
+} from "@libs/service/bootstrapping/bootstrapping.service"
+import {Test, TestingModule} from "@nestjs/testing"
+import {BootstrappingServiceMock} from "../mocks/bootstrapping.service.mock"
+import {RequireApprovalModeUseCaseMock} from "../mocks/require-approva-mode.use-case.mock"
+import {SafeToApplyModeUseCaseMock} from "../mocks/safe-to-apply-mode.use-case.mock"
+import {TerraformEntity} from "@libs/domain/terraform/resource"
+import {mockConfiguration} from "@libs/testing/mocks/configuration.mock"
 
 describe("ApprovalService", () => {
   let approvalService: ApprovalService
   let bootstrappingService: BootstrappingService
+  let requireApprovalModeUseCase: RequireApprovalModeUseCase
+  let safeToApplyModeUseCase: SafeToApplyModeUseCase
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,538 +29,183 @@ describe("ApprovalService", () => {
           provide: BootstrappingService,
           useClass: BootstrappingServiceMock
         },
-        RequireApprovalModeUseCase,
-        SafeToApplyModeUseCase
+        {
+          provide: RequireApprovalModeUseCase,
+          useClass: RequireApprovalModeUseCaseMock
+        },
+        {
+          provide: SafeToApplyModeUseCase,
+          useClass: SafeToApplyModeUseCaseMock
+        }
       ]
     }).compile()
 
     approvalService = module.get(ApprovalService)
     bootstrappingService = module.get(BootstrappingService)
+    requireApprovalModeUseCase = module.get(RequireApprovalModeUseCase)
+    safeToApplyModeUseCase = module.get(SafeToApplyModeUseCase)
 
     jest.restoreAllMocks()
   })
 
   describe("isApprovalRequired", () => {
-    it("should return true if the plan contains a plain resource that requires approval", async () => {
+    it("should call requireApprovalModeUseCase.isApprovalRequired if mode is require_approval", async () => {
       // Given
-
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
-
-      const terraformEntities: TerraformEntity[] = [
-        {
-          entityInfo: {
-            internalType: "plain_resource",
-            providerType: resourceType,
-            userProvidedName: resourceName
-          },
-          decorator: {type: "manual_approval"}
-        }
-      ]
-
-      const diffFromPlan: TerraformDiff = {
-        fullyQualifiedAddress: resourceAddress,
-        userProvidedName: resourceName,
-        providerType: resourceType,
-        diffType: "create"
-      }
-
-      const terraformDiffMap = {
-        [resourceAddress]: diffFromPlan
-      }
-
-      jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-        terraformDiffMap,
-        terraformEntities,
+      const mode = "require_approval"
+      const bootstrapResult: BootstapResult = {
+        terraformEntities: [] as TerraformEntity[],
+        terraformDiffMap: {},
         configuration: mockConfiguration()
-      })
+      }
+
+      const isApprovalRequiredResult = true
+
+      jest
+        .spyOn(bootstrappingService, "bootstrap")
+        .mockResolvedValue(bootstrapResult)
+      jest
+        .spyOn(requireApprovalModeUseCase, "isApprovalRequired")
+        .mockReturnValue(isApprovalRequiredResult)
 
       // When
-      const result = await approvalService.isApprovalRequired({
-        mode: "require_approval"
-      })
+      const result = await approvalService.isApprovalRequired({mode})
 
       // Expect
-      expect(result).toBe(true)
+      expect(result).toBe(isApprovalRequiredResult)
     })
 
-    it("should return true if the plan contains a resource defined in a module that requires approval", async () => {
+    it("should call safeToApplyModeUseCase.isApprovalRequired if mode is safe_to_apply", async () => {
       // Given
-      const moduleName = "my_module"
-
-      const terraformEntities: TerraformEntity[] = [
-        {
-          entityInfo: {
-            internalType: "module",
-            userProvidedName: moduleName
-          },
-          decorator: {type: "manual_approval"}
-        }
-      ]
-
-      const diffFromPlan: TerraformDiff = {
-        fullyQualifiedAddress: "fq_address",
-        userProvidedName: "my_bucket",
-        providerType: "aws_s3_bucket",
-        diffType: "create",
-        firstLevelModule: moduleName
-      }
-
-      const terraformDiffMap = {
-        [diffFromPlan.fullyQualifiedAddress]: diffFromPlan
-      }
-
-      jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-        terraformDiffMap,
-        terraformEntities,
+      const mode = "safe_to_apply"
+      const bootstrapResult: BootstapResult = {
+        terraformEntities: [] as TerraformEntity[],
+        terraformDiffMap: {},
         configuration: mockConfiguration()
-      })
+      }
+
+      const isApprovalRequiredResult = true
+
+      jest
+        .spyOn(bootstrappingService, "bootstrap")
+        .mockResolvedValue(bootstrapResult)
+      jest
+        .spyOn(safeToApplyModeUseCase, "isApprovalRequired")
+        .mockReturnValue(isApprovalRequiredResult)
 
       // When
-      const result = await approvalService.isApprovalRequired({
-        mode: "require_approval"
-      })
+      const result = await approvalService.isApprovalRequired({mode})
 
       // Expect
-      expect(result).toBe(true)
+      expect(result).toBe(isApprovalRequiredResult)
     })
 
-    it("should return true if the plan contains a plain resource that requires approval and the action matches", async () => {
+    it("should throw an error if mode is not supported", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      const mode: IsApprovalRequiredParams["mode"] =
+        "not_supported" as IsApprovalRequiredParams["mode"]
 
-      const terraformEntities: TerraformEntity[] = [
-        {
-          entityInfo: {
-            internalType: "plain_resource",
-            providerType: resourceType,
-            userProvidedName: resourceName
-          },
-          decorator: {
-            type: "manual_approval",
-            matchActions: [Action.CREATE]
+      const bootstrapResult: BootstapResult = {
+        terraformEntities: [] as TerraformEntity[],
+        terraformDiffMap: {},
+        configuration: mockConfiguration()
+      }
+
+      const isApprovalRequiredResult = true
+
+      jest
+        .spyOn(bootstrappingService, "bootstrap")
+        .mockResolvedValue(bootstrapResult)
+      jest
+        .spyOn(safeToApplyModeUseCase, "isApprovalRequired")
+        .mockReturnValue(isApprovalRequiredResult)
+
+      // When
+      const result = approvalService.isApprovalRequired({mode})
+
+      // Expect
+      await expect(result).rejects.toThrow("Mode not supported")
+    })
+
+    it("should throw an error if the diff from the plan does not have a counterpart in the code base", async () => {
+      // Given
+      const mode = "safe_to_apply"
+      const bootstrapResult: BootstapResult = {
+        terraformEntities: [] as TerraformEntity[],
+        terraformDiffMap: {
+          "aws_s3_bucket.my_bucket": {
+            fullyQualifiedAddress: "aws_s3_bucket.my_bucket",
+            userProvidedName: "my_bucket",
+            providerType: "aws_s3_bucket",
+            diffType: "create"
           }
-        }
-      ]
-
-      const diffFromPlan: TerraformDiff = {
-        fullyQualifiedAddress: resourceAddress,
-        userProvidedName: resourceName,
-        providerType: resourceType,
-        diffType: "create"
-      }
-
-      const terraformDiffMap = {
-        [resourceAddress]: diffFromPlan
-      }
-
-      jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-        terraformDiffMap,
-        terraformEntities,
+        },
         configuration: mockConfiguration()
-      })
+      }
+
+      const isApprovalRequiredResult = true
+
+      jest
+        .spyOn(bootstrappingService, "bootstrap")
+        .mockResolvedValue(bootstrapResult)
+      jest
+        .spyOn(safeToApplyModeUseCase, "isApprovalRequired")
+        .mockReturnValue(isApprovalRequiredResult)
 
       // When
-      const result = await approvalService.isApprovalRequired({
-        mode: "require_approval"
-      })
+      const result = approvalService.isApprovalRequired({mode})
 
       // Expect
-      expect(result).toBe(true)
+      await expect(result).rejects.toThrow(
+        "Could not find counterpart for diff"
+      )
     })
 
-    it("should return false if the plan contains a plain resource but the action does not match", async () => {
+    it("should correctly map the diff from the plan to the entity from the code base", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
-
-      const terraformEntities: TerraformEntity[] = [
-        {
-          entityInfo: {
-            internalType: "plain_resource",
-            providerType: resourceType,
-            userProvidedName: resourceName
-          },
-          decorator: {
-            type: "manual_approval",
-            matchActions: [Action.DELETE]
-          }
-        }
-      ]
-
-      const diffFromPlan: TerraformDiff = {
-        fullyQualifiedAddress: resourceAddress,
-        userProvidedName: resourceName,
-        providerType: resourceType,
-        diffType: "create"
-      }
-
-      const terraformDiffMap = {
-        [resourceAddress]: diffFromPlan
-      }
-
-      jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-        terraformDiffMap,
-        terraformEntities,
-        configuration: mockConfiguration()
-      })
-
-      // When
-      const result = await approvalService.isApprovalRequired({
-        mode: "require_approval"
-      })
-
-      // Expect
-      expect(result).toBe(false)
-    })
-
-    describe("require approval mode", () => {
-      it("should return true if the plan contains a diff type included in the global match actions", async () => {
-        // Given
-        const resourceType: string = "aws_s3_bucket"
-        const resourceName: string = "my_bucket"
-        const resourceAddress: string = "aws_s3_bucket.my_bucket"
-
-        const terraformEntities: TerraformEntity[] = [
+      const mode = "safe_to_apply"
+      const bootstrapResult: BootstapResult = {
+        terraformEntities: [
           {
             entityInfo: {
               internalType: "plain_resource",
-              providerType: resourceType,
-              userProvidedName: resourceName
+              providerType: "aws_s3_bucket",
+              userProvidedName: "my_bucket"
             },
             decorator: {
               type: "no_decorator"
             }
           }
-        ]
-
-        const diffFromPlan: TerraformDiff = {
-          fullyQualifiedAddress: resourceAddress,
-          userProvidedName: resourceName,
-          providerType: resourceType,
-          diffType: "create"
-        }
-
-        const terraformDiffMap = {
-          [resourceAddress]: diffFromPlan
-        }
-
-        jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-          terraformDiffMap,
-          terraformEntities,
-          configuration: mockConfiguration({
-            global: {
-              requireApprovalActions: [Action.CREATE]
-            }
-          })
-        })
-
-        // When
-        const result = await approvalService.isApprovalRequired({
-          mode: "require_approval"
-        })
-
-        // Expect
-        expect(result).toBe(true)
-      })
-    })
-
-    describe("safe to apply mode", () => {
-      it("should return true if the plan contains resource that are not safe to apply", async () => {
-        // Given
-        const resourceType: string = "aws_s3_bucket"
-        const resourceName: string = "my_bucket"
-        const resourceAddress: string = "aws_s3_bucket.my_bucket"
-
-        const terraformEntities: TerraformEntity[] = [
-          {
-            entityInfo: {
-              internalType: "plain_resource",
-              providerType: resourceType,
-              userProvidedName: resourceName
-            },
-            decorator: {
-              type: "no_decorator"
-            }
-          }
-        ]
-
-        const diffFromPlan: TerraformDiff = {
-          fullyQualifiedAddress: resourceAddress,
-          userProvidedName: resourceName,
-          providerType: resourceType,
-          diffType: "create"
-        }
-
-        const terraformDiffMap = {
-          [resourceAddress]: diffFromPlan
-        }
-
-        jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-          terraformDiffMap,
-          terraformEntities,
-          configuration: mockConfiguration()
-        })
-
-        // When
-        const result = await approvalService.isApprovalRequired({
-          mode: "safe_to_apply"
-        })
-
-        // Expect
-        expect(result).toBe(true)
-      })
-
-      it(
-        "should return false if the plan contains only " +
-          "resources that are safe to apply (defined in the decorator)",
-        async () => {
-          // Given
-          const resourceType: string = "aws_s3_bucket"
-          const resourceName: string = "my_bucket"
-          const resourceAddress: string = "aws_s3_bucket.my_bucket"
-
-          const terraformEntities: TerraformEntity[] = [
-            {
-              entityInfo: {
-                internalType: "plain_resource",
-                providerType: resourceType,
-                userProvidedName: resourceName
-              },
-              decorator: {
-                type: "safe_to_apply"
-              }
-            }
-          ]
-
-          const diffFromPlan: TerraformDiff = {
-            fullyQualifiedAddress: resourceAddress,
-            userProvidedName: resourceName,
-            providerType: resourceType,
+        ] as TerraformEntity[],
+        terraformDiffMap: {
+          "aws_s3_bucket.my_bucket": {
+            fullyQualifiedAddress: "aws_s3_bucket.my_bucket",
+            userProvidedName: "my_bucket",
+            providerType: "aws_s3_bucket",
             diffType: "create"
           }
+        },
+        configuration: mockConfiguration()
+      }
 
-          const terraformDiffMap = {
-            [resourceAddress]: diffFromPlan
-          }
+      jest
+        .spyOn(bootstrappingService, "bootstrap")
+        .mockResolvedValue(bootstrapResult)
+      jest
+        .spyOn(safeToApplyModeUseCase, "isApprovalRequired")
+        .mockReturnValue(false)
 
-          jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-            terraformDiffMap,
-            terraformEntities,
-            configuration: mockConfiguration()
-          })
+      // When
+      await approvalService.isApprovalRequired({mode})
 
-          // When
-          const result = await approvalService.isApprovalRequired({
-            mode: "safe_to_apply"
-          })
-
-          // Expect
-          expect(result).toBe(false)
-        }
-      )
-
-      it(
-        "should return false if the plan contains only " +
-          "resources that are safe to apply (defined in the global rules)",
-        async () => {
-          // Given
-          const resourceType: string = "aws_s3_bucket"
-          const resourceName: string = "my_bucket"
-          const resourceAddress: string = "aws_s3_bucket.my_bucket"
-
-          const terraformEntities: TerraformEntity[] = [
-            {
-              entityInfo: {
-                internalType: "plain_resource",
-                providerType: resourceType,
-                userProvidedName: resourceName
-              },
-              decorator: {
-                type: "no_decorator"
-              }
-            }
+      // Expect
+      expect(safeToApplyModeUseCase.isApprovalRequired).toHaveBeenCalledWith({
+        configuration: bootstrapResult.configuration,
+        diffsEntityPairs: [
+          [
+            bootstrapResult.terraformDiffMap["aws_s3_bucket.my_bucket"],
+            bootstrapResult.terraformEntities[0]
           ]
-
-          const diffFromPlan: TerraformDiff = {
-            fullyQualifiedAddress: resourceAddress,
-            userProvidedName: resourceName,
-            providerType: resourceType,
-            diffType: "create"
-          }
-
-          const terraformDiffMap = {
-            [resourceAddress]: diffFromPlan
-          }
-
-          jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-            terraformDiffMap,
-            terraformEntities,
-            configuration: mockConfiguration({
-              global: {
-                safeToApplyActions: [Action.CREATE]
-              }
-            })
-          })
-
-          // When
-          const result = await approvalService.isApprovalRequired({
-            mode: "safe_to_apply"
-          })
-
-          // Expect
-          expect(result).toBe(false)
-        }
-      )
-
-      it(
-        "should return false if the plan contains only " +
-          "resources that are safe to apply (defined in the global rules and the decorator)",
-        async () => {
-          // Given
-          const resourceType: string = "aws_s3_bucket"
-          const resourceName: string = "my_bucket"
-          const resourceAddress: string = "aws_s3_bucket.my_bucket"
-
-          const terraformEntities: TerraformEntity[] = [
-            {
-              entityInfo: {
-                internalType: "plain_resource",
-                providerType: resourceType,
-                userProvidedName: resourceName
-              },
-              decorator: {
-                type: "safe_to_apply",
-                matchActions: [Action.DELETE]
-              }
-            }
-          ]
-
-          const diffFromPlan: TerraformDiff = {
-            fullyQualifiedAddress: resourceAddress,
-            userProvidedName: resourceName,
-            providerType: resourceType,
-            diffType: "replace"
-          }
-
-          const terraformDiffMap = {
-            [resourceAddress]: diffFromPlan
-          }
-
-          jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-            terraformDiffMap,
-            terraformEntities,
-            configuration: mockConfiguration({
-              global: {
-                safeToApplyActions: [Action.CREATE]
-              }
-            })
-          })
-
-          // When
-          const result = await approvalService.isApprovalRequired({
-            mode: "safe_to_apply"
-          })
-
-          // Expect
-          expect(result).toBe(false)
-        }
-      )
-
-      it("should return false if the plan contains only actions specified in the decorator", async () => {
-        // Given
-        const resourceType: string = "aws_s3_bucket"
-        const resourceName: string = "my_bucket"
-        const resourceAddress: string = "aws_s3_bucket.my_bucket"
-
-        const terraformEntities: TerraformEntity[] = [
-          {
-            entityInfo: {
-              internalType: "plain_resource",
-              providerType: resourceType,
-              userProvidedName: resourceName
-            },
-            decorator: {
-              type: "safe_to_apply",
-              matchActions: [Action.CREATE]
-            }
-          }
         ]
-
-        const diffFromPlan: TerraformDiff = {
-          fullyQualifiedAddress: resourceAddress,
-          userProvidedName: resourceName,
-          providerType: resourceType,
-          diffType: "create"
-        }
-
-        const terraformDiffMap = {
-          [resourceAddress]: diffFromPlan
-        }
-
-        jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-          terraformDiffMap,
-          terraformEntities,
-          configuration: mockConfiguration()
-        })
-
-        // When
-        const result = await approvalService.isApprovalRequired({
-          mode: "safe_to_apply"
-        })
-
-        // Expect
-        expect(result).toBe(false)
-      })
-
-      it("should return true if the plan contains actions that are not specified in the decorator", async () => {
-        // Given
-        const resourceType: string = "aws_s3_bucket"
-        const resourceName: string = "my_bucket"
-        const resourceAddress: string = "aws_s3_bucket.my_bucket"
-
-        const terraformEntities: TerraformEntity[] = [
-          {
-            entityInfo: {
-              internalType: "plain_resource",
-              providerType: resourceType,
-              userProvidedName: resourceName
-            },
-            decorator: {
-              type: "safe_to_apply",
-              matchActions: [Action.CREATE]
-            }
-          }
-        ]
-
-        const diffFromPlan: TerraformDiff = {
-          fullyQualifiedAddress: resourceAddress,
-          userProvidedName: resourceName,
-          providerType: resourceType,
-          diffType: "replace"
-        }
-
-        const terraformDiffMap = {
-          [resourceAddress]: diffFromPlan
-        }
-
-        jest.spyOn(bootstrappingService, "bootstrap").mockResolvedValue({
-          terraformDiffMap,
-          terraformEntities,
-          configuration: mockConfiguration()
-        })
-
-        // When
-        const result = await approvalService.isApprovalRequired({
-          mode: "safe_to_apply"
-        })
-
-        // Expect
-        expect(result).toBe(true)
       })
     })
   })
