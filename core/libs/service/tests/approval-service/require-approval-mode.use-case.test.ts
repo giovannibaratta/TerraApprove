@@ -2,6 +2,7 @@ import {Action, TerraformDiff} from "@libs/domain/terraform/diffs"
 import {TerraformEntity} from "@libs/domain/terraform/resource"
 import {RequireApprovalModeUseCase} from "@libs/service/approval/require-approval-mode.use-case"
 import {mockConfiguration} from "@libs/testing/mocks/configuration.mock"
+import {generateTerraformResource} from "@libs/testing/random"
 import {Test, TestingModule} from "@nestjs/testing"
 
 describe("RequireApprovalModeUseCase", () => {
@@ -22,9 +23,8 @@ describe("RequireApprovalModeUseCase", () => {
   describe("isApprovalRequired", () => {
     it("should return true if the plan contains a plain resource that requires approval", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      const {resourceType, resourceName, resourceAddress} =
+        generateTerraformResource()
 
       const terraformEntity: TerraformEntity = {
         entityInfo: {
@@ -96,9 +96,8 @@ describe("RequireApprovalModeUseCase", () => {
 
     it("should return true if the plan contains a plain resource that requires approval and the action matches", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      const {resourceType, resourceName, resourceAddress} =
+        generateTerraformResource()
 
       const terraformEntity: TerraformEntity = {
         entityInfo: {
@@ -137,9 +136,8 @@ describe("RequireApprovalModeUseCase", () => {
 
     it("should return false if the plan contains a plain resource but the action does not match", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      const {resourceType, resourceName, resourceAddress} =
+        generateTerraformResource()
 
       const terraformEntity: TerraformEntity = {
         entityInfo: {
@@ -178,9 +176,8 @@ describe("RequireApprovalModeUseCase", () => {
 
     it("should return true if the plan contains a diff type included in the global match actions", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      const {resourceType, resourceName, resourceAddress} =
+        generateTerraformResource()
 
       const terraformEntity: TerraformEntity = {
         entityInfo: {
@@ -222,9 +219,8 @@ describe("RequireApprovalModeUseCase", () => {
 
     it("should return true if the provider type is included in the global match provider types", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      const {resourceType, resourceName, resourceAddress} =
+        generateTerraformResource()
 
       const terraformEntity: TerraformEntity = {
         entityInfo: {

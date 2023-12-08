@@ -3,6 +3,7 @@ import {FilePlanReader} from "@libs/external/file-plan-reader/file-plan-reader"
 import {Test} from "@nestjs/testing"
 import "expect-more-jest"
 import {Logger} from "@nestjs/common"
+import {generateTerraformResource} from "@libs/testing/random"
 
 jest.mock("fs", () => fs)
 
@@ -22,9 +23,8 @@ describe("FilePlanReader", () => {
   it("should read the plan and return the diffs", async () => {
     // Given
     const planLocation = "/plan.json"
-    const resourceType = "aws_instance"
-    const resourceName = "example"
-    const resourceAddress = "unique_resource_address"
+    const {resourceType, resourceName, resourceAddress} =
+      generateTerraformResource()
     const planContent = {
       resource_changes: [
         {

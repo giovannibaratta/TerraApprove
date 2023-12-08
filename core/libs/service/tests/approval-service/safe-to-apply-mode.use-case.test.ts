@@ -2,6 +2,7 @@ import {Action, TerraformDiff} from "@libs/domain/terraform/diffs"
 import {TerraformEntity} from "@libs/domain/terraform/resource"
 import {SafeToApplyModeUseCase} from "@libs/service/approval/safe-to-apply-mode.use-case"
 import {mockConfiguration} from "@libs/testing/mocks/configuration.mock"
+import {generateTerraformResource} from "@libs/testing/random"
 import {Test, TestingModule} from "@nestjs/testing"
 
 describe("SafeToApplyModeUseCase", () => {
@@ -22,9 +23,8 @@ describe("SafeToApplyModeUseCase", () => {
   describe("isApprovalRequired", () => {
     it("should return true if the plan contains resource that are not safe to apply", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      const {resourceType, resourceName, resourceAddress} =
+        generateTerraformResource()
 
       const terraformEntity: TerraformEntity = {
         entityInfo: {
@@ -65,9 +65,8 @@ describe("SafeToApplyModeUseCase", () => {
         "resources that are safe to apply (defined in the decorator)",
       async () => {
         // Given
-        const resourceType: string = "aws_s3_bucket"
-        const resourceName: string = "my_bucket"
-        const resourceAddress: string = "aws_s3_bucket.my_bucket"
+        const {resourceType, resourceName, resourceAddress} =
+          generateTerraformResource()
 
         const terraformEntity: TerraformEntity = {
           entityInfo: {
@@ -109,9 +108,8 @@ describe("SafeToApplyModeUseCase", () => {
         "resources that are safe to apply (defined in the global rules)",
       async () => {
         // Given
-        const resourceType: string = "aws_s3_bucket"
-        const resourceName: string = "my_bucket"
-        const resourceAddress: string = "aws_s3_bucket.my_bucket"
+        const {resourceType, resourceName, resourceAddress} =
+          generateTerraformResource()
 
         const terraformEntity: TerraformEntity = {
           entityInfo: {
@@ -157,9 +155,8 @@ describe("SafeToApplyModeUseCase", () => {
         "resources that are safe to apply (defined in the global rules and the decorator)",
       async () => {
         // Given
-        const resourceType: string = "aws_s3_bucket"
-        const resourceName: string = "my_bucket"
-        const resourceAddress: string = "aws_s3_bucket.my_bucket"
+        const {resourceType, resourceName, resourceAddress} =
+          generateTerraformResource()
 
         const terraformEntity: TerraformEntity = {
           entityInfo: {
@@ -203,9 +200,8 @@ describe("SafeToApplyModeUseCase", () => {
 
     it("should return false if the plan contains only actions specified in the decorator", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      const {resourceType, resourceName, resourceAddress} =
+        generateTerraformResource()
 
       const terraformEntity: TerraformEntity = {
         entityInfo: {
@@ -244,9 +240,8 @@ describe("SafeToApplyModeUseCase", () => {
 
     it("should return true if the plan contains actions that are not specified in the decorator", async () => {
       // Given
-      const resourceType: string = "aws_s3_bucket"
-      const resourceName: string = "my_bucket"
-      const resourceAddress: string = "aws_s3_bucket.my_bucket"
+      const {resourceType, resourceName, resourceAddress} =
+        generateTerraformResource()
 
       const terraformEntity: TerraformEntity = {
         entityInfo: {
@@ -286,9 +281,8 @@ describe("SafeToApplyModeUseCase", () => {
 
   it("should return false if the plan contains resources of type that are safe to apply", async () => {
     // Given
-    const resourceType: string = "aws_s3_bucket"
-    const resourceName: string = "my_bucket"
-    const resourceAddress: string = "aws_s3_bucket.my_bucket"
+    const {resourceType, resourceName, resourceAddress} =
+      generateTerraformResource()
 
     const terraformEntity: TerraformEntity = {
       entityInfo: {
