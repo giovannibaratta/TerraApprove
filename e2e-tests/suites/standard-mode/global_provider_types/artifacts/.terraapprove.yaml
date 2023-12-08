@@ -1,0 +1,6 @@
+global:
+  requireApproval:
+    allResources:
+      matchers:
+        - providerType: "local_file"
+        - providerType: "local_sensitive_file"
