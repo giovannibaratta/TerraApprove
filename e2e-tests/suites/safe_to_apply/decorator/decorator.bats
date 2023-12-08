@@ -26,6 +26,8 @@ teardown() {
 
   # Expect
   [ "$status" -eq 1 ]
+  # Sanity check
+  grep "Operating mode: reverse" <<< "$output"
 }
 
 @test "should return 0 if the only resource in the plan is safe to apply" {
@@ -39,8 +41,10 @@ teardown() {
   terraform show -json test.tfplan > ${BATS_TEST_TMPDIR}/test.tfplan.json
 
   # When
-  run "/code/terraapprove" "." "./test.tfplan.json"
+  run "/code/terraapprove" "." "./test.tfplan.json" "--reverse"
 
   # Expect
   [ "$status" -eq 0 ]
+  # Sanity check
+  grep "Operating mode: reverse" <<< "$output"
 }

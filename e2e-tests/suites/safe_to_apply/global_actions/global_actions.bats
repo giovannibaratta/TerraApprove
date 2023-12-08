@@ -36,8 +36,10 @@ teardown() {
   terraform show -json test.tfplan > ${BATS_TEST_TMPDIR}/test.tfplan.json
 
   # When
-  run "/code/terraapprove" "." "./test.tfplan.json"
+  run "/code/terraapprove" "." "./test.tfplan.json" "--reverse"
 
   # Expect
   [ "$status" -eq 0 ]
+  # Sanity check
+  grep "Operating mode: reverse" <<< "$output"
 }
