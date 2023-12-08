@@ -1229,6 +1229,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/chance@npm:1.1.6":
+  version: 1.1.6
+  resolution: "@types/chance@npm:1.1.6"
+  checksum: a1845ff0a70989d581b8f7628aaef1807276c0ae22d0c038013ebcac4f4bd57e6a765319377994cc3cae2122838638fdb2afe5232ee6b987b3f7ea2cddecbead
+  languageName: node
+  linkType: hard
+
 "@types/eslint-scope@npm:^3.7.3":
   version: 3.7.7
   resolution: "@types/eslint-scope@npm:3.7.7"
@@ -2221,6 +2228,13 @@ __metadata:
     escape-string-regexp: ^1.0.5
     supports-color: ^5.3.0
   checksum: ec3661d38fe77f681200f878edbd9448821924e0f93a9cefc0e26a33b145f1027a2084bf19967160d11e1f03bfe4eaffcabf5493b89098b2782c3fe0b03d80c2
+  languageName: node
+  linkType: hard
+
+"chance@npm:1.1.11":
+  version: 1.1.11
+  resolution: "chance@npm:1.1.11"
+  checksum: 2e871fcc76584d274f860f0f25380b6ab547caf0d22d8b043a313be73d5c3db38941373241f83aeba049e7511f752f9746dc722a0f2b0182020d493c4e11da84
   languageName: node
   linkType: hard
 
@@ -6224,12 +6238,14 @@ __metadata:
     "@nestjs/core": 10.2.8
     "@nestjs/schematics": 10.0.3
     "@nestjs/testing": 10.2.8
+    "@types/chance": 1.1.6
     "@types/inquirer": 9.0.7
     "@types/jest": 29.5.8
     "@types/node": 18.18.9
     "@typescript-eslint/eslint-plugin": 6.10.0
     "@typescript-eslint/parser": 6.10.0
     ajv: 8.12.0
+    chance: 1.1.11
     eslint: 8.53.0
     eslint-config-prettier: 8.10.0
     eslint-plugin-jest: 27.6.0
