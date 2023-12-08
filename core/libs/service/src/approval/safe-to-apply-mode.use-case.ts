@@ -27,11 +27,20 @@ export class SafeToApplyModeUseCase {
         ...getSafeToApplyActionsFromDecorator(pair[1].decorator)
       ]
 
-      // It all the actions that will be perfomed to apply the plan are not included in the safe-list,
-      // it means that there is a potential unsafe action for the resource and we need to ask for approval.
-      return !areAllItemsIncluded(
-        safeActionsForResource,
-        mapDiffTypeToActions(pair[0].diffType)
+      const isTypeSafeToApply =
+        configuration.global.safeToApplyItems
+          ?.map(it => it.providerType)
+          .includes(pair[0].providerType) ?? false
+
+      return (
+        // If type is in the safe-list, there is no need to check the actions
+        !isTypeSafeToApply &&
+        // It all the actions that will be perfomed to apply the plan are not included in the safe-list,
+        // it means that there is a potential unsafe action for the resource and we need to ask for approval.
+        !areAllItemsIncluded(
+          safeActionsForResource,
+          mapDiffTypeToActions(pair[0].diffType)
+        )
       )
     })
 

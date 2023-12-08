@@ -283,4 +283,52 @@ describe("SafeToApplyModeUseCase", () => {
       expect(result).toBe(true)
     })
   })
+
+  it("should return false if the plan contains resources of type that are safe to apply", async () => {
+    // Given
+    const resourceType: string = "aws_s3_bucket"
+    const resourceName: string = "my_bucket"
+    const resourceAddress: string = "aws_s3_bucket.my_bucket"
+
+    const terraformEntity: TerraformEntity = {
+      entityInfo: {
+        internalType: "plain_resource",
+        providerType: resourceType,
+        userProvidedName: resourceName
+      },
+      decorator: {
+        type: "no_decorator"
+      }
+    }
+
+    const diffFromPlan: TerraformDiff = {
+      fullyQualifiedAddress: resourceAddress,
+      userProvidedName: resourceName,
+      providerType: resourceType,
+      diffType: "create"
+    }
+
+    const diffsEntityPairs: [TerraformDiff, TerraformEntity][] = [
+      [diffFromPlan, terraformEntity]
+    ]
+
+    const configuration = mockConfiguration({
+      global: {
+        safeToApplyItems: [
+          {
+            providerType: resourceType
+          }
+        ]
+      }
+    })
+
+    // When
+    const result = await useCase.isApprovalRequired({
+      configuration,
+      diffsEntityPairs
+    })
+
+    // Expect
+    expect(result).toBe(false)
+  })
 })
