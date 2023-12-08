@@ -124,11 +124,15 @@ resource "aws_instance" "example" {
 
 ## Global rules
 
-The application supports global rules that can be used to mark all the resources without specifying a decorator. The rules must be added to the `.terraapprove.yaml` file in the root folder of the codebase.
+The application supports global rules that affect all the resources in the code base without the need to mark all the resources with a decorator. The rules must be added to the `.terraapprove.yaml` file in the root folder of the codebase.
 
-### Standard mode
+The supported rules are:
+* matching a list of actions
+* matching a list of provider types
 
-When using the standard mode, The `requireApproval` parameter can be used to specify the list of actions that always require approval. If in the plan there is at least one resource that specify on the action listed in the parameter, the application will exit with code `1` indicating that an approval is required.
+### Matching actions in standard mode
+
+When using the standard mode, the `requireApproval.allResource.actions` parameter can be used to specify the list of actions that always require approval. If in the plan there is at least one resource that specify on the action listed in the parameter, the application will exit with code `1` indicating that an approval is required.
 
 ```yaml
 .terraapprove.yaml
@@ -140,9 +144,9 @@ global:
         - "DELETE"
 ```
 
-### Safe to apply mode
+### Matching actions in safe to apply mode
 
-When using the safe to apply mode, The `safeToApply` parameter can be used to specify the list of actions that are always safe to apply. If in the plan there are only resources that specify the action listed in the parameter, the application will exit with code `0` indicating that the plan can be applied with `-auto-approve`.
+When using the safe to apply mode, the `safeToApply.allResource.actions` parameter can be used to specify the list of actions that are always safe to apply. If in the plan there are only resources that specify the action listed in the parameter, the application will exit with code `0` indicating that the plan can be applied with `-auto-approve`.
 
 ```yaml
 .terraapprove.yaml
@@ -152,6 +156,34 @@ global:
     allResources:
       actions: # Supported values are "CREATE", "UPDATE_IN_PLACE", "DELETE"
         - "CREATE"
+```
+
+### Matching provider types in standard mode
+
+When using the standard mode, the `requireApproval.allResources.matchers` parameter can be used to specify the list of provider types that always require approval. If in the plan there is at least one resource of the type specified in list, the application will exit with code `1` indicating that an approval is required.
+
+```yaml
+.terraapprove.yaml
+
+global:
+  requireApproval:
+    allResources:
+      matchers:
+        - providerType: "google_storage_bucket"
+```
+
+### Matching provider types in safe to apply mode
+
+When using the safe to apply mode, the `safeToApply.allResources.matchers` parameter can be used to specify the list of provider types that are always safe to apply. If in the plan there are only resources of the types specified in list, the application will exit with code `0` indicating that an approval is not required.
+
+```yaml
+.terraapprove.yaml
+
+global:
+  safeToApply:
+    allResources:
+      matchers:
+        - providerType: "google_storage_bucket"
 ```
 
 ## Alternatives
