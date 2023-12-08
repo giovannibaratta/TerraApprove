@@ -60,7 +60,7 @@ export function requireApprovalItemToTerraformEntity(
   }
 }
 
-interface ResourceIdentifier {
+export interface ResourceIdentifier {
   // Name of the resource assgined by the provider (e.g. google_storage_bucket)
   readonly providerType: string
 }

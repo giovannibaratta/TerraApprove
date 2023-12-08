@@ -152,6 +152,82 @@ describe("FileConfigurationReader", () => {
     })
   })
 
+  it("should return a global object containing required approval provider types", () => {
+    // Given
+    const providerTypes = ["aProviderType", "anotherProviderType"]
+    const yamlToJsonContent = {
+      global: {
+        requireApproval: {
+          allResources: {
+            matchers: [
+              {
+                providerType: providerTypes[0]
+              },
+              {
+                providerType: providerTypes[1]
+              }
+            ]
+          }
+        }
+      }
+    }
+
+    jest
+      .spyOn(FileFunction, "readFile")
+      .mockReturnValueOnce(either.right("aContent"))
+
+    jest
+      .spyOn(FileFunction, "yamlToJson")
+      .mockReturnValueOnce(either.right(yamlToJsonContent))
+
+    // When
+    const result = fileConfigurationReader.readConfiguration("aLocation")
+
+    // Then
+    expectRight(result)
+    expect(
+      result.right.global.requireApprovalItems?.map(it => it.providerType)
+    ).toBeArrayIncludingOnly(providerTypes)
+  })
+
+  it("should return a global object containing safe to apply provider types", () => {
+    // Given
+    const providerTypes = ["aProviderType", "anotherProviderType"]
+    const yamlToJsonContent = {
+      global: {
+        safeToApply: {
+          allResources: {
+            matchers: [
+              {
+                providerType: providerTypes[0]
+              },
+              {
+                providerType: providerTypes[1]
+              }
+            ]
+          }
+        }
+      }
+    }
+
+    jest
+      .spyOn(FileFunction, "readFile")
+      .mockReturnValueOnce(either.right("aContent"))
+
+    jest
+      .spyOn(FileFunction, "yamlToJson")
+      .mockReturnValueOnce(either.right(yamlToJsonContent))
+
+    // When
+    const result = fileConfigurationReader.readConfiguration("aLocation")
+
+    // Then
+    expectRight(result)
+    expect(
+      result.right.global.safeToApplyItems?.map(it => it.providerType)
+    ).toBeArrayIncludingOnly(providerTypes)
+  })
+
   it("should return 'invalid_configuration' if the action is not valid", () => {
     // Given
 

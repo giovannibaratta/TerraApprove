@@ -1,6 +1,7 @@
 import {
   Configuration,
-  RequireApprovalItem
+  RequireApprovalItem,
+  ResourceIdentifier
 } from "@libs/domain/configuration/configuration"
 import {
   IConfigurationReader,
@@ -63,11 +64,21 @@ export class FileConfigurationReader implements IConfigurationReader {
     const globalSafeToApplyActions =
       externalModel.global?.safeToApply?.allResources?.actions
 
+    const globalRequiredApprovalProviderTypes:
+      | ResourceIdentifier[]
+      | undefined =
+      externalModel.global?.requireApproval?.allResources?.matchers
+
+    const globalSafeToApplyProviderTypes: ResourceIdentifier[] | undefined =
+      externalModel.global?.safeToApply?.allResources?.matchers
+
     return either.right({
       requireApprovalItems: eitherRequireApprovalItems.right,
       global: {
         requireApprovalActions: globalRequiredApprovalActions,
-        safeToApplyActions: globalSafeToApplyActions
+        safeToApplyActions: globalSafeToApplyActions,
+        requireApprovalItems: globalRequiredApprovalProviderTypes,
+        safeToApplyItems: globalSafeToApplyProviderTypes
       }
     })
   }
@@ -131,6 +142,21 @@ const configurationSchema: JSONSchemaType<ConfigurationYamlModel> = {
                     type: "string",
                     enum: Object.values(Action)
                   }
+                },
+                matchers: {
+                  type: "array",
+                  minItems: 1,
+                  uniqueItems: true,
+                  items: {
+                    type: "object",
+                    additionalProperties: false,
+                    required: ["providerType"],
+                    properties: {
+                      providerType: {
+                        type: "string"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -155,6 +181,21 @@ const configurationSchema: JSONSchemaType<ConfigurationYamlModel> = {
                   items: {
                     type: "string",
                     enum: Object.values(Action)
+                  }
+                },
+                matchers: {
+                  type: "array",
+                  minItems: 1,
+                  uniqueItems: true,
+                  items: {
+                    type: "object",
+                    additionalProperties: false,
+                    required: ["providerType"],
+                    properties: {
+                      providerType: {
+                        type: "string"
+                      }
+                    }
                   }
                 }
               }
@@ -199,13 +240,19 @@ interface ConfigurationYamlModel {
     requireApproval?: {
       allResources?: {
         actions: Action[]
+        matchers: ResourceMatcher[]
       }
     }
 
     safeToApply?: {
       allResources?: {
         actions: Action[]
+        matchers: ResourceMatcher[]
       }
     }
   }
+}
+
+interface ResourceMatcher {
+  providerType: string
 }
