@@ -22,6 +22,10 @@ export class RequireApprovalModeUseCase {
     // From all the diffs, keep only the ones that requires approval
     const resourcesThatRequiredApproval = diffsEntityPairs.filter(
       pair =>
+        // Check if the provider type is in the list of types that always require approval
+        configuration.global.requireApprovalItems
+          ?.map(it => it.providerType)
+          .includes(pair[0].providerType) ||
         // Verify first if one of the action to achieve the diffType is in the list of actions that
         // always require approval. If this is the case the resource requires approval.
         this.doesContainActionThatAlwaysRequireApproval(
