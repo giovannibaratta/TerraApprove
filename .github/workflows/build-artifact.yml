@@ -52,3 +52,22 @@ jobs:
             artifacts/terraapprove-linux
             artifacts/terraapprove-alpine
           tag_name: ${{ inputs.tag }}
+
+      # Prepare Dockerfile dependencies
+      - name: Copy artifact
+        run: |
+          cp artifacts/terraapprove-alpine docker/terraapprove-alpine
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: docker
+          file: docker/Dockerfile
+          push: true
+          tags: giovannibaratta/terraapprove:${{ inputs.tag }}
