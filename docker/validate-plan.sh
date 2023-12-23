@@ -25,11 +25,11 @@ exit_code=$?
 
 if [ $exit_code -eq 0 ]; then
   # No approval is required
-  echo "false" >> $OUTPUT
+  echo "approval_required=false" >> $OUTPUT
   exit 0
 elif [ $exit_code -eq 1 ]; then
   # Approval is required
-  echo "true" >> $OUTPUT
+  echo "approval_required=true" >> $OUTPUT
   exit 0
 else
   # TerraApprove exited with an error. Propagate the error.
