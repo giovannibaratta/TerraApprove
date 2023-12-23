@@ -19,6 +19,8 @@ TerraApprove is a tool that can be integrated in a CI/CD pipeline and can be use
 
 > :warning: It's up to the user to implement the necessary logic to ask the user for approval.
 
+A GitHub Action is also provided to simplify the integration in a GitHub workflow. See [here](https://github.com/marketplace/actions/terraapprove) for more details.
+
 ## Usage
 
 1. You need a Terraform code base and the relative Terraform plan. The Terraform plan must be in JSON format.
