@@ -1,0 +1,4 @@
+global:
+  safeToApply:
+    allResources:
+      actions: [ "CREATE", "UPDATE_IN_PLACE" ]
