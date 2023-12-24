@@ -132,6 +132,8 @@ The supported rules are:
 * matching a list of actions
 * matching a list of provider types
 
+> A set of predefined configurations is available [here](https://github.com/giovannibaratta/TerraApprove/tree/main/configurations). The description of the predefined configurations is available [here](https://github.com/giovannibaratta/TerraApprove/blob/main/configurations/README.md).
+
 ### Matching actions in standard mode
 
 When using the standard mode, the `requireApproval.allResource.actions` parameter can be used to specify the list of actions that always require approval. If in the plan there is at least one resource that specify on the action listed in the parameter, the application will exit with code `1` indicating that an approval is required.
