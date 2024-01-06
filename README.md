@@ -18,8 +18,9 @@ The folder structure is as follows:
 ```bash
 .
 ├── artifacts # Contains the artifacts (executables, ...) of the project
-├── core # Contains the source code of the application
 ├── configurations # Contains example of .terraapprove configurations
+├── core # Contains the source code of the application
+├── e2e-tests # Contains e2e tests based on bats
 └── examples # Contains examples of how the application can be used
 ```
 
