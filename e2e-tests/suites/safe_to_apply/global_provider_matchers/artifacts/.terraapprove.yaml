@@ -1,0 +1,6 @@
+global:
+  safeToApply:
+    allResources:
+      matchers:
+        - providerType: "local_file"
+          actions: ["CREATE"]

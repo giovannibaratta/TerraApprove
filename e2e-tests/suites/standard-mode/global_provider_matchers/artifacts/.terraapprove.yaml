@@ -1,0 +1,6 @@
+global:
+  requireApproval:
+    allResources:
+      matchers:
+        - providerType: "local_file"
+          actions: ["CREATE"]
