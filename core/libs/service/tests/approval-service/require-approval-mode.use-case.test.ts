@@ -217,7 +217,7 @@ describe("RequireApprovalModeUseCase", () => {
       expect(result).toBe(true)
     })
 
-    it("should return true if the provider type is included in the global match provider types", async () => {
+    it("should return true if diff is matched by a global matcher (provider type only)", async () => {
       // Given
       const {resourceType, resourceName, resourceAddress} =
         generateTerraformResource()
@@ -263,5 +263,53 @@ describe("RequireApprovalModeUseCase", () => {
       // Expect
       expect(result).toBe(true)
     })
+  })
+
+  it("should return true if diff is matched by a global matcher (provider type and action)", async () => {
+    // Given
+    const {resourceType, resourceName, resourceAddress} =
+      generateTerraformResource()
+
+    const terraformEntity: TerraformEntity = {
+      entityInfo: {
+        internalType: "plain_resource",
+        providerType: resourceType,
+        userProvidedName: resourceName
+      },
+      decorator: {
+        type: "no_decorator"
+      }
+    }
+
+    const diffFromPlan: TerraformDiff = {
+      fullyQualifiedAddress: resourceAddress,
+      userProvidedName: resourceName,
+      providerType: resourceType,
+      diffType: "create"
+    }
+
+    const diffsEntityPairs: [TerraformDiff, TerraformEntity][] = [
+      [diffFromPlan, terraformEntity]
+    ]
+
+    const configuration = mockConfiguration({
+      global: {
+        requireApprovalItems: [
+          {
+            providerType: resourceType,
+            actions: [Action.CREATE]
+          }
+        ]
+      }
+    })
+
+    // When
+    const result = await useCase.isApprovalRequired({
+      configuration,
+      diffsEntityPairs
+    })
+
+    // Expect
+    expect(result).toBe(true)
   })
 })
