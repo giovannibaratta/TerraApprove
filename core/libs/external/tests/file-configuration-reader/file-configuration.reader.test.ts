@@ -228,6 +228,82 @@ describe("FileConfigurationReader", () => {
     ).toBeArrayIncludingOnly(providerTypes)
   })
 
+  it("should return a global object containing safe to apply matcher with actions", () => {
+    // Given
+    const providerType = "aProviderType"
+    const actions = [Action.CREATE, Action.UPDATE_IN_PLACE]
+    const yamlToJsonContent = {
+      global: {
+        safeToApply: {
+          allResources: {
+            matchers: [
+              {
+                providerType: providerType,
+                actions: actions
+              }
+            ]
+          }
+        }
+      }
+    }
+
+    jest
+      .spyOn(FileFunction, "readFile")
+      .mockReturnValueOnce(either.right("aContent"))
+
+    jest
+      .spyOn(FileFunction, "yamlToJson")
+      .mockReturnValueOnce(either.right(yamlToJsonContent))
+
+    const result = fileConfigurationReader.readConfiguration("aLocation")
+
+    // Then
+    expectRight(result)
+    expect(result.right.global.safeToApplyItems).toHaveLength(1)
+
+    expect(
+      result.right.global.safeToApplyItems?.at(0)?.actions
+    ).toBeArrayIncludingOnly(actions)
+  })
+
+  it("should return a global object containing require approval matcher with actions", () => {
+    // Given
+    const providerType = "aProviderType"
+    const actions = [Action.CREATE, Action.UPDATE_IN_PLACE]
+    const yamlToJsonContent = {
+      global: {
+        requireApproval: {
+          allResources: {
+            matchers: [
+              {
+                providerType: providerType,
+                actions: actions
+              }
+            ]
+          }
+        }
+      }
+    }
+
+    jest
+      .spyOn(FileFunction, "readFile")
+      .mockReturnValueOnce(either.right("aContent"))
+
+    jest
+      .spyOn(FileFunction, "yamlToJson")
+      .mockReturnValueOnce(either.right(yamlToJsonContent))
+
+    const result = fileConfigurationReader.readConfiguration("aLocation")
+
+    // Then
+    expectRight(result)
+    expect(result.right.global.requireApprovalItems).toHaveLength(1)
+
+    expect(
+      result.right.global.requireApprovalItems?.at(0)?.actions
+    ).toBeArrayIncludingOnly(actions)
+  })
+
   it("should return 'invalid_configuration' if the action is not valid", () => {
     // Given
 

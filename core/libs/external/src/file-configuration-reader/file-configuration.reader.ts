@@ -64,12 +64,10 @@ export class FileConfigurationReader implements IConfigurationReader {
     const globalSafeToApplyActions =
       externalModel.global?.safeToApply?.allResources?.actions
 
-    const globalRequiredApprovalProviderTypes:
-      | TerraformDiffMatcher[]
-      | undefined =
+    const globalRequiredApprovalMatchers: TerraformDiffMatcher[] | undefined =
       externalModel.global?.requireApproval?.allResources?.matchers
 
-    const globalSafeToApplyProviderTypes: TerraformDiffMatcher[] | undefined =
+    const globalSafeToApplyMatchers: TerraformDiffMatcher[] | undefined =
       externalModel.global?.safeToApply?.allResources?.matchers
 
     return either.right({
@@ -77,8 +75,8 @@ export class FileConfigurationReader implements IConfigurationReader {
       global: {
         requireApprovalActions: globalRequiredApprovalActions,
         safeToApplyActions: globalSafeToApplyActions,
-        requireApprovalItems: globalRequiredApprovalProviderTypes,
-        safeToApplyItems: globalSafeToApplyProviderTypes
+        requireApprovalItems: globalRequiredApprovalMatchers,
+        safeToApplyItems: globalSafeToApplyMatchers
       }
     })
   }
@@ -154,6 +152,16 @@ const configurationSchema: JSONSchemaType<ConfigurationYamlModel> = {
                     properties: {
                       providerType: {
                         type: "string"
+                      },
+                      actions: {
+                        type: "array",
+                        nullable: true,
+                        minItems: 1,
+                        uniqueItems: true,
+                        items: {
+                          type: "string",
+                          enum: Object.values(Action)
+                        }
                       }
                     }
                   }
@@ -194,6 +202,16 @@ const configurationSchema: JSONSchemaType<ConfigurationYamlModel> = {
                     properties: {
                       providerType: {
                         type: "string"
+                      },
+                      actions: {
+                        type: "array",
+                        nullable: true,
+                        minItems: 1,
+                        uniqueItems: true,
+                        items: {
+                          type: "string",
+                          enum: Object.values(Action)
+                        }
                       }
                     }
                   }
@@ -255,4 +273,5 @@ interface ConfigurationYamlModel {
 
 interface ResourceMatcher {
   providerType: string
+  actions?: Action[]
 }
