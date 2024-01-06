@@ -65,4 +65,6 @@ export function requireApprovalItemToTerraformEntity(
 export interface TerraformDiffMatcher {
   // Name of the resource assgined by the provider (e.g. google_storage_bucket)
   readonly providerType: string
+  // List of actions supported by Terraform during an apply
+  readonly actions?: ReadonlyArray<Action>
 }
