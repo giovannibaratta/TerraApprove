@@ -325,4 +325,52 @@ describe("SafeToApplyModeUseCase", () => {
     // Expect
     expect(result).toBe(false)
   })
+
+  it("should return false if the diff is matched by a global matcher (provider type and actions)", async () => {
+    // Given
+    const {resourceType, resourceName, resourceAddress} =
+      generateTerraformResource()
+
+    const terraformEntity: TerraformEntity = {
+      entityInfo: {
+        internalType: "plain_resource",
+        providerType: resourceType,
+        userProvidedName: resourceName
+      },
+      decorator: {
+        type: "no_decorator"
+      }
+    }
+
+    const diffFromPlan: TerraformDiff = {
+      fullyQualifiedAddress: resourceAddress,
+      userProvidedName: resourceName,
+      providerType: resourceType,
+      diffType: "replace"
+    }
+
+    const diffsEntityPairs: [TerraformDiff, TerraformEntity][] = [
+      [diffFromPlan, terraformEntity]
+    ]
+
+    const configuration = mockConfiguration({
+      global: {
+        safeToApplyItems: [
+          {
+            providerType: resourceType,
+            actions: [Action.DELETE, Action.CREATE]
+          }
+        ]
+      }
+    })
+
+    // When
+    const result = await useCase.isApprovalRequired({
+      configuration,
+      diffsEntityPairs
+    })
+
+    // Expect
+    expect(result).toBe(false)
+  })
 })

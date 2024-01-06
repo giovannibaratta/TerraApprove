@@ -27,10 +27,10 @@ export class SafeToApplyModeUseCase {
         ...getSafeToApplyActionsFromDecorator(pair[1].decorator)
       ]
 
-      const isTypeSafeToApply =
-        configuration.global.safeToApplyItems
-          ?.map(it => it.providerType)
-          .includes(pair[0].providerType) ?? false
+      const isTypeSafeToApply = this.doesDiffMatchGlobalConfigurationMatchers(
+        configuration,
+        pair[0]
+      )
 
       return (
         // If type is in the safe-list, there is no need to check the actions
@@ -52,6 +52,30 @@ export class SafeToApplyModeUseCase {
     )
 
     return resourcesThatAreNotSafeToApply.length > 0
+  }
+
+  /**
+   * Check if at least one of the global matchers matches the Terraform diff.
+   */
+  private doesDiffMatchGlobalConfigurationMatchers(
+    configuration: Configuration,
+    diff: TerraformDiff
+  ): boolean {
+    if (configuration.global.safeToApplyItems === undefined) return false
+
+    const diffTypeToActions = mapDiffTypeToActions(diff.diffType)
+
+    // One matcher is enough to consider the Terraform diff as matched.
+    return configuration.global.safeToApplyItems.some(
+      matcher =>
+        // The conditions of the matcher are in logical AND.
+        matcher.providerType === diff.providerType &&
+        // If no actions is specified, it means that all actions are automatically matched.
+        (matcher.actions === undefined ||
+          // If at least one action is specified, in order to be considered safe we have to check
+          // that all the actiosn that Terraform wants to perform are included in the matcher list.
+          areAllItemsIncluded(matcher.actions, diffTypeToActions))
+    )
   }
 }
 
