@@ -2,9 +2,14 @@
 
 # TerraApprove
 
-TerraApprove is a project created to experiment with new technologies (e.g. GitHub Copilot, devcontainers) and project management activities on something that is a little more than a toy project.
+TerraApprove is a tool that can be integrated in a CI/CD pipeline and can be used to reduce the risk of applying a Terraform plan that can cause undesired changes. All the resources that require special attention (e.g. stateful resources) can be tagged with a decorator. TerraApprove will then check if the plan contains any of these resources and will produce an output that can be used to decide if the plan can be applied with `-auto-approve` or if manual approval is required.
+
+![TerraApprove workflow](./images/terraapprove-workflow-v1.excalidraw.png)
 
 See [here](https://giovannibaratta.github.io/TerraApprove/) for the list of supported features.
+
+## Why TerraApprove ?
+TerraApprove is a project created to experiment with new technologies (e.g. GitHub Copilot, devcontainers) and project management activities on something that is a little more than a toy project.
 
 ## Folder structure
 
