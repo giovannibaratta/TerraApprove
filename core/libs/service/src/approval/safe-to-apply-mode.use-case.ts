@@ -21,15 +21,18 @@ export class SafeToApplyModeUseCase {
 
     // From all the diffs, remove all the ones that are safe to apply
     const resourcesThatAreNotSafeToApply = diffsEntityPairs.filter(pair => {
+      const terraformDiff = pair[0]
+      const terraformEntity = pair[1]
+
       // Merge the safe to apply actions defined at the global level and the ones defined at the resource level
       const safeActionsForResource: Action[] = [
         ...(configuration.global.safeToApplyActions ?? []),
-        ...getSafeToApplyActionsFromDecorator(pair[1].decorator)
+        ...getSafeToApplyActionsFromDecorator(terraformEntity.decorator)
       ]
 
       const isTypeSafeToApply = this.doesDiffMatchGlobalConfigurationMatchers(
         configuration,
-        pair[0]
+        terraformDiff
       )
 
       return (
@@ -39,7 +42,7 @@ export class SafeToApplyModeUseCase {
         // it means that there is a potential unsafe action for the resource and we need to ask for approval.
         !areAllItemsIncluded(
           safeActionsForResource,
-          mapDiffTypeToActions(pair[0].diffType)
+          mapDiffTypeToActions(terraformDiff.diffType)
         )
       )
     })
