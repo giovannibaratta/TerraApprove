@@ -13,10 +13,12 @@ export interface GlobalConfiguration {
   // List of actions that are safe to apply if they are found in the
   // plan.
   readonly safeToApplyActions?: ReadonlyArray<Action>
-  // List of resources that always require approval if they are found
-  readonly requireApprovalItems?: ReadonlyArray<ResourceIdentifier>
-  // List of resources that are safe to apply if they are found
-  readonly safeToApplyItems?: ReadonlyArray<ResourceIdentifier>
+  // List of matchers to identify resources that always require approval if they are found in the
+  // Terraform plan
+  readonly requireApprovalItems?: ReadonlyArray<TerraformDiffMatcher>
+  // List of matchers that can be used to identify resources that are safe to apply if they are
+  // found in the Terraform plan
+  readonly safeToApplyItems?: ReadonlyArray<TerraformDiffMatcher>
 }
 
 export interface RequireApprovalItem {
@@ -60,7 +62,7 @@ export function requireApprovalItemToTerraformEntity(
   }
 }
 
-export interface ResourceIdentifier {
+export interface TerraformDiffMatcher {
   // Name of the resource assgined by the provider (e.g. google_storage_bucket)
   readonly providerType: string
 }

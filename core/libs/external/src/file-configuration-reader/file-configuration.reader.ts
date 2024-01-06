@@ -1,7 +1,7 @@
 import {
   Configuration,
   RequireApprovalItem,
-  ResourceIdentifier
+  TerraformDiffMatcher
 } from "@libs/domain/configuration/configuration"
 import {
   IConfigurationReader,
@@ -65,11 +65,11 @@ export class FileConfigurationReader implements IConfigurationReader {
       externalModel.global?.safeToApply?.allResources?.actions
 
     const globalRequiredApprovalProviderTypes:
-      | ResourceIdentifier[]
+      | TerraformDiffMatcher[]
       | undefined =
       externalModel.global?.requireApproval?.allResources?.matchers
 
-    const globalSafeToApplyProviderTypes: ResourceIdentifier[] | undefined =
+    const globalSafeToApplyProviderTypes: TerraformDiffMatcher[] | undefined =
       externalModel.global?.safeToApply?.allResources?.matchers
 
     return either.right({
