@@ -19,6 +19,7 @@ The folder structure is as follows:
 .
 ├── artifacts # Contains the artifacts (executables, ...) of the project
 ├── core # Contains the source code of the application
+├── configurations # Contains example of .terraapprove configurations
 └── examples # Contains examples of how the application can be used
 ```
 
