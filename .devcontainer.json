@@ -32,7 +32,8 @@
         "orta.vscode-jest",
         "yoavbls.pretty-ts-errors",
         "github.vscode-github-actions",
-        "donjayamanne.githistory"
+        "donjayamanne.githistory",
+        "pomdtr.excalidraw-editor"
       ],
       "settings": {
         "editor.formatOnSave": true,
