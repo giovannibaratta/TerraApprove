@@ -162,9 +162,9 @@ global:
         - "CREATE"
 ```
 
-### Matching provider types in standard mode
+### Matchers in standard mode
 
-When using the standard mode, the `requireApproval.allResources.matchers` parameter can be used to specify the list of provider types that always require approval. If in the plan there is at least one resource of the type specified in list, the application will exit with code `1` indicating that an approval is required.
+When using the standard mode, the `requireApproval.allResources.matchers` parameter can be used to specify matching rules to identify resources impacted in the plan. If a resource is matched, the tool the application will exit with code `1` indicating that an approval is required. The matcher accepts a providerType and optionally a list of actions. If the list of actions is not specified, all the actions are matched automatically.
 
 ```yaml
 .terraapprove.yaml
@@ -174,11 +174,12 @@ global:
     allResources:
       matchers:
         - providerType: "google_storage_bucket"
+          actions: ["DELETE"]
 ```
 
-### Matching provider types in safe to apply mode
+### Matchers in safe to apply mode
 
-When using the safe to apply mode, the `safeToApply.allResources.matchers` parameter can be used to specify the list of provider types that are always safe to apply. If in the plan there are only resources of the types specified in list, the application will exit with code `0` indicating that an approval is not required.
+When using the safe to apply mode, the `safeToApply.allResources.matchers` parameter can be used to specify matching rules to identify resources impacted in the plan. If in the plan there are only resources that have been matched (including resources matched via decorators), the application will exit with code `0` indicating that an approval is not required.
 
 ```yaml
 .terraapprove.yaml
@@ -188,6 +189,7 @@ global:
     allResources:
       matchers:
         - providerType: "google_storage_bucket"
+          actions: ["CREATE"]
 ```
 
 ## Alternatives
