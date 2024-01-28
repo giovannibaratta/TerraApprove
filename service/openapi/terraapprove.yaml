@@ -1,0 +1,143 @@
+openapi: 3.1.0
+info:
+  title: TerraApprove API
+  version: 0.0.1
+  description: API documentation for TerraApprove service
+
+paths:
+  /source-code-refs:
+    post:
+      summary: Create a reference to the source code in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostSourceCode'
+      responses:
+        '201':
+          description: Source code reference created successfully'
+  /runs:
+    post:
+      summary: Create a run in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRun'
+      responses:
+        '201':
+          description: Run created successfully
+
+  /runs/{run_id}:
+    get:
+      summary: Get a run in the system
+      parameters:
+        - name: run_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Run retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRun'
+
+  /approvals:
+    post:
+      summary: Create an approval in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostApproval'
+      responses:
+        '201':
+          description: Approval created successfully
+
+components:
+  schemas:
+
+    PostSourceCode:
+      oneOf:
+        - $ref: '#/components/schemas/S3Payload'
+
+    PostRun:
+      type: object
+      properties:
+        source_code_id:
+          type: string
+          description: |
+            The ID managedy by the system of the source code reference. The plan must be generated
+            starting from the specified source code.
+        plan_ref:
+          oneOf:
+            - $ref: '#/components/schemas/S3Payload'
+
+    S3Payload:
+      type: object
+      properties:
+        s3:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri
+      required:
+        - s3
+
+    PostApproval:
+      type: object
+      required:
+        - run_id
+        - approval
+      properties:
+        run_id:
+          type: string
+          description: |
+            The ID managedy by the system of the run.
+        approval:
+          type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              x-extensible-enum:
+              - grant
+              - deny
+            comment:
+              type: string
+
+    GetRun:
+      type: object
+      required:
+        - id
+        - state
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: |
+            The ID managedy by the system of the run.
+        state:
+          type: string
+          x-extensible-enum:
+            - pending_analysis
+            - pending_approval
+            - approved
+            - denied
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time 
