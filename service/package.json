@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "generate:interfaces": "openapi-typescript openapi/terraapprove.yaml -o generated/interfaces/terraapprove.d.ts"
+  },
+  "name": "terraapprove",
+  "version": "0.0.1",
+  "repository": "https://github.com/giovannibaratta/TerraApprove",
+  "author": "Giovanni Baratta",
+  "license": "MIT",
+  "engines": {
+    "node": "18"
+  },
+  "packageManager": "yarn@3.6.1",
+  "devDependencies": {
+    "openapi-typescript": "6.7.4",
+    "typescript": "5.2.2"
+  }
+}
