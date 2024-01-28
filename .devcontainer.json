@@ -33,7 +33,8 @@
         "yoavbls.pretty-ts-errors",
         "github.vscode-github-actions",
         "donjayamanne.githistory",
-        "pomdtr.excalidraw-editor"
+        "pomdtr.excalidraw-editor",
+        "42crunch.vscode-openapi"
       ],
       "settings": {
         "editor.formatOnSave": true,
