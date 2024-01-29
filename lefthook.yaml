@@ -1,15 +1,27 @@
 pre-commit:
   parallel: true
   commands:
-    lint-typescript-app:
+    lint-typescript-cli:
       root: core
       run: yarn lint
-    compile-typescript-app:
+    compile-typescript-cli:
       root: core
       run: yarn compile
-    test-typescript-app:
+    test-typescript-cli:
       root: core
       run: yarn test
+    lint-typescript-backend:
+      root: service
+      run: yarn lint
+    compile-typescript-backend:
+      root: service
+      run: yarn compile
+    test-typescript-backend:
+      root: service
+      run: yarn test
+    format-backend:
+      root: service
+      run: yarn format:prettier
 
 pre-push:
   parallel: true

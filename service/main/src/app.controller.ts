@@ -1,4 +1,4 @@
-import { AppService } from "@libs/service/app.service"
+import {AppService} from "@libs/service/app.service"
 import {Controller, Get} from "@nestjs/common"
 
 @Controller()
