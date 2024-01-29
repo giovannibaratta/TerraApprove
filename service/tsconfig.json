@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig-google.json",
+  "compilerOptions": {
+    "outDir": "./build",
+    "baseUrl": "./",
+    "types": ["jest", "node"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "paths": {
+      "@app": ["main/src"],
+      "@app/*": ["main/src/*"],
+      "@libs/domain": ["libs/domain/src"],
+      "@libs/domain/*": ["libs/domain/src/*"],
+      "@libs/service": ["libs/service/src"],
+      "@libs/service/*": ["libs/service/src/*"],
+      "@libs/external": ["libs/external/src"],
+      "@libs/external/*": ["libs/external/src/*"],
+      "@libs/testing": ["libs/testing/src", "libs/domain/tests"],
+      "@libs/testing/*": ["libs/testing/src/*", "libs/domain/tests/*"]
+    }
+  },
+  "exclude": ["node_modules", "build"]
+}

@@ -1,5 +1,10 @@
 {
   "scripts": {
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "lint": "yarn eslint --cache --fix .",
+    "format:prettier": "yarn prettier --config .prettierrc . --write",
+    "compile": "nest build",
     "generate:interfaces": "openapi-typescript openapi/terraapprove.yaml -o generated/interfaces/terraapprove.d.ts"
   },
   "name": "terraapprove-backend",
