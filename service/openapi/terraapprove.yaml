@@ -13,9 +13,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostSourceCode'
+              $ref: "#/components/schemas/PostSourceCode"
       responses:
-        '201':
+        "201":
           description: Source code reference created successfully'
   /runs:
     post:
@@ -25,9 +25,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostRun'
+              $ref: "#/components/schemas/PostRun"
       responses:
-        '201':
+        "201":
           description: Run created successfully
 
   /runs/{run_id}:
@@ -41,12 +41,12 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Run retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetRun'
+                $ref: "#/components/schemas/GetRun"
 
   /approvals:
     post:
@@ -56,17 +56,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostApproval'
+              $ref: "#/components/schemas/PostApproval"
       responses:
-        '201':
+        "201":
           description: Approval created successfully
 
 components:
   schemas:
-
     PostSourceCode:
       oneOf:
-        - $ref: '#/components/schemas/S3Payload'
+        - $ref: "#/components/schemas/S3Payload"
 
     PostRun:
       type: object
@@ -78,7 +77,7 @@ components:
             starting from the specified source code.
         plan_ref:
           oneOf:
-            - $ref: '#/components/schemas/S3Payload'
+            - $ref: "#/components/schemas/S3Payload"
 
     S3Payload:
       type: object
@@ -110,8 +109,8 @@ components:
             type:
               type: string
               x-extensible-enum:
-              - grant
-              - deny
+                - grant
+                - deny
             comment:
               type: string
 
@@ -140,4 +139,4 @@ components:
           format: date-time
         updated_at:
           type: string
-          format: date-time 
+          format: date-time
