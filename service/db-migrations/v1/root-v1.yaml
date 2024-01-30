@@ -1,1 +1,3 @@
 databaseChangeLog:
+  - include:
+      file: v1/create-source-code-table.yaml

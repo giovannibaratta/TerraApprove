@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: 8153a55e-9f5a-4a58-aede-3e1ce6ddaa05
+      comment: Create the table to store source code references
+      changes:
+        - createTable:
+            tableName: source_code
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: type
+                  description: The type of source code reference (e.g s3)
+                  type: clob
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reference
+                  description: The reference to the source code. The type defines the format of the reference.
+                  type: clob
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
