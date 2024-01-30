@@ -2,6 +2,11 @@
   "scripts": {
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "deps:db:start": "docker-compose -f dev-external-deps/docker-compose.yaml up -d",
+    "deps:db:stop": "docker-compose -f dev-external-deps/docker-compose.yaml stop",
+    "deps:db:down": "docker-compose -f dev-external-deps/docker-compose.yaml down",
+    "deps:db:migrate": "yarn deps:db:start && yarn liquibase:update",
+    "liquibase:update": "docker run --network host --rm -v ./db-migrations:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties update",
     "lint": "yarn eslint --cache --fix .",
     "format:prettier": "yarn prettier --config .prettierrc . --write",
     "compile": "nest build",

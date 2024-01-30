@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  # Local DB used for development and testing
+  db:
+    image: postgres:16.1
+    environment:
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: Safe1!
+      POSTGRES_DB: terraapprove
+    ports:
+      - 5432:5432
