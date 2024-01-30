@@ -1112,6 +1112,64 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@prisma/client@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@prisma/client@npm:5.9.0"
+  peerDependencies:
+    prisma: "*"
+  peerDependenciesMeta:
+    prisma:
+      optional: true
+  checksum: d7e62159180f264760dc60f267350fd78691e49b5cbb2f00377080aabb5264001bf306fa5db0ed6dab3589e6d95a6320ea7d2888e18e51866332accacc8fea3f
+  languageName: node
+  linkType: hard
+
+"@prisma/debug@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@prisma/debug@npm:5.9.0"
+  checksum: 0f711a6ed5ba8792749214928ce4eb825b08da98defa2e449012ba2a775141b933dce27d0becccdba756c558bfdf28dd5ff8fe920adf9f781cc2c966a48fde6b
+  languageName: node
+  linkType: hard
+
+"@prisma/engines-version@npm:5.9.0-32.23fdc5965b1e05fc54e5f26ed3de66776b93de64":
+  version: 5.9.0-32.23fdc5965b1e05fc54e5f26ed3de66776b93de64
+  resolution: "@prisma/engines-version@npm:5.9.0-32.23fdc5965b1e05fc54e5f26ed3de66776b93de64"
+  checksum: 7ed88a87f64b1cd55fe5ade37020dafb47e8b2f0735cd0e1941953012c3097a6c10800fd7e6d683e8f74bffa66c3b5442e343cada383b3ec2e15c6d4c4b4074f
+  languageName: node
+  linkType: hard
+
+"@prisma/engines@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@prisma/engines@npm:5.9.0"
+  dependencies:
+    "@prisma/debug": "npm:5.9.0"
+    "@prisma/engines-version": "npm:5.9.0-32.23fdc5965b1e05fc54e5f26ed3de66776b93de64"
+    "@prisma/fetch-engine": "npm:5.9.0"
+    "@prisma/get-platform": "npm:5.9.0"
+  checksum: 6c544c0753cd2a6a635f452566cead86ae93c4c97694c44dcb7be3502866379023a7abe8ea14a45047fd3f86ec931970c9cb490d136f718f0dbb5eece88a6df3
+  languageName: node
+  linkType: hard
+
+"@prisma/fetch-engine@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@prisma/fetch-engine@npm:5.9.0"
+  dependencies:
+    "@prisma/debug": "npm:5.9.0"
+    "@prisma/engines-version": "npm:5.9.0-32.23fdc5965b1e05fc54e5f26ed3de66776b93de64"
+    "@prisma/get-platform": "npm:5.9.0"
+  checksum: 8ccd4247346b89d0f40075a8eb7d454edfaf61460e415c6bfdd5693de184bb8f47c1b077d4a006119f9a5a7cd6541689cd0fa1149f6e234b14f6a048a26a8e5a
+  languageName: node
+  linkType: hard
+
+"@prisma/get-platform@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@prisma/get-platform@npm:5.9.0"
+  dependencies:
+    "@prisma/debug": "npm:5.9.0"
+  checksum: 4e7b633fa56002a47d130261c1052f45aee51e4777558b03772aeee8544720b1a22add36402841447eaa0e2c6bdee23d6bcefb588262560657135e8a31edfc0a
+  languageName: node
+  linkType: hard
+
 "@sinclair/typebox@npm:^0.27.8":
   version: 0.27.8
   resolution: "@sinclair/typebox@npm:0.27.8"
@@ -5546,6 +5604,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prisma@npm:5.9.0":
+  version: 5.9.0
+  resolution: "prisma@npm:5.9.0"
+  dependencies:
+    "@prisma/engines": "npm:5.9.0"
+  bin:
+    prisma: build/index.js
+  checksum: 83dfbe50ce714e09329a0fe99acfe74c07bb64e7ffaba0698ebc9b426aa8bd010df086b8f2e8fb31a01f520c30af7412262484f3e476aa488936b8e00618e971
+  languageName: node
+  linkType: hard
+
 "proc-log@npm:^3.0.0":
   version: 3.0.0
   resolution: "proc-log@npm:3.0.0"
@@ -6338,6 +6407,7 @@ __metadata:
     "@nestjs/platform-express": "npm:10.3.1"
     "@nestjs/schematics": "npm:10.1.0"
     "@nestjs/testing": "npm:10.2.8"
+    "@prisma/client": "npm:5.9.0"
     "@types/jest": "npm:29.5.8"
     "@types/node": "npm:18.18.9"
     "@typescript-eslint/eslint-plugin": "npm:6.10.0"
@@ -6351,6 +6421,7 @@ __metadata:
     jest: "npm:29.7.0"
     openapi-typescript: "npm:6.7.4"
     prettier: "npm:2.8.8"
+    prisma: "npm:5.9.0"
     reflect-metadata: "npm:0.2.1"
     rxjs: "npm:7.8.1"
     ts-jest: "npm:29.1.1"

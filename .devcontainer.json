@@ -34,7 +34,8 @@
         "github.vscode-github-actions",
         "donjayamanne.githistory",
         "pomdtr.excalidraw-editor",
-        "42crunch.vscode-openapi"
+        "42crunch.vscode-openapi",
+        "prisma.prisma"
       ],
       "settings": {
         "editor.formatOnSave": true,
