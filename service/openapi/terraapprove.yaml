@@ -88,6 +88,8 @@ components:
       properties:
         s3:
           type: object
+          required:
+            - url
           properties:
             url:
               type: string

@@ -39,7 +39,7 @@ export interface components {
     readonly S3Payload: {
       readonly s3: {
         /** Format: uri */
-        readonly url?: string;
+        readonly url: string;
       };
     };
     readonly PostApproval: {
