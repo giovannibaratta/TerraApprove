@@ -8,6 +8,7 @@ paths:
   /source-code-refs:
     post:
       summary: Create a reference to the source code in the system
+      operationId: createSourceCodeRef
       requestBody:
         required: true
         content:
@@ -20,6 +21,7 @@ paths:
   /runs:
     post:
       summary: Create a run in the system
+      operationId: createRun
       requestBody:
         required: true
         content:
@@ -33,6 +35,7 @@ paths:
   /runs/{run_id}:
     get:
       summary: Get a run in the system
+      operationId: getRun
       parameters:
         - name: run_id
           in: path
@@ -51,6 +54,7 @@ paths:
   /approvals:
     post:
       summary: Create an approval in the system
+      operationId: createApproval
       requestBody:
         required: true
         content:

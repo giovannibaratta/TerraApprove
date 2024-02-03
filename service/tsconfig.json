@@ -7,6 +7,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowJs": true,
+    "noUncheckedIndexedAccess": true,
     "paths": {
       "@app": ["main/src"],
       "@app/*": ["main/src/*"],
@@ -17,7 +18,9 @@
       "@libs/external": ["libs/external/src"],
       "@libs/external/*": ["libs/external/src/*"],
       "@libs/testing": ["libs/testing/src", "libs/domain/tests"],
-      "@libs/testing/*": ["libs/testing/src/*", "libs/domain/tests/*"]
+      "@libs/testing/*": ["libs/testing/src/*", "libs/domain/tests/*"],
+      "@apis": ["generated/interfaces/terraapprove-apis"],
+      "@apis/*": ["generated/interfaces/terraapprove-apis/*"]
     }
   },
   "exclude": ["node_modules", "build"]

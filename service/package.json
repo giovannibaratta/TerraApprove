@@ -13,7 +13,8 @@
     "compile": "nest build",
     "prisma:pull": "yarn prisma db pull",
     "prisma:generate": "yarn prisma generate",
-    "generate:interfaces": "openapi-typescript openapi/terraapprove.yaml -o generated/interfaces/terraapprove.d.ts",
+    "openapi": "yarn openapi-typescript openapi/terraapprove.yaml -o generated/interfaces/terraapprove-apis/apis.ts --immutable-types",
+    "generate:interfaces": "yarn openapi",
     "test": "yarn jest {libs/**/*.test.ts,main/**/*.test.ts}"
   },
   "name": "terraapprove-backend",
