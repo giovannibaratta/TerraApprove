@@ -10,7 +10,7 @@
     "test:e2e:no-build": "../e2e-tests/run-e2e-tests.sh",
     "test:coverage": "yarn test --coverage",
     "prepush-validation": "yarn lint && yarn compile && yarn test",
-    "generate:artifacts":"(rm ../artifacts/terraapprove 2>/dev/null || true) && yarn pkg --targets node18-linux,node18-alpine --output ../artifacts/terraapprove --compress GZip ./build/main/src/main.js"
+    "generate:artifacts": "(rm ../artifacts/terraapprove 2>/dev/null || true) && yarn pkg --targets node18-linux,node18-alpine --output ../artifacts/terraapprove --compress GZip ./build/main/src/main.js"
   },
   "name": "terraapprove",
   "version": "0.0.9",
