@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "nest start --watch --debug",
     "deps:db:start": "docker-compose -f dev-external-deps/docker-compose.yaml up -d",
     "deps:db:stop": "docker-compose -f dev-external-deps/docker-compose.yaml stop",
     "deps:db:down": "docker-compose -f dev-external-deps/docker-compose.yaml down",
@@ -14,7 +14,7 @@
     "prisma:pull": "yarn prisma db pull",
     "prisma:generate": "yarn prisma generate",
     "openapi": "yarn openapi-typescript openapi/terraapprove.yaml -o generated/interfaces/terraapprove-apis/apis.ts --immutable-types",
-    "generate:interfaces": "yarn openapi",
+    "generate:interfaces": "yarn openapi && yarn prisma:generate",
     "test": "yarn jest {libs/**/*.test.ts,main/**/*.test.ts}"
   },
   "name": "terraapprove-backend",
