@@ -35,7 +35,8 @@
         "donjayamanne.githistory",
         "pomdtr.excalidraw-editor",
         "42crunch.vscode-openapi",
-        "prisma.prisma"
+        "prisma.prisma",
+        "postman.postman-for-vscode"
       ],
       "settings": {
         "editor.formatOnSave": true,
