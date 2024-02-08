@@ -15,13 +15,11 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: type
-                  description: The type of source code reference (e.g s3)
                   type: clob
                   constraints:
                     nullable: false
               - column:
                   name: reference
-                  description: The reference to the source code. The type defines the format of the reference.
                   type: clob
                   constraints:
                     nullable: false
