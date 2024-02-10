@@ -62,6 +62,14 @@ export interface components {
       /** Format: date-time */
       readonly updated_at: string;
     };
+    readonly BadRequestResponse: {
+      readonly errors: readonly {
+          /** @description Machine readable error code */
+          readonly code: string;
+          /** @description A human readable message describing the error */
+          readonly message: string;
+        }[];
+    };
   };
   responses: never;
   parameters: never;
@@ -87,6 +95,12 @@ export interface operations {
       /** @description Source code reference created successfully' */
       201: {
         content: never;
+      };
+      /** @description The request is malformed of contains invalid data */
+      400: {
+        content: {
+          readonly "application/json": components["schemas"]["BadRequestResponse"];
+        };
       };
     };
   };

@@ -18,6 +18,13 @@ paths:
       responses:
         "201":
           description: Source code reference created successfully'
+        "400":
+          description: The request is malformed of contains invalid data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+
   /runs:
     post:
       summary: Create a run in the system
@@ -146,3 +153,23 @@ components:
         updated_at:
           type: string
           format: date-time
+
+    BadRequestResponse:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+              - code
+              - message
+            properties:
+              code:
+                type: string
+                description: Machine readable error code
+              message:
+                type: string
+                description: A human readable message describing the error
