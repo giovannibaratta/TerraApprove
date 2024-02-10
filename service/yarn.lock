@@ -3665,6 +3665,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fp-ts@npm:2.16.2":
+  version: 2.16.2
+  resolution: "fp-ts@npm:2.16.2"
+  checksum: 61c1f3db171191527e9d902a8a0195942e8de9380c0c491c61e3e2c39d6007c6432be03e9f55d73dd8aae1431f35083c729636c59bbd185830b09e5db2615adb
+  languageName: node
+  linkType: hard
+
 "fresh@npm:0.5.2":
   version: 0.5.2
   resolution: "fresh@npm:0.5.2"
@@ -6685,6 +6692,7 @@ __metadata:
     eslint-plugin-prettier: "npm:4.2.1"
     expect-more-jest: "npm:5.5.0"
     express: "npm:4.18.2"
+    fp-ts: "npm:2.16.2"
     jest: "npm:29.7.0"
     openapi-typescript: "npm:6.7.4"
     prettier: "npm:2.8.8"
