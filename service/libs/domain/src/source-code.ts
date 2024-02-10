@@ -10,3 +10,8 @@ export interface CreateSourceCode {
     url: string
   }
 }
+
+export function doesUrlIncludeCredentials(urlToValidate: string): boolean {
+  const url = new URL(urlToValidate)
+  return url.username !== "" || url.password !== ""
+}

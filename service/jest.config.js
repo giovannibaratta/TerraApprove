@@ -12,6 +12,7 @@ const mainSettings = {
   moduleNameMapper: {
     "@app/(.*)": "<rootDir>/main/src/$1",
     "@libs/domain/(.*)": "<rootDir>/libs/domain/src/$1",
+    "@libs/domain": "<rootDir>/libs/domain/src",
     "@libs/service/(.*)": "<rootDir>/libs/service/src/$1",
     "@libs/service": "<rootDir>/libs/service/src",
     "@libs/external/(.*)": "<rootDir>/libs/external/src/$1",

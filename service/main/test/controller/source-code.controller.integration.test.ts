@@ -62,6 +62,25 @@ describe("POST /source-code-refs", () => {
     expect(sourceCodeDbObject?.reference).toEqual(requestBody.s3.url)
   })
 
+  it("should return CREDENTIALS_DETECTED if the url contains credentials", async () => {
+    // Given
+    const requestBody: operations["createSourceCodeRef"]["requestBody"]["content"]["application/json"] =
+      {
+        s3: {
+          url: "https://user:password@domain.local"
+        }
+      }
+
+    // When
+    const response = await request(app.getHttpServer())
+      .post("/source-code-refs")
+      .send(requestBody)
+
+    // Expect
+    expect(response.status).toBe(400)
+    expect(response.body.errors[0].code).toEqual("CREDENTIALS_DETECTED")
+  })
+
   afterAll(async () => {
     await prisma.sourceCode.deleteMany()
     await prisma.$disconnect()
