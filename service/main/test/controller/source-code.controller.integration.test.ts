@@ -81,6 +81,27 @@ describe("POST /source-code-refs", () => {
     expect(response.body.errors[0].code).toEqual("CREDENTIALS_DETECTED")
   })
 
+  describe("error handling", () => {
+    it("should return INVALID_PROTOCOL if the url has an invalid protocol", async () => {
+      // Given
+      const requestBody: operations["createSourceCodeRef"]["requestBody"]["content"]["application/json"] =
+        {
+          s3: {
+            url: "ftp://domain.local"
+          }
+        }
+
+      // When
+      const response = await request(app.getHttpServer())
+        .post("/source-code-refs")
+        .send(requestBody)
+
+      // Expect
+      expect(response.status).toBe(400)
+      expect(response.body.errors[0].code).toEqual("INVALID_PROTOCOL")
+    })
+  })
+
   afterAll(async () => {
     await prisma.sourceCode.deleteMany()
     await prisma.$disconnect()

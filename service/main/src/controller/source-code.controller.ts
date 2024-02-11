@@ -52,15 +52,23 @@ type CreateSourceCodeErrors = ExtractLeft<
 function generateErrorResponse(
   errorCode: CreateSourceCodeErrors
 ): BadRequestResponseBody {
-  if (errorCode !== "credentials_detected") {
-    throw new Error("Invalid error code")
+  const upperCaseErrorCode = errorCode.toUpperCase()
+  let message = ""
+
+  switch (errorCode) {
+    case "credentials_detected":
+      message = "The provided URL contains credentials"
+      break
+    case "invalid_protocol":
+      message = "The provided URL has an invalid protocol"
+      break
   }
 
   return {
     errors: [
       {
-        code: "CREDENTIALS_DETECTED",
-        message: "The url contains credentials"
+        code: upperCaseErrorCode,
+        message
       }
     ]
   }
