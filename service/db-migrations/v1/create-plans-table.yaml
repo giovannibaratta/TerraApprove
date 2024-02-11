@@ -1,11 +1,11 @@
 databaseChangeLog:
   - changeSet:
-      id: 8153a55e-9f5a-4a58-aede-3e1ce6ddaa05
+      id: a102678c-0ab7-4f06-b8d0-7967fa3cd0ff
       author: Giovanni Baratta
-      comment: Create the table to store source code references
+      comment: Create the table to store plan references
       changes:
         - createTable:
-            tableName: source_code
+            tableName: plans
             columns:
               - column:
                   name: id
