@@ -9,6 +9,10 @@ export interface paths {
     /** Create a reference to the source code in the system */
     post: operations["createSourceCodeRef"];
   };
+  "/plan-refs": {
+    /** Create a reference to the Terraform plan in the system */
+    post: operations["createPlanRef"];
+  };
   "/runs": {
     /** Create a run in the system */
     post: operations["createRun"];
@@ -92,7 +96,33 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Source code reference created successfully' */
+      /**
+       * @description Source code reference created successfully. A link to the source code metadata stored in the system is
+       * returned in the Location header. The unique ID can be used to be referenced in subsequent requests.
+       */
+      201: {
+        content: never;
+      };
+      /** @description The request is malformed of contains invalid data */
+      400: {
+        content: {
+          readonly "application/json": components["schemas"]["BadRequestResponse"];
+        };
+      };
+    };
+  };
+  /** Create a reference to the Terraform plan in the system */
+  createPlanRef: {
+    readonly requestBody: {
+      readonly content: {
+        readonly "application/json": components["schemas"]["S3Payload"];
+      };
+    };
+    responses: {
+      /**
+       * @description Plan reference created successfully. A link to the plan metadata stored in the system is
+       * returned in the Location header. The unique ID can be used to be referenced in subsequent requests.
+       */
       201: {
         content: never;
       };

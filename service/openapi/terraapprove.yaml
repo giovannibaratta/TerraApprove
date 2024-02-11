@@ -17,7 +17,31 @@ paths:
               $ref: "#/components/schemas/PostSourceCode"
       responses:
         "201":
-          description: Source code reference created successfully'
+          description: |
+            Source code reference created successfully. A link to the source code metadata stored in the system is
+            returned in the Location header. The unique ID can be used to be referenced in subsequent requests.
+        "400":
+          description: The request is malformed of contains invalid data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+
+  /plan-refs:
+    post:
+      summary: Create a reference to the Terraform plan in the system
+      operationId: createPlanRef
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/S3Payload"
+      responses:
+        "201":
+          description: |
+            Plan reference created successfully. A link to the plan metadata stored in the system is
+            returned in the Location header. The unique ID can be used to be referenced in subsequent requests.
         "400":
           description: The request is malformed of contains invalid data
           content:
