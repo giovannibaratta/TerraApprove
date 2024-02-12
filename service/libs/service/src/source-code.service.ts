@@ -1,7 +1,9 @@
 import {CreateSourceCode, SourceCode} from "@libs/domain"
 import {Inject, Injectable, Logger} from "@nestjs/common"
 import {either} from "fp-ts"
-import {Either} from "fp-ts/lib/Either"
+import {Either, isLeft} from "fp-ts/lib/Either"
+import * as TE from "fp-ts/lib/TaskEither"
+import {pipe} from "fp-ts/lib/function"
 import {
   SOURCE_CODE_REPOSITORY_TOKEN,
   SourceCodeRepository
@@ -18,14 +20,31 @@ export class SourceCodeService {
   async createSourceCodeRef(
     request: CreateSourceCode
   ): Promise<Either<"credentials_detected" | "invalid_protocol", SourceCode>> {
-    const isValidUrl = isValidS3Url(request.s3.url)
+    // Wrap in a lambda to preserve the "this" context
+    const persistSourceCode = (req: CreateSourceCode) =>
+      this.sourceCodeRepo.createSourceCode(req)
 
-    if (either.isLeft(isValidUrl)) {
-      return either.left(isValidUrl.left)
-    }
-    return this.sourceCodeRepo.createSourceCode(request).then(sourceCode => {
-      Logger.log(`Created source code with id: ${sourceCode.id}`)
-      return either.right(sourceCode)
-    })
+    const result = await pipe(
+      request,
+      validateRequest,
+      TE.fromEither,
+      TE.chainW(persistSourceCode),
+      TE.chainW(logCreateResult)
+    )()
+
+    return result
   }
+}
+
+const validateRequest = (
+  request: CreateSourceCode
+): Either<"credentials_detected" | "invalid_protocol", CreateSourceCode> => {
+  const isValidUrl = isValidS3Url(request.s3.url)
+
+  return isLeft(isValidUrl) ? isValidUrl : either.right(request)
+}
+
+const logCreateResult = (result: SourceCode) => {
+  Logger.log(`Created source code with id: ${result.id}`)
+  return TE.right(result)
 }
