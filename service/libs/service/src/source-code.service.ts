@@ -1,16 +1,12 @@
-import {
-  CreateSourceCode,
-  SourceCode,
-  doesUrlIncludeCredentials,
-  isHttpOrHttpsProtocol
-} from "@libs/domain"
+import {CreateSourceCode, SourceCode} from "@libs/domain"
 import {Inject, Injectable, Logger} from "@nestjs/common"
+import {either} from "fp-ts"
+import {Either} from "fp-ts/lib/Either"
 import {
   SOURCE_CODE_REPOSITORY_TOKEN,
   SourceCodeRepository
 } from "./interfaces/source-code.interfaces"
-import {either} from "fp-ts"
-import {Either} from "fp-ts/lib/Either"
+import {isValidS3Url} from "./shared/s3-urls"
 
 @Injectable()
 export class SourceCodeService {
@@ -22,14 +18,11 @@ export class SourceCodeService {
   async createSourceCodeRef(
     request: CreateSourceCode
   ): Promise<Either<"credentials_detected" | "invalid_protocol", SourceCode>> {
-    if (!isHttpOrHttpsProtocol(request.s3.url)) {
-      return either.left("invalid_protocol")
-    }
+    const isValidUrl = isValidS3Url(request.s3.url)
 
-    if (doesUrlIncludeCredentials(request.s3.url)) {
-      return either.left("credentials_detected")
+    if (either.isLeft(isValidUrl)) {
+      return either.left(isValidUrl.left)
     }
-
     return this.sourceCodeRepo.createSourceCode(request).then(sourceCode => {
       Logger.log(`Created source code with id: ${sourceCode.id}`)
       return either.right(sourceCode)
