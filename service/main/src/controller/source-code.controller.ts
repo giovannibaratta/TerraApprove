@@ -53,7 +53,7 @@ function generateErrorResponse(
   errorCode: CreateSourceCodeErrors
 ): BadRequestResponseBody {
   const upperCaseErrorCode = errorCode.toUpperCase()
-  let message = ""
+  let message: string
 
   switch (errorCode) {
     case "credentials_detected":
