@@ -1,5 +1,7 @@
 databaseChangeLog:
   - include:
+      file: v1/set-db-as-template.yaml
+  - include:
       file: v1/create-source-code-table.yaml
   - include:
       file: v1/create-plans-table.yaml

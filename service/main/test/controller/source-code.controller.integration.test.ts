@@ -1,30 +1,39 @@
 // eslint-disable-next-line node/no-unpublished-import
 import * as request from "supertest"
-
 import {NestApplication} from "@nestjs/core"
 // eslint-disable-next-line node/no-unpublished-import
 import {Test, TestingModule} from "@nestjs/testing"
 import {AppModule} from "@app/app.module"
 import {operations} from "@apis/apis"
 import {PrismaClient} from "@prisma/client"
+import {cleanDatabase, prepareDatabase} from "@libs/testing/database"
+import {Config} from "@libs/external/config/config"
+import {DatabaseClient} from "@libs/external/db/database-client"
 
 describe("POST /source-code-refs", () => {
   let app: NestApplication
-
-  const prisma = new PrismaClient()
+  let prisma: PrismaClient
 
   beforeAll(async () => {
+    const isolatedDb = await prepareDatabase()
+
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
-    }).compile()
+    })
+      .overrideProvider(Config)
+      .useValue({
+        getDbConnectionUrl: () => isolatedDb
+      })
+      .compile()
 
     app = module.createNestApplication()
     await app.init()
-    await prisma.$connect()
+
+    prisma = module.get(DatabaseClient)
   })
 
   beforeEach(async () => {
-    await prisma.sourceCode.deleteMany()
+    await cleanDatabase(prisma)
   })
 
   it("should create a record in the SourceCode table and return the uuid", async () => {
@@ -103,7 +112,7 @@ describe("POST /source-code-refs", () => {
   })
 
   afterAll(async () => {
-    await prisma.sourceCode.deleteMany()
+    await cleanDatabase(prisma)
     await prisma.$disconnect()
     await app.close()
   })

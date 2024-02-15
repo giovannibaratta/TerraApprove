@@ -7,21 +7,31 @@ import {Test, TestingModule} from "@nestjs/testing"
 import {AppModule} from "@app/app.module"
 import {PrismaClient} from "@prisma/client"
 import {CreatePlanRefRequestBody} from "@app/controller/plan-models"
-import {cleanDatabase} from "@libs/testing/database"
+import {cleanDatabase, prepareDatabase} from "@libs/testing/database"
+import {Config} from "@libs/external/config/config"
+import {DatabaseClient} from "@libs/external/db/database-client"
 
 describe("POST /plan-refs", () => {
   let app: NestApplication
   const endpoint = "/plan-refs"
-  const prisma = new PrismaClient()
+  let prisma: PrismaClient
 
   beforeAll(async () => {
+    const isolatedDb = await prepareDatabase()
+
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
-    }).compile()
+    })
+      .overrideProvider(Config)
+      .useValue({
+        getDbConnectionUrl: () => isolatedDb
+      })
+      .compile()
 
     app = module.createNestApplication()
     await app.init()
-    await prisma.$connect()
+
+    prisma = module.get(DatabaseClient)
   })
 
   beforeEach(async () => {

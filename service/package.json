@@ -1,13 +1,15 @@
 {
   "scripts": {
-    "start": "nest start",
-    "start:dev": "nest start --watch --debug",
+    "start": "dotenv -e .env.local -- nest start",
+    "start:dev": "dotenv -e .env.local -- nest start --watch --debug",
     "deps:db:start": "docker-compose -f dev-external-deps/docker-compose.yaml up -d",
     "deps:db:stop": "docker-compose -f dev-external-deps/docker-compose.yaml stop",
     "deps:db:down": "docker-compose -f dev-external-deps/docker-compose.yaml down",
     "deps:db:update-schema": "yarn deps:db:start && yarn prisma:pull && yarn prisma:generate",
     "deps:db:migrate": "yarn deps:db:start && yarn liquibase:update",
-    "liquibase:update": "docker run --network host --rm -v ./db-migrations:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties update",
+    "liquibase:update": "yarn liquibase:update:dev && yarn liquibase:update:test",
+    "liquibase:update:dev": "docker run --network host --rm -v ./db-migrations:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties update",
+    "liquibase:update:test": "docker run --network host --rm -v ./db-migrations:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/integration-test.liquibase.docker.properties update",
     "lint": "yarn eslint --cache --fix .",
     "format:prettier": "yarn prettier --config .prettierrc . --write",
     "compile": "nest build",
@@ -15,7 +17,7 @@
     "prisma:generate": "yarn prisma generate",
     "openapi": "yarn openapi-typescript openapi/terraapprove.yaml -o generated/interfaces/terraapprove-apis/apis.ts --immutable-types",
     "generate:interfaces": "yarn openapi && yarn prisma:generate",
-    "test": "yarn jest {libs/**/*.test.ts,main/**/*.test.ts}"
+    "test": "dotenv -e .env.test -- yarn jest {libs/**/*.test.ts,main/**/*.test.ts}"
   },
   "name": "terraapprove-backend",
   "version": "0.0.1",
@@ -46,6 +48,7 @@
     "@types/supertest": "6.0.2",
     "@typescript-eslint/eslint-plugin": "6.10.0",
     "@typescript-eslint/parser": "6.10.0",
+    "dotenv-cli": "7.3.0",
     "eslint": "8.53.0",
     "eslint-config-prettier": "8.10.0",
     "eslint-plugin-jest": "27.6.0",

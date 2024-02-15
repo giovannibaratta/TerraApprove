@@ -4,6 +4,7 @@ import {SOURCE_CODE_REPOSITORY_TOKEN} from "@libs/service/interfaces/source-code
 import {SourceCodeDbRepository} from "./db/source-code.repository"
 import {PLAN_REPOSITORY_TOKEN} from "@libs/service/interfaces/plan.interfaces"
 import {PlanDbRepository} from "./db/plan.repository"
+import {Config} from "./config/config"
 
 const sourceCodeRepository = {
   provide: SOURCE_CODE_REPOSITORY_TOKEN,
@@ -17,7 +18,7 @@ const planRepository = {
 
 @Module({
   imports: [],
-  providers: [sourceCodeRepository, planRepository, DatabaseClient],
+  providers: [sourceCodeRepository, planRepository, DatabaseClient, Config],
   exports: [sourceCodeRepository, planRepository]
 })
 export class ExternalModule {}
