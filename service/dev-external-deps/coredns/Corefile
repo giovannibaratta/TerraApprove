@@ -1,0 +1,6 @@
+. {
+    errors
+    cancel
+    # Forward all queries to Docker internal DNS
+    forward . 127.0.0.11
+}

@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  # Local DB used for development and testing
+  # Local DB used for development and manual testing
   db:
     image: postgres:16.1
     environment:
@@ -10,6 +10,7 @@ services:
     ports:
       - 5432:5432
 
+  # Local DB used for integration tests
   integration-test-db:
     image: postgres:16.1
     # These tweaks are not safe to use in production, but they can speed up local development
@@ -21,3 +22,56 @@ services:
       POSTGRES_DB: terraapprove
     ports:
       - 5433:5432
+
+  message-broker:
+    container_name: message-broker
+    image: bitnami/kafka:latest
+    ports:
+      - "9092:9092"
+      - "9997:9997"
+    environment:
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      # The broker listens on two ports: 9090 for internal communication and 9092 for external communication
+      KAFKA_CFG_LISTENERS: INTERNAL://:9090,EXTERNAL://:9092
+      # Advertise the external listener on the container's ip address
+      KAFKA_CFG_ADVERTISED_LISTENERS: EXTERNAL://message-broker:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@message-broker:9090
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: INTERNAL
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: EXTERNAL
+      KAFKA_CFG_KAFKA_JMX_PORT: 9997
+      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=message-broker -Dcom.sun.management.jmxremote.rmi.port=9997
+      # Allows the creation of topics automatically. This is useful for development and testing
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+  # The message broker UI is only needed to have insights of what is happening in the message broker
+  message-broker-ui:
+    container_name: message-broker-ui
+    image: provectuslabs/kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: dev
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: message-broker:9092
+      KAFKA_CLUSTERS_0_METRICS_PORT: 9997
+
+  # CoreDNS is used to let the host resolve Docker internal service names (e.g. message-broker).
+  # This is necessary because Kafka returns the advertised url to the client but the client
+  # is not running in Docker (in the development setup), therefore it's not able to resolve the
+  # domain name.
+  coredns:
+    container_name: coredns
+    image: coredns/coredns
+    volumes:
+      - ./coredns/Corefile:/home/nonroot/Corefile:ro
+    ports:
+      - 53:53/udp
+    networks:
+      - default
+      - host-network
+
+networks:
+  host-network:
+    # Pre-existing network created during docker installation
+    external: true

@@ -4976,6 +4976,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"kafkajs@npm:2.2.4":
+  version: 2.2.4
+  resolution: "kafkajs@npm:2.2.4"
+  checksum: 75eb0d221397085f90e51f8a2d752495c9fa9c1b3a1a6db610cd7074fa8c52777f295832fd0a7c49cded5e574337a09fafa8c3f7cf1caa38f4dc9aa20fcfb7df
+  languageName: node
+  linkType: hard
+
 "keyv@npm:^4.5.3":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
@@ -6723,6 +6730,7 @@ __metadata:
     express: "npm:4.18.2"
     fp-ts: "npm:2.16.2"
     jest: "npm:29.7.0"
+    kafkajs: "npm:2.2.4"
     openapi-typescript: "npm:6.7.4"
     prettier: "npm:2.8.8"
     prisma: "npm:5.9.0"

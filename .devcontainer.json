@@ -4,14 +4,15 @@
   "onCreateCommand": {
     "install-dependencies": "/bin/bash ./.devcontainer/install_dependencies.sh || echo 'Failing to install dependencies'",
     "install-yarn": "/bin/bash ./.devcontainer/install_yarn.sh || echo 'Script install_yarn failed'",
-    "configure-jekyll": "/bin/bash ./.devcontainer/configure_jekyll.sh || echo 'Jekyll configuration failed'"
+    "configure-jekyll": "/bin/bash ./.devcontainer/configure_jekyll.sh || echo 'Jekyll configuration failed'",
+    "configure-docker": "/bin/bash ./.devcontainer/configure_docker.sh || echo 'Docker configuration failed'"
   },
   "features": {
     // Add docker in docker support
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "version": "latest",
       "moby": true,
-      "dockerDashComposeVersion": "v1"
+      "dockerDashComposeVersion": "v2"
     },
     // Add node support
     "ghcr.io/devcontainers/features/node:1": {

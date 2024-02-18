@@ -12,7 +12,7 @@
    ```
 1. Start the database and initialize it
    ```bash
-   yarn deps:db:migrate
+   yarn db:migrate
    ```
 1. Start the application
    ```bash
