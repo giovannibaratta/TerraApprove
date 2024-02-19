@@ -16,10 +16,8 @@ const mainSettings = {
     "@libs/service/(.*)": "<rootDir>/libs/service/src/$1",
     "@libs/service": "<rootDir>/libs/service/src",
     "@libs/external/(.*)": "<rootDir>/libs/external/src/$1",
-    "@libs/testing/(.*)": [
-      "<rootDir>/libs/testing/src/$1",
-      "<rootDir>/libs/domain/tests/$1"
-    ],
+    "@libs/testing/(.*)": "<rootDir>/libs/testing/src/$1",
+    "@libs/testing": "<rootDir>/libs/testing/src",
     "@apis/(.*)": "<rootDir>/generated/interfaces/terraapprove-apis/$1"
   }
 }

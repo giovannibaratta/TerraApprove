@@ -17,8 +17,8 @@
       "@libs/service/*": ["libs/service/src/*"],
       "@libs/external": ["libs/external/src"],
       "@libs/external/*": ["libs/external/src/*"],
-      "@libs/testing": ["libs/testing/src", "libs/domain/tests"],
-      "@libs/testing/*": ["libs/testing/src/*", "libs/domain/tests/*"],
+      "@libs/testing": ["libs/testing/src"],
+      "@libs/testing/*": ["libs/testing/src/*"],
       "@apis": ["generated/interfaces/terraapprove-apis"],
       "@apis/*": ["generated/interfaces/terraapprove-apis/*"]
     }
