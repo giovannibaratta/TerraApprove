@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4d28bdd0-37fb-4861-846a-b2e6245a07e5
+      author: Giovanni Baratta
+      comment: Create the table to store runs
+      changes:
+        - createTable:
+            tableName: runs
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: source_code_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_runs_source_code_id
+                    referencedTableName: source_code
+                    referencedColumnNames: id
+              - column:
+                  name: plan_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_runs_plans_id
+                    referencedTableName: plans
+                    referencedColumnNames: id
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: state
+                  type: clob
+                  constraints:
+                    nullable: false
