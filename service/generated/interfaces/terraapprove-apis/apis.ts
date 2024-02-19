@@ -33,12 +33,13 @@ export interface components {
   schemas: {
     readonly PostSourceCode: components["schemas"]["S3Payload"];
     readonly PostRun: {
+      /** @description The ID managedy by the system of the source code reference. */
+      readonly source_code_id: string;
       /**
-       * @description The ID managedy by the system of the source code reference. The plan must be generated
+       * @description The ID managedy by the system of the plan reference. The plan must be generated
        * starting from the specified source code.
        */
-      readonly source_code_id?: string;
-      readonly plan_ref?: components["schemas"]["S3Payload"];
+      readonly plan_id: string;
     };
     readonly S3Payload: {
       readonly s3: {

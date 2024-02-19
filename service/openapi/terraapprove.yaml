@@ -104,15 +104,19 @@ components:
 
     PostRun:
       type: object
+      required:
+        - source_code_id
+        - plan_id
       properties:
         source_code_id:
           type: string
           description: |
-            The ID managedy by the system of the source code reference. The plan must be generated
+            The ID managedy by the system of the source code reference.
+        plan_id:
+          type: string
+          description: |
+            The ID managedy by the system of the plan reference. The plan must be generated
             starting from the specified source code.
-        plan_ref:
-          oneOf:
-            - $ref: "#/components/schemas/S3Payload"
 
     S3Payload:
       type: object
