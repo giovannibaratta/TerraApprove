@@ -1274,6 +1274,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/chance@npm:1.1.6":
+  version: 1.1.6
+  resolution: "@types/chance@npm:1.1.6"
+  checksum: f4366f1b3144d143af3e6f0fad2ed1db7b9bdfa7d82d40944e9619d57fe7e6b60e8c1452f47a8ededa6b2188932879518628ecd9aac81c40384ded39c26338ba
+  languageName: node
+  linkType: hard
+
 "@types/connect@npm:*":
   version: 3.4.38
   resolution: "@types/connect@npm:3.4.38"
@@ -2460,6 +2467,13 @@ __metadata:
   version: 5.3.0
   resolution: "chalk@npm:5.3.0"
   checksum: 6373caaab21bd64c405bfc4bd9672b145647fc9482657b5ea1d549b3b2765054e9d3d928870cdf764fb4aad67555f5061538ff247b8310f110c5c888d92397ea
+  languageName: node
+  linkType: hard
+
+"chance@npm:1.1.11":
+  version: 1.1.11
+  resolution: "chance@npm:1.1.11"
+  checksum: d76cc76dbcb837f051e6080d94be8bdcd07559d52077854f614c7081062fee10d4c3b508f6ae4b70303dac000422ea35160b01de165fcd176a01f67ea4b2cef5
   languageName: node
   linkType: hard
 
@@ -6714,12 +6728,14 @@ __metadata:
     "@nestjs/schematics": "npm:10.1.0"
     "@nestjs/testing": "npm:10.2.8"
     "@prisma/client": "npm:5.9.0"
+    "@types/chance": "npm:1.1.6"
     "@types/express": "npm:4.17.21"
     "@types/jest": "npm:29.5.8"
     "@types/node": "npm:18.18.9"
     "@types/supertest": "npm:6.0.2"
     "@typescript-eslint/eslint-plugin": "npm:6.10.0"
     "@typescript-eslint/parser": "npm:6.10.0"
+    chance: "npm:1.1.11"
     dotenv-cli: "npm:7.3.0"
     eslint: "npm:8.53.0"
     eslint-config-prettier: "npm:8.10.0"
