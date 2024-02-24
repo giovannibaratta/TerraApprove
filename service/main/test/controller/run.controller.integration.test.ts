@@ -8,9 +8,11 @@ import {persistSourceCodeMock} from "@libs/testing"
 import {NestApplication} from "@nestjs/core"
 import {TestingModule, Test} from "@nestjs/testing"
 import {PrismaClient} from "@prisma/client"
-
 // eslint-disable-next-line node/no-unpublished-import
 import * as request from "supertest"
+import "expect-more-jest"
+import {randomUUID} from "crypto"
+import {globalValidationPipe} from "@app/validation-pipe"
 
 describe("POST /runs", () => {
   let app: NestApplication
@@ -29,8 +31,8 @@ describe("POST /runs", () => {
         getDbConnectionUrl: () => isolatedDb
       })
       .compile()
-
     app = module.createNestApplication()
+    app.useGlobalPipes(globalValidationPipe)
     await app.init()
 
     prisma = module.get(DatabaseClient)
@@ -74,6 +76,56 @@ describe("POST /runs", () => {
     expect(run).toBeDefined()
     expect(run?.planId).toBe(requestBody.plan_id)
     expect(run?.sourceCodeId).toBe(requestBody.source_code_id)
+  })
+
+  it("should return 400 if the plan_id is not a valid uuid", async () => {
+    // Given
+    const requestBody: CreateRunRequestBody = {
+      plan_id: "not-a-uuid",
+      source_code_id: randomUUID()
+    }
+
+    // When
+    const response = await request(app.getHttpServer())
+      .post(endpoint)
+      .send(requestBody)
+
+    // Expect
+    expect(response.body.errors).toBeArrayOf({
+      code: expect.toBeString(),
+      message: expect.toBeString()
+    })
+    expect(
+      response.body.errors.map(
+        (it: {code: string; message: string}) => it.message
+      )
+    ).toBeArrayIncludingAllOf(["plan_id must be a UUID"])
+    expect(response.status).toBe(400)
+  })
+
+  it("should return 400 if the source_code_id is not a valid uuid", async () => {
+    // Given
+    const requestBody: CreateRunRequestBody = {
+      plan_id: "not-a-uuid",
+      source_code_id: "not-a-uuid"
+    }
+
+    // When
+    const response = await request(app.getHttpServer())
+      .post(endpoint)
+      .send(requestBody)
+
+    // Expect
+    expect(response.body.errors).toBeArrayOf({
+      code: expect.toBeString(),
+      message: expect.toBeString()
+    })
+    expect(
+      response.body.errors.map(
+        (it: {code: string; message: string}) => it.message
+      )
+    ).toBeArrayIncludingAllOf(["source_code_id must be a UUID"])
+    expect(response.status).toBe(400)
   })
 
   afterAll(async () => {
