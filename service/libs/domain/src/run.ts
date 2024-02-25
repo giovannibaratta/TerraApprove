@@ -10,6 +10,7 @@ export interface BaseRun {
     | "rejected"
   createdAt: Date
   updatedAt: Date
+  revision: bigint
 }
 
 export interface Run extends BaseRun {

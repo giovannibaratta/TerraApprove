@@ -15,6 +15,7 @@ export function generateMockRun(overrides: Partial<BaseRun>): BaseRun {
     ]),
     createdAt: new Date(),
     updatedAt: new Date(),
+    revision: BigInt(random.integer()),
     ...overrides
   }
 

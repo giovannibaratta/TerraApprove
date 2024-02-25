@@ -2,7 +2,7 @@ import {BaseRun} from "@libs/domain"
 import {TaskEither} from "fp-ts/lib/TaskEither"
 
 export interface RunRepository {
-  createRun(request: CreateRun): TaskEither<never, string>
+  createRun(request: CreateRun): TaskEither<"unknown_run_state", BaseRun>
 }
 
 export interface CreateRun {

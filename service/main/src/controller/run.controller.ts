@@ -28,7 +28,10 @@ export class RunController {
     })
 
     if (isLeft(eitherRun)) {
-      throw new InternalServerErrorException()
+      throw new InternalServerErrorException({
+        message: "Unkwon error",
+        error: eitherRun.left.toUpperCase()
+      })
     }
 
     const run = eitherRun.right

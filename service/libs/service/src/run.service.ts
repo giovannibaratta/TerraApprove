@@ -1,3 +1,4 @@
+import {BaseRun} from "@libs/domain"
 import {RunDbRepository} from "@libs/external/db/run.repository"
 import {Inject, Injectable, Logger} from "@nestjs/common"
 import {randomUUID} from "crypto"
@@ -12,7 +13,9 @@ export class RunService {
     private readonly runRepository: RunDbRepository
   ) {}
 
-  async createRun(request: CreateRun): Promise<Either<never, string>> {
+  async createRun(
+    request: CreateRun
+  ): Promise<Either<"unknown_run_state", string>> {
     const createdAt = new Date()
 
     // Wrap in a lambda to preserve the "this" context
@@ -24,7 +27,8 @@ export class RunService {
           createdAt,
           updatedAt: createdAt,
           state: "pending_validation",
-          id: randomUUID()
+          id: randomUUID(),
+          revision: 0n
         }
       })
 
@@ -32,14 +36,15 @@ export class RunService {
       request,
       TE.right,
       TE.chainW(persistRun),
-      TE.chainW((result: string) => logCreateResult(result, request))
+      TE.chainW((result: BaseRun) => logCreateResult(result, request)),
+      TE.map(result => result.id)
     )()
 
     return result
   }
 }
 
-const logCreateResult = (result: string, conxtext: CreateRun) => {
+const logCreateResult = (result: BaseRun, conxtext: CreateRun) => {
   Logger.log(
     `Created run with id ${result} for source code ${conxtext.sourceCodeId} and plan ${conxtext.planId}`
   )
