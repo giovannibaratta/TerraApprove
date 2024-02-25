@@ -2545,14 +2545,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"class-transformer@npm:^0.5.1":
+"class-transformer@npm:0.5.1":
   version: 0.5.1
   resolution: "class-transformer@npm:0.5.1"
   checksum: 750327e3e9a5cf233c5234252f4caf6b06c437bf68a24acbdcfb06c8e0bfff7aa97c30428184813e38e08111b42871f20c5cf669ea4490f8ae837c09f08b31e7
   languageName: node
   linkType: hard
 
-"class-validator@npm:^0.14.1":
+"class-validator@npm:0.14.1":
   version: 0.14.1
   resolution: "class-validator@npm:0.14.1"
   dependencies:
@@ -6768,8 +6768,8 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:6.10.0"
     "@typescript-eslint/parser": "npm:6.10.0"
     chance: "npm:1.1.11"
-    class-transformer: "npm:^0.5.1"
-    class-validator: "npm:^0.14.1"
+    class-transformer: "npm:0.5.1"
+    class-validator: "npm:0.14.1"
     dotenv-cli: "npm:7.3.0"
     eslint: "npm:8.53.0"
     eslint-config-prettier: "npm:8.10.0"
