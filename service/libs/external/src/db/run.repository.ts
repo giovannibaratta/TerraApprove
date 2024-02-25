@@ -28,7 +28,8 @@ export class RunDbRepository implements RunRepository {
                 sourceCodeId: request.sourceCodeId,
                 planId: request.planId,
                 id: request.baseRun.id,
-                updatedAt: request.baseRun.updatedAt
+                updatedAt: request.baseRun.updatedAt,
+                revision: 0
               },
               select: {
                 id: true

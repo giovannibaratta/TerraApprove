@@ -28,13 +28,14 @@ model Plan {
 }
 
 model Run {
-  id             String     @id @db.Uuid
-  sourceCodeId   String     @map("source_code_id") @db.Uuid
-  planId         String     @map("plan_id") @db.Uuid
-  createdAt      DateTime   @map("created_at") @db.Timestamp(6)
-  updatedAt      DateTime   @map("updated_at") @db.Timestamp(6)
-  state          String
-  planRef        Plan       @relation(fields: [planId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_runs_plans_id")
+  id            String     @id @db.Uuid
+  sourceCodeId  String     @map("source_code_id") @db.Uuid
+  planId        String     @map("plan_id") @db.Uuid
+  createdAt     DateTime   @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime   @map("updated_at") @db.Timestamp(6)
+  state         String
+  revision      BigInt
+  planRef       Plan       @relation(fields: [planId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_runs_plans_id")
   sourceCodeRef SourceCode @relation(fields: [sourceCodeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_runs_source_code_id")
 
   @@map("runs")

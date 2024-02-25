@@ -44,3 +44,9 @@ databaseChangeLog:
                   type: clob
                   constraints:
                     nullable: false
+              - column:
+                  name: revision
+                  remarks: "A monotonic increasing number that represents the revision of the run"
+                  type: bigint
+                  constraints:
+                    nullable: false
