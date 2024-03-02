@@ -5,12 +5,15 @@ import {randomUUID} from "crypto"
 import {Either} from "fp-ts/lib/Either"
 import {pipe} from "fp-ts/lib/function"
 import * as TE from "fp-ts/lib/TaskEither"
+import {RunEventPublisher} from "./interfaces/run.interfaces"
 
 @Injectable()
 export class RunService {
   constructor(
     @Inject("RUN_REPOSITORY_TOKEN")
-    private readonly runRepository: RunDbRepository
+    private readonly runRepository: RunDbRepository,
+    @Inject("RUN_EVENT_PUBLISHER_TOKEN")
+    private readonly runEventPublisher: RunEventPublisher
   ) {}
 
   async createRun(
@@ -32,12 +35,24 @@ export class RunService {
         }
       })
 
+    const emitRunStateEvent = (run: BaseRun) =>
+      pipe(
+        run,
+        TE.right,
+        TE.chainW(value => this.runEventPublisher.publishRunState(value)),
+        TE.map(() => run)
+      )
+
+    /* The emitting of the event could fail and the event could be lost forever but for now we are
+      ignoring the issue in order not to overcomplicate the code at this stage. */
     const result = await pipe(
       request,
       TE.right,
       TE.chainW(persistRun),
       TE.chainW((result: BaseRun) => logCreateResult(result, request)),
-      TE.map(result => result.id)
+      TE.chainW(emitRunStateEvent),
+      TE.chainW(logEmitEventResult),
+      TE.map(value => value.id)
     )()
 
     return result
@@ -46,7 +61,14 @@ export class RunService {
 
 const logCreateResult = (result: BaseRun, conxtext: CreateRun) => {
   Logger.log(
-    `Created run with id ${result} for source code ${conxtext.sourceCodeId} and plan ${conxtext.planId}`
+    `Created run with id ${result.id} for source code ${conxtext.sourceCodeId} and plan ${conxtext.planId}`
+  )
+  return TE.right(result)
+}
+
+const logEmitEventResult = (result: BaseRun) => {
+  Logger.log(
+    `Published run state event for run ${result.id} with state ${result.state}`
   )
   return TE.right(result)
 }

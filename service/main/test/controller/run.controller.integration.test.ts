@@ -28,7 +28,8 @@ describe("POST /runs", () => {
     })
       .overrideProvider(Config)
       .useValue({
-        getDbConnectionUrl: () => isolatedDb
+        getDbConnectionUrl: () => isolatedDb,
+        kafkaBrokers: ["localhost:9092"]
       })
       .compile()
     app = module.createNestApplication()
