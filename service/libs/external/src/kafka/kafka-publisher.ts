@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common"
-import {Kafka} from "kafkajs"
+import {Kafka, Partitioners} from "kafkajs"
 import {Config} from "../config/config"
 
 @Injectable()
@@ -9,7 +9,7 @@ export class KafkaPublisher {
   constructor(readonly config: Config) {
     this.kafka = new Kafka({
       clientId: "terraapprove-publisher",
-      brokers: config.kafkaBrokers,
+      brokers: config.kafkaConfig.brokers,
       retry: {
         retries: 2
       },
@@ -20,7 +20,9 @@ export class KafkaPublisher {
   async publish(topic: string, message: string) {
     /* Possible improvements: cache the producers instead of creating a new
     one for each message to publish */
-    const producer = this.kafka.producer()
+    const producer = this.kafka.producer({
+      createPartitioner: Partitioners.DefaultPartitioner
+    })
     await producer.connect()
     await producer.send({
       topic,

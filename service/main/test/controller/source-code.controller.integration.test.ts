@@ -7,22 +7,26 @@ import {AppModule} from "@app/app.module"
 import {operations} from "@apis/apis"
 import {PrismaClient} from "@prisma/client"
 import {cleanDatabase, prepareDatabase} from "@libs/testing/database"
-import {Config} from "@libs/external/config/config"
+import {Config, KafkaConfig} from "@libs/external/config/config"
 import {DatabaseClient} from "@libs/external/db/database-client"
+import {cleanKafka, prepareKafka} from "@libs/testing/kafka"
 
 describe("POST /source-code-refs", () => {
+  let kafkaConfig: KafkaConfig
   let app: NestApplication
   let prisma: PrismaClient
 
   beforeAll(async () => {
     const isolatedDb = await prepareDatabase()
+    kafkaConfig = await prepareKafka()
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
     })
       .overrideProvider(Config)
       .useValue({
-        getDbConnectionUrl: () => isolatedDb
+        getDbConnectionUrl: () => isolatedDb,
+        kafkaConfig
       })
       .compile()
 
@@ -33,6 +37,7 @@ describe("POST /source-code-refs", () => {
   })
 
   beforeEach(async () => {
+    await cleanKafka(kafkaConfig)
     await cleanDatabase(prisma)
   })
 
@@ -112,6 +117,7 @@ describe("POST /source-code-refs", () => {
   })
 
   afterAll(async () => {
+    await cleanKafka(kafkaConfig)
     await cleanDatabase(prisma)
     await prisma.$disconnect()
     await app.close()

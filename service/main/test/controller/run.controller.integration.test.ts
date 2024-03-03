@@ -1,6 +1,6 @@
 import {AppModule} from "@app/app.module"
 import {CreateRunRequestBody} from "@app/controller/run-models"
-import {Config} from "@libs/external/config/config"
+import {Config, KafkaConfig} from "@libs/external/config/config"
 import {DatabaseClient} from "@libs/external/db/database-client"
 import {cleanDatabase, prepareDatabase} from "@libs/testing/database"
 import {persistPlanMock} from "@libs/testing"
@@ -13,15 +13,18 @@ import * as request from "supertest"
 import "expect-more-jest"
 import {randomUUID} from "crypto"
 import {globalValidationPipe} from "@app/validation-pipe"
+import {cleanKafka, prepareKafka} from "@libs/testing/kafka"
 
 describe("POST /runs", () => {
   let app: NestApplication
   let prisma: PrismaClient
+  let kafkaConfig: KafkaConfig
 
   const endpoint = "/runs"
 
   beforeAll(async () => {
     const isolatedDb = await prepareDatabase()
+    kafkaConfig = await prepareKafka()
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
@@ -29,7 +32,7 @@ describe("POST /runs", () => {
       .overrideProvider(Config)
       .useValue({
         getDbConnectionUrl: () => isolatedDb,
-        kafkaBrokers: ["localhost:9092"]
+        kafkaConfig
       })
       .compile()
     app = module.createNestApplication()
@@ -40,6 +43,7 @@ describe("POST /runs", () => {
   })
 
   beforeEach(async () => {
+    await cleanKafka(kafkaConfig)
     await cleanDatabase(prisma)
   })
 
@@ -130,6 +134,7 @@ describe("POST /runs", () => {
   })
 
   afterAll(async () => {
+    await cleanKafka(kafkaConfig)
     await cleanDatabase(prisma)
     await prisma.$disconnect()
     await app.close()

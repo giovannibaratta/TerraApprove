@@ -8,23 +8,27 @@ import {AppModule} from "@app/app.module"
 import {PrismaClient} from "@prisma/client"
 import {CreatePlanRefRequestBody} from "@app/controller/plan-models"
 import {cleanDatabase, prepareDatabase} from "@libs/testing/database"
-import {Config} from "@libs/external/config/config"
+import {Config, KafkaConfig} from "@libs/external/config/config"
 import {DatabaseClient} from "@libs/external/db/database-client"
+import {cleanKafka, prepareKafka} from "@libs/testing/kafka"
 
 describe("POST /plan-refs", () => {
   let app: NestApplication
   const endpoint = "/plan-refs"
   let prisma: PrismaClient
+  let kafkaConfig: KafkaConfig
 
   beforeAll(async () => {
     const isolatedDb = await prepareDatabase()
+    kafkaConfig = await prepareKafka()
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
     })
       .overrideProvider(Config)
       .useValue({
-        getDbConnectionUrl: () => isolatedDb
+        getDbConnectionUrl: () => isolatedDb,
+        kafkaConfig
       })
       .compile()
 
@@ -35,6 +39,7 @@ describe("POST /plan-refs", () => {
   })
 
   beforeEach(async () => {
+    await cleanKafka(kafkaConfig)
     await cleanDatabase(prisma)
   })
 
@@ -111,6 +116,7 @@ describe("POST /plan-refs", () => {
   })
 
   afterAll(async () => {
+    await cleanKafka(kafkaConfig)
     await cleanDatabase(prisma)
     await prisma.$disconnect()
     await app.close()

@@ -7,10 +7,18 @@ import {TaskEither} from "fp-ts/lib/TaskEither"
 import {KafkaPublisher} from "./kafka-publisher"
 import * as TE from "fp-ts/lib/TaskEither"
 import {pipe} from "fp-ts/lib/function"
+import {Config} from "../config/config"
 
 @Injectable()
 export class RunKafkaEventPublisher implements RunEventPublisher {
-  constructor(private readonly kafkaPublisher: KafkaPublisher) {}
+  private readonly runStateChangedTopic: string
+
+  constructor(
+    private readonly kafkaPublisher: KafkaPublisher,
+    readonly config: Config
+  ) {
+    this.runStateChangedTopic = config.kafkaConfig.topics.runStatusChanged
+  }
 
   publishRunState(runState: RunState): TaskEither<never, void> {
     const result = pipe(
@@ -26,7 +34,7 @@ export class RunKafkaEventPublisher implements RunEventPublisher {
   private emitRunStateEvent(): (event: string) => TaskEither<never, void> {
     return event =>
       TE.tryCatchK(
-        () => this.kafkaPublisher.publish("run-state-changed", event),
+        () => this.kafkaPublisher.publish(this.runStateChangedTopic, event),
         error => {
           Logger.error("Error while publishing run state event")
           throw error
