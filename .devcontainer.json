@@ -4,7 +4,9 @@
   "onCreateCommand": {
     "install-dependencies": "/bin/bash ./.devcontainer/install_dependencies.sh || echo 'Failing to install dependencies'",
     "install-yarn": "/bin/bash ./.devcontainer/install_yarn.sh || echo 'Script install_yarn failed'",
-    "configure-jekyll": "/bin/bash ./.devcontainer/configure_jekyll.sh || echo 'Jekyll configuration failed'",
+    "configure-jekyll": "/bin/bash ./.devcontainer/configure_jekyll.sh || echo 'Jekyll configuration failed'"
+  },
+  "postStartCommand": {
     "configure-docker": "/bin/bash ./.devcontainer/configure_docker.sh || echo 'Docker configuration failed'"
   },
   "features": {

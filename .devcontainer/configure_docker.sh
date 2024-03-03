@@ -1,6 +1,10 @@
 #!/bin/bash
 
-docker network create host-network
+if ! docker network list | grep host-network ; then
+  docker network create host-network
+else
+  echo "host-network already exists. Skipping creation."
+fi
 
 # Forward DNS queries to CoreDNS
 original_content=$(cat /etc/resolv.conf)
