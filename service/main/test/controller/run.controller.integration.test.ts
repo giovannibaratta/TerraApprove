@@ -13,7 +13,11 @@ import * as request from "supertest"
 import "expect-more-jest"
 import {randomUUID} from "crypto"
 import {globalValidationPipe} from "@app/validation-pipe"
-import {cleanKafka, prepareKafka} from "@libs/testing/kafka"
+import {
+  cleanKafka,
+  prepareKafka,
+  readMessagesFromKafka
+} from "@libs/testing/kafka"
 
 describe("POST /runs", () => {
   let app: NestApplication
@@ -47,9 +51,8 @@ describe("POST /runs", () => {
     await cleanDatabase(prisma)
   })
 
-  it("should create a record in the run table and return the uuid", async () => {
+  it("should persist the run, emit a run-status-changed event and return the uuid", async () => {
     // Given
-
     const sourceCode = await persistSourceCodeMock(prisma)
     const plan = await persistPlanMock(prisma)
 
@@ -71,6 +74,18 @@ describe("POST /runs", () => {
     const responseUuid: string =
       response.headers.location?.split("/").reverse()[0] ?? ""
 
+    // Validate events
+    const messages = await readMessagesFromKafka(
+      kafkaConfig,
+      kafkaConfig.topics.runStatusChanged
+    )
+
+    expect(messages).toBeArrayOfSize(1)
+    expect(JSON.parse(messages[0] ?? "")).toMatchObject({
+      id: responseUuid,
+      state: "pending_validation"
+    })
+
     // Validate database
     const run = await prisma.run.findUnique({
       where: {
@@ -81,7 +96,7 @@ describe("POST /runs", () => {
     expect(run).toBeDefined()
     expect(run?.planId).toBe(requestBody.plan_id)
     expect(run?.sourceCodeId).toBe(requestBody.source_code_id)
-  })
+  }, 10000)
 
   it("should return 400 if the plan_id is not a valid uuid", async () => {
     // Given
