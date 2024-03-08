@@ -18,6 +18,7 @@ import {
   prepareKafka,
   readMessagesFromKafka
 } from "@libs/testing/kafka"
+import {HttpStatus} from "@nestjs/common"
 
 describe("POST /runs", () => {
   let app: NestApplication
@@ -146,6 +147,56 @@ describe("POST /runs", () => {
       )
     ).toBeArrayIncludingAllOf(["source_code_id must be a UUID"])
     expect(response.status).toBe(400)
+  })
+
+  it("should return 400 if the plan_id does not exist", async () => {
+    // Given
+    const sourceCode = await persistSourceCodeMock(prisma)
+
+    const requestBody: CreateRunRequestBody = {
+      plan_id: randomUUID(),
+      source_code_id: sourceCode.id
+    }
+
+    // When
+    const response = await request(app.getHttpServer())
+      .post(endpoint)
+      .send(requestBody)
+
+    // Expect
+    expect(response.body.errors).toBeArrayOf({
+      code: expect.toBeString(),
+      message: expect.toBeString()
+    })
+    expect(
+      response.body.errors.map((it: {code: string}) => it.code)
+    ).toBeArrayIncludingAllOf(["PLAN_NOT_FOUND"])
+    expect(response.status).toBe(HttpStatus.BAD_REQUEST)
+  })
+
+  it("should return 400 if the source_code_id does not exist", async () => {
+    // Given
+    const plan = await persistPlanMock(prisma)
+
+    const requestBody: CreateRunRequestBody = {
+      plan_id: plan.id,
+      source_code_id: randomUUID()
+    }
+
+    // When
+    const response = await request(app.getHttpServer())
+      .post(endpoint)
+      .send(requestBody)
+
+    // Expect
+    expect(response.body.errors).toBeArrayOf({
+      code: expect.toBeString(),
+      message: expect.toBeString()
+    })
+    expect(
+      response.body.errors.map((it: {code: string}) => it.code)
+    ).toBeArrayIncludingAllOf(["SOURCE_CODE_NOT_FOUND"])
+    expect(response.status).toBe(HttpStatus.BAD_REQUEST)
   })
 
   afterAll(async () => {

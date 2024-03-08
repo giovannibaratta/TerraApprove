@@ -5,7 +5,7 @@ import {randomUUID} from "crypto"
 import {Either} from "fp-ts/lib/Either"
 import {pipe} from "fp-ts/lib/function"
 import * as TE from "fp-ts/lib/TaskEither"
-import {RunEventPublisher} from "./interfaces/run.interfaces"
+import {CreateRunError, RunEventPublisher} from "./interfaces/run.interfaces"
 
 @Injectable()
 export class RunService {
@@ -16,9 +16,7 @@ export class RunService {
     private readonly runEventPublisher: RunEventPublisher
   ) {}
 
-  async createRun(
-    request: CreateRun
-  ): Promise<Either<"unknown_run_state", string>> {
+  async createRun(request: CreateRun): Promise<Either<CreateRunError, string>> {
     const createdAt = new Date()
 
     // Wrap in a lambda to preserve the "this" context

@@ -2,8 +2,13 @@ import {BaseRun} from "@libs/domain"
 import {TaskEither} from "fp-ts/lib/TaskEither"
 
 export interface RunRepository {
-  createRun(request: CreateRun): TaskEither<"unknown_run_state", BaseRun>
+  createRun(request: CreateRun): TaskEither<CreateRunError, BaseRun>
 }
+
+export type CreateRunError =
+  | "unknown_run_state"
+  | "source_code_not_found"
+  | "plan_not_found"
 
 export interface RunEventPublisher {
   publishRunState(runState: RunState): TaskEither<never, void>

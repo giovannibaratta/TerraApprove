@@ -5,3 +5,17 @@ type CreateSourceCodeBadRequestResponseBody =
 
 export interface BadRequestResponseBody
   extends CreateSourceCodeBadRequestResponseBody {}
+
+export function generateBadRequestResponse(
+  code: string,
+  message: string
+): BadRequestResponseBody {
+  return {
+    errors: [
+      {
+        code,
+        message
+      }
+    ]
+  }
+}
