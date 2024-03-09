@@ -7,6 +7,8 @@
   "jest.jestCommandLine": "yarn test",
   "jest.rootPath": "core",
 
+  "java.jdt.ls.java.home": "/usr/lib/jvm/java-17-openjdk-amd64/",
+
   "terminal.integrated.copyOnSelection": true,
   "terminal.integrated.cursorBlinking": true
 }

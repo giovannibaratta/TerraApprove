@@ -56,6 +56,46 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: message-broker:9092
       KAFKA_CLUSTERS_0_METRICS_PORT: 9997
 
+  # Apache Flink
+  flink-job-manager:
+    container_name: flink-job-manager
+    image: flink-event-to-http-converter
+    build:
+      context: apache-flink
+    ports:
+      - "8081:8081"
+    command:
+      - standalone-job
+      - --job-classname
+      - it.giovannibaratta.EventToHttpConverter
+      - --jars
+      - /opt/flink/usrlib/EventToHttpConverter.jar
+      # Custom properties required by the job
+      - --kafkaBootstrapServers
+      - "message-broker:9092"
+      - --kafkaTopic
+      - "run-status-changed"
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-job-manager
+        parallelism.default: 2
+
+  # Flink Task Manager that will execute the job
+  flink-task-manager:
+    container_name: flink-task-manager
+    image: flink-event-to-http-converter
+    depends_on:
+      - flink-job-manager
+    command: taskmanager
+    scale: 1
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-job-manager
+        taskmanager.numberOfTaskSlots: 2
+        parallelism.default: 2
+
   # CoreDNS is used to let the host resolve Docker internal service names (e.g. message-broker).
   # This is necessary because Kafka returns the advertised url to the client but the client
   # is not running in Docker (in the development setup), therefore it's not able to resolve the

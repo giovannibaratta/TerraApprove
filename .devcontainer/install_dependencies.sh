@@ -18,7 +18,11 @@ lefthook_dependencies=(
 
 liquibase_dependencies=(
     liquibase=4.25.1
-    openjdk-8-jre
+    openjdk-17-jre
+)
+
+apache_flink_dependencies=(
+    openjdk-17-jdk
 )
 
 rm /tmp/installation-completed 2> /dev/null || true
@@ -41,7 +45,8 @@ sudo apt-get install -y \
     "${jekyll_dependencies[@]}" \
     "${parallel_dependencies[@]}" \
     "${lefthook_dependencies[@]}" \
-    "${liquibase_dependencies[@]}"
+    "${liquibase_dependencies[@]}" \
+    "${apache_flink_dependencies[@]}"
 
 # Notify other scripts that all the dependencies are installed
 touch /tmp/installation-completed
