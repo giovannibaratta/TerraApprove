@@ -73,8 +73,17 @@ services:
       # Custom properties required by the job
       - --kafkaBootstrapServers
       - "message-broker:9092"
-      - --kafkaTopic
+      # If you need to add a new topic, add the topic name separated by a comma from the previous one
+      # and add two extra variables using the following schema
+      # - --<topic-name>
+      # - "<http-endpoint>"
+      # Example:
+      # - --my-custom-topic
+      # - "http://example.local:8080/my-custom-topic"
+      - --kafkaTopics
       - "run-status-changed"
+      - --run-status-changed
+      - "http://backend-proxy:9000/runs/status-changed"
     environment:
       - |
         FLINK_PROPERTIES=
@@ -110,6 +119,17 @@ services:
     networks:
       - default
       - host-network
+
+  backend-proxy:
+    image: nginx
+    container_name: backend-proxy
+    volumes:
+      - type: bind
+        source: ./nginx/nginx.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+    ports:
+      - 9000:9000
 
 networks:
   host-network:
