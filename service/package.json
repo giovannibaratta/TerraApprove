@@ -5,6 +5,7 @@
     "deps:start": "docker-compose -f dev-external-deps/docker-compose.yaml up -d",
     "deps:stop": "docker-compose -f dev-external-deps/docker-compose.yaml stop",
     "deps:down": "docker-compose -f dev-external-deps/docker-compose.yaml down",
+    "deps:rebuild": "docker-compose -f dev-external-deps/docker-compose.yaml up -d --build",
     "deps:update-schema": "yarn deps:start && yarn prisma:pull && yarn prisma:generate",
     "db:migrate": "yarn deps:start && yarn liquibase:update",
     "liquibase:update": "yarn liquibase:update:dev && yarn liquibase:update:test",
