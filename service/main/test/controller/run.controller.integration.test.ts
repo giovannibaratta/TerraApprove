@@ -2,23 +2,21 @@ import {AppModule} from "@app/app.module"
 import {CreateRunRequestBody} from "@app/controller/run-models"
 import {Config, KafkaConfig} from "@libs/external/config/config"
 import {DatabaseClient} from "@libs/external/db/database-client"
-import {cleanDatabase, prepareDatabase} from "@libs/testing/database"
-import {persistPlanMock} from "@libs/testing"
-import {persistSourceCodeMock} from "@libs/testing"
+import {persistPlanMock, persistSourceCodeMock} from "@libs/testing"
+import {prepareDatabase} from "@libs/testing/database"
 import {NestApplication} from "@nestjs/core"
-import {TestingModule, Test} from "@nestjs/testing"
+import {Test, TestingModule} from "@nestjs/testing"
 import {PrismaClient} from "@prisma/client"
 // eslint-disable-next-line node/no-unpublished-import
-import * as request from "supertest"
-import "expect-more-jest"
-import {randomUUID} from "crypto"
 import {globalValidationPipe} from "@app/validation-pipe"
 import {
-  cleanKafka,
-  prepareKafka,
+  generateIsolatedKafkaConfig,
   readMessagesFromKafka
 } from "@libs/testing/kafka"
 import {HttpStatus} from "@nestjs/common"
+import {randomUUID} from "crypto"
+import "expect-more-jest"
+import * as request from "supertest"
 
 describe("POST /runs", () => {
   let app: NestApplication
@@ -27,9 +25,9 @@ describe("POST /runs", () => {
 
   const endpoint = "/runs"
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const isolatedDb = await prepareDatabase()
-    kafkaConfig = await prepareKafka()
+    kafkaConfig = await generateIsolatedKafkaConfig()
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
@@ -45,11 +43,6 @@ describe("POST /runs", () => {
     await app.init()
 
     prisma = module.get(DatabaseClient)
-  })
-
-  beforeEach(async () => {
-    await cleanKafka(kafkaConfig)
-    await cleanDatabase(prisma)
   })
 
   it("should persist the run, emit a run-status-changed event and return the uuid", async () => {
@@ -200,8 +193,6 @@ describe("POST /runs", () => {
   })
 
   afterAll(async () => {
-    await cleanKafka(kafkaConfig)
-    await cleanDatabase(prisma)
     await prisma.$disconnect()
     await app.close()
   })

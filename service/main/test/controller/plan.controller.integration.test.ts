@@ -3,14 +3,14 @@ import * as request from "supertest"
 
 import {NestApplication} from "@nestjs/core"
 // eslint-disable-next-line node/no-unpublished-import
-import {Test, TestingModule} from "@nestjs/testing"
 import {AppModule} from "@app/app.module"
-import {PrismaClient} from "@prisma/client"
 import {CreatePlanRefRequestBody} from "@app/controller/plan-models"
-import {cleanDatabase, prepareDatabase} from "@libs/testing/database"
 import {Config, KafkaConfig} from "@libs/external/config/config"
 import {DatabaseClient} from "@libs/external/db/database-client"
-import {cleanKafka, prepareKafka} from "@libs/testing/kafka"
+import {prepareDatabase} from "@libs/testing/database"
+import {generateIsolatedKafkaConfig} from "@libs/testing/kafka"
+import {Test, TestingModule} from "@nestjs/testing"
+import {PrismaClient} from "@prisma/client"
 
 describe("POST /plan-refs", () => {
   let app: NestApplication
@@ -18,9 +18,9 @@ describe("POST /plan-refs", () => {
   let prisma: PrismaClient
   let kafkaConfig: KafkaConfig
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const isolatedDb = await prepareDatabase()
-    kafkaConfig = await prepareKafka()
+    kafkaConfig = await generateIsolatedKafkaConfig()
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
@@ -36,11 +36,6 @@ describe("POST /plan-refs", () => {
     await app.init()
 
     prisma = module.get(DatabaseClient)
-  })
-
-  beforeEach(async () => {
-    await cleanKafka(kafkaConfig)
-    await cleanDatabase(prisma)
   })
 
   it("should create a record in the plan table and return the uuid", async () => {
@@ -116,8 +111,6 @@ describe("POST /plan-refs", () => {
   })
 
   afterAll(async () => {
-    await cleanKafka(kafkaConfig)
-    await cleanDatabase(prisma)
     await prisma.$disconnect()
     await app.close()
   })
