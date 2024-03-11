@@ -1,13 +1,13 @@
-import {Injectable} from "@nestjs/common"
-import {Kafka, Partitioners} from "kafkajs"
+import {Injectable, OnModuleDestroy, OnModuleInit} from "@nestjs/common"
+import {Kafka, Partitioners, Producer} from "kafkajs"
 import {Config} from "../config/config"
 
 @Injectable()
-export class KafkaPublisher {
-  private readonly kafka: Kafka
+export class KafkaPublisher implements OnModuleInit, OnModuleDestroy {
+  private readonly producer: Producer
 
   constructor(readonly config: Config) {
-    this.kafka = new Kafka({
+    const kafka = new Kafka({
       clientId: "terraapprove-publisher",
       brokers: config.kafkaConfig.brokers,
       retry: {
@@ -15,19 +15,24 @@ export class KafkaPublisher {
       },
       connectionTimeout: 5000
     })
+
+    this.producer = kafka.producer({
+      createPartitioner: Partitioners.DefaultPartitioner
+    })
+  }
+
+  async onModuleInit() {
+    await this.producer.connect()
   }
 
   async publish(topic: string, message: string) {
-    /* Possible improvements: cache the producers instead of creating a new
-    one for each message to publish */
-    const producer = this.kafka.producer({
-      createPartitioner: Partitioners.DefaultPartitioner
-    })
-    await producer.connect()
-    await producer.send({
+    await this.producer.send({
       topic,
       messages: [{value: message}]
     })
-    await producer.disconnect()
+  }
+
+  async onModuleDestroy() {
+    await this.producer.disconnect()
   }
 }
