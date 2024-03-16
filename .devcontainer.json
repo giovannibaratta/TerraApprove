@@ -6,9 +6,6 @@
     "install-yarn": "/bin/bash ./.devcontainer/install_yarn.sh || echo 'Script install_yarn failed'",
     "configure-jekyll": "/bin/bash ./.devcontainer/configure_jekyll.sh || echo 'Jekyll configuration failed'"
   },
-  "postStartCommand": {
-    "configure-docker": "/bin/bash ./.devcontainer/configure_docker.sh || echo 'Docker configuration failed'"
-  },
   "features": {
     // Add docker in docker support
     "ghcr.io/devcontainers/features/docker-in-docker:2": {

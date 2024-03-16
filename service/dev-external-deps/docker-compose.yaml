@@ -30,19 +30,20 @@ services:
     container_name: message-broker
     image: bitnami/kafka:latest
     ports:
+      - "9090:9090"
       - "9092:9092"
       - "9997:9997"
     environment:
       KAFKA_CFG_NODE_ID: 0
       KAFKA_CFG_PROCESS_ROLES: controller,broker
       # The broker listens on two ports: 9090 for internal communication and 9092 for external communication
-      KAFKA_CFG_LISTENERS: INTERNAL://:9090,EXTERNAL://:9092
+      KAFKA_CFG_LISTENERS: CONTROLLER://:9090,BROKER://:9092
       # Advertise the external listener on the container's ip address
-      KAFKA_CFG_ADVERTISED_LISTENERS: EXTERNAL://message-broker:9092
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@message-broker:9090
-      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: INTERNAL
-      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: EXTERNAL
+      KAFKA_CFG_ADVERTISED_LISTENERS: BROKER://localhost:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@localhost:9090
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: BROKER
       KAFKA_CFG_KAFKA_JMX_PORT: 9997
       KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=message-broker -Dcom.sun.management.jmxremote.rmi.port=9997
       # Allows the creation of topics automatically. This is useful for development and testing
@@ -111,22 +112,6 @@ services:
         taskmanager.numberOfTaskSlots: 2
         parallelism.default: 2
 
-  # CoreDNS is used to let the host resolve Docker internal service names (e.g. message-broker).
-  # This is necessary because Kafka returns the advertised url to the client but the client
-  # is not running in Docker (in the development setup), therefore it's not able to resolve the
-  # domain name.
-  coredns:
-    profiles: [dev, test]
-    container_name: coredns
-    image: coredns/coredns
-    volumes:
-      - ./coredns/Corefile:/home/nonroot/Corefile:ro
-    ports:
-      - 53:53/udp
-    networks:
-      - default
-      - host-network
-
   backend-proxy:
     profiles: [dev]
     image: nginx
@@ -138,8 +123,3 @@ services:
         read_only: true
     ports:
       - 9000:9000
-
-networks:
-  host-network:
-    # Pre-existing network created during docker installation
-    external: true
