@@ -1,0 +1,37 @@
+name: Tests
+
+on:
+  pull_request:
+    paths:
+      - "service/**/*"
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Yarn install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+          dir: service
+
+      - name: Run tests
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: test
+          dir: service
+
+      - name: Clean dependencies
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: deps:down
+          dir: service
