@@ -59,7 +59,7 @@ describe("POST /plan-refs", () => {
     const responseUuid: string =
       response.headers.location?.split("/").reverse()[0] ?? ""
 
-    expect(response.status).toBe(201)
+    expect(response.status).toBe(202)
 
     // Validate side effects
     const planDbObject = await prisma.plan.findUnique({
