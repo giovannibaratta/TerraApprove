@@ -2,6 +2,7 @@ version: "3.8"
 services:
   # Local DB used for development and manual testing
   db:
+    profiles: [dev]
     image: postgres:16.1
     environment:
       POSTGRES_USER: developer
@@ -12,6 +13,7 @@ services:
 
   # Local DB used for integration tests
   integration-test-db:
+    profiles: [test]
     image: postgres:16.1
     # These tweaks are not safe to use in production, but they can speed up local development
     # Apply some performance improvements to pg as these guarantees are not needed while running locally
@@ -24,6 +26,7 @@ services:
       - 5433:5432
 
   message-broker:
+    profiles: [dev, test]
     container_name: message-broker
     image: bitnami/kafka:latest
     ports:
@@ -47,6 +50,7 @@ services:
 
   # The message broker UI is only needed to have insights of what is happening in the message broker
   message-broker-ui:
+    profiles: [dev]
     container_name: message-broker-ui
     image: provectuslabs/kafka-ui
     ports:
@@ -58,6 +62,7 @@ services:
 
   # Apache Flink
   flink-job-manager:
+    profiles: [dev]
     container_name: flink-job-manager
     image: flink-event-to-http-converter
     build:
@@ -92,6 +97,7 @@ services:
 
   # Flink Task Manager that will execute the job
   flink-task-manager:
+    profiles: [dev]
     container_name: flink-task-manager
     image: flink-event-to-http-converter
     depends_on:
@@ -110,6 +116,7 @@ services:
   # is not running in Docker (in the development setup), therefore it's not able to resolve the
   # domain name.
   coredns:
+    profiles: [dev, test]
     container_name: coredns
     image: coredns/coredns
     volumes:
@@ -121,6 +128,7 @@ services:
       - host-network
 
   backend-proxy:
+    profiles: [dev]
     image: nginx
     container_name: backend-proxy
     volumes:
