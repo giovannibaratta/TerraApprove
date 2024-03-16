@@ -30,7 +30,7 @@ public class EventToHttpConverter {
     for (String topic : kafkaTopics) {
       String destination = parameters.getRequired(topic);
 
-      if(destination == null || destination.isEmpty() {
+      if(destination == null || destination.isEmpty()) {
         throw new IllegalArgumentException("Destination for topic " + topic + " must be provided");
       }
 
