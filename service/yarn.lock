@@ -1024,9 +1024,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/testing@npm:10.2.8":
-  version: 10.2.8
-  resolution: "@nestjs/testing@npm:10.2.8"
+"@nestjs/testing@npm:10.3.3":
+  version: 10.3.3
+  resolution: "@nestjs/testing@npm:10.3.3"
   dependencies:
     tslib: "npm:2.6.2"
   peerDependencies:
@@ -1039,7 +1039,7 @@ __metadata:
       optional: true
     "@nestjs/platform-express":
       optional: true
-  checksum: ea7e413acdc87635cf1159cd211e6d6bd891c9a220729f77cf3c0fe302eebbb436f480413542852f2aa003266ab86c72f002005415ad3fdafb285664b30f9ed2
+  checksum: ae8176aeba18c13014f48f756e8ce1d69fb1f80cd15252877ac28c11e430c516d581230b2d21d55efb8d71f021eb276a8a0a35187815062b5bc514ea92cf6d0e
   languageName: node
   linkType: hard
 
@@ -6758,7 +6758,7 @@ __metadata:
     "@nestjs/core": "npm:10.2.8"
     "@nestjs/platform-express": "npm:10.3.1"
     "@nestjs/schematics": "npm:10.1.0"
-    "@nestjs/testing": "npm:10.2.8"
+    "@nestjs/testing": "npm:10.3.3"
     "@prisma/client": "npm:5.9.0"
     "@types/chance": "npm:1.1.6"
     "@types/express": "npm:4.17.21"
