@@ -2,8 +2,8 @@
   "scripts": {
     "start": "dotenv -e .env.local -- nest start",
     "start:dev": "dotenv -e .env.local -- nest start --watch --debug",
-    "deps:start": "docker-compose -f dev-external-deps/docker-compose.yaml --profile dev up -d",
-    "deps:start:test": "docker-compose -f dev-external-deps/docker-compose.yaml --profile test up -d",
+    "deps:start": "docker-compose -f dev-external-deps/docker-compose.yaml --profile dev up -d --wait",
+    "deps:start:test": "docker-compose -f dev-external-deps/docker-compose.yaml --profile test up -d --wait",
     "deps:stop": "docker-compose -f dev-external-deps/docker-compose.yaml --profile dev --profile test stop",
     "deps:down": "docker-compose -f dev-external-deps/docker-compose.yaml --profile dev --profile test down",
     "deps:rebuild": "docker-compose -f dev-external-deps/docker-compose.yaml --profile dev up -d --build",

@@ -48,6 +48,12 @@ services:
       KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=message-broker -Dcom.sun.management.jmxremote.rmi.port=9997
       # Allows the creation of topics automatically. This is useful for development and testing
       KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: "/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"
+      interval: 2s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
 
   # The message broker UI is only needed to have insights of what is happening in the message broker
   message-broker-ui:
