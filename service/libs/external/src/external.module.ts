@@ -12,6 +12,8 @@ import {RunDbRepository} from "./db/run.repository"
 import {SourceCodeDbRepository} from "./db/source-code.repository"
 import {KafkaPublisher} from "./kafka/kafka-publisher"
 import {RunKafkaEventPublisher} from "./kafka/run.event-publisher"
+import {ValidationControllerDbRepository} from "./db/validation-controller.repository"
+import {VALIDATION_CONTROLLER_REPOSITORY_TOKEN} from "@libs/service/interfaces/validation-controller.interfaces"
 
 const sourceCodeRepository = {
   provide: SOURCE_CODE_REPOSITORY_TOKEN,
@@ -33,12 +35,18 @@ const runEventPublisher = {
   useClass: RunKafkaEventPublisher
 }
 
+const validationController = {
+  provide: VALIDATION_CONTROLLER_REPOSITORY_TOKEN,
+  useClass: ValidationControllerDbRepository
+}
+
 @Module({
   imports: [],
   providers: [
     sourceCodeRepository,
     planRepository,
     runRepository,
+    validationController,
     runEventPublisher,
     DatabaseClient,
     KafkaPublisher,
@@ -48,6 +56,7 @@ const runEventPublisher = {
     sourceCodeRepository,
     planRepository,
     runRepository,
+    validationController,
     runEventPublisher
   ]
 })
