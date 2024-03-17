@@ -1,6 +1,6 @@
 import {Injectable, Logger} from "@nestjs/common"
 import {DatabaseClient} from "./database-client"
-import {Prisma, Run as PrismaRun} from "@prisma/client"
+import {Run as PrismaRun} from "@prisma/client"
 import {
   CreateRun,
   CreateRunError,
@@ -12,6 +12,7 @@ import * as TE from "fp-ts/lib/TaskEither"
 import {BaseRun} from "@libs/domain"
 import {Either, isLeft} from "fp-ts/lib/Either"
 import {either} from "fp-ts"
+import {isPrismaForeignKeyViolationErrorForTarget} from "./shared"
 
 @Injectable()
 export class RunDbRepository implements RunRepository {
@@ -49,8 +50,6 @@ export class RunDbRepository implements RunRepository {
   }
 }
 
-const PRISMA_FOREIGN_KEY_VIOLATION_ERROR_CODE = "P2003"
-
 // These are the values that Prisma returns for the field_name property of the meta object
 // when a foreign key violation occurs. The values depends on the name of the constraint
 // in the database.
@@ -60,42 +59,23 @@ const PRISMA_PLAN_FK_VIOLATION_FIELD_NAME_VALUE = "fk_runs_plans_id (index)"
 
 function mapToLeft(error: unknown): CreateRunError {
   if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === PRISMA_FOREIGN_KEY_VIOLATION_ERROR_CODE
-  ) {
-    if (
-      isPrismaForeignKeyViolationErrorForTarget(
-        error,
-        PRISMA_SOURCE_CODE_FK_VIOLATION_FIELD_NAME_VALUE
-      )
+    isPrismaForeignKeyViolationErrorForTarget(
+      error,
+      PRISMA_SOURCE_CODE_FK_VIOLATION_FIELD_NAME_VALUE
     )
-      return "source_code_not_found"
+  )
+    return "source_code_not_found"
 
-    if (
-      isPrismaForeignKeyViolationErrorForTarget(
-        error,
-        PRISMA_PLAN_FK_VIOLATION_FIELD_NAME_VALUE
-      )
+  if (
+    isPrismaForeignKeyViolationErrorForTarget(
+      error,
+      PRISMA_PLAN_FK_VIOLATION_FIELD_NAME_VALUE
     )
-      return "plan_not_found"
-  }
+  )
+    return "plan_not_found"
 
   Logger.error("Error while creating run")
   throw error
-}
-
-function isPrismaForeignKeyViolationErrorForTarget(
-  error: unknown,
-  target: string
-): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === PRISMA_FOREIGN_KEY_VIOLATION_ERROR_CODE &&
-    error.meta !== undefined &&
-    Object.hasOwnProperty.call(error.meta, "field_name") &&
-    typeof error.meta.field_name === "string" &&
-    error.meta.field_name === target
-  )
 }
 
 function mapToDomain(run: PrismaRun): TaskEither<"unknown_run_state", BaseRun> {

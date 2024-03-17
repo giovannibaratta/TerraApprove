@@ -15,6 +15,7 @@ import {
 } from "@prisma/client"
 import {Either} from "fp-ts/lib/Either"
 import {either} from "fp-ts"
+import {isPrismaForeignKeyViolationErrorForTarget} from "./shared"
 
 @Injectable()
 export class ValidationControllerDbRepository
@@ -148,8 +149,6 @@ function mapToDomain(
   })
 }
 
-const PRISMA_FOREIGN_KEY_VIOLATION_ERROR_CODE = "P2003"
-
 // These are the values that Prisma returns for the field_name property of the meta object
 // when a foreign key violation occurs. The values depends on the name of the constraint
 // in the database.
@@ -162,34 +161,15 @@ function mapToLeft(error: unknown): CreateValidationControllerItemError {
   }
 
   if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === PRISMA_FOREIGN_KEY_VIOLATION_ERROR_CODE
-  ) {
-    if (
-      isPrismaForeignKeyViolationErrorForTarget(
-        error,
-        PRISMA_RUN_FK_VIOLATION_FIELD_NAME_VALUE
-      )
+    isPrismaForeignKeyViolationErrorForTarget(
+      error,
+      PRISMA_RUN_FK_VIOLATION_FIELD_NAME_VALUE
     )
-      return "run_not_found"
-  }
+  )
+    return "run_not_found"
 
   Logger.error("Error while creating run")
   throw error
-}
-
-function isPrismaForeignKeyViolationErrorForTarget(
-  error: unknown,
-  target: string
-): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === PRISMA_FOREIGN_KEY_VIOLATION_ERROR_CODE &&
-    error.meta !== undefined &&
-    Object.hasOwnProperty.call(error.meta, "field_name") &&
-    typeof error.meta.field_name === "string" &&
-    error.meta.field_name === target
-  )
 }
 
 class DuplicatedValidationControllerError extends Error {
