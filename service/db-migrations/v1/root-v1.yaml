@@ -7,3 +7,5 @@ databaseChangeLog:
       file: v1/create-plans-table.yaml
   - include:
       file: v1/create-runs-table.yaml
+  - include:
+      file: v1/create-validation-controller-table.yaml

@@ -28,17 +28,31 @@ model Plan {
 }
 
 model Run {
-  id            String     @id @db.Uuid
-  sourceCodeId  String     @map("source_code_id") @db.Uuid
-  planId        String     @map("plan_id") @db.Uuid
-  createdAt     DateTime   @map("created_at") @db.Timestamp(6)
-  updatedAt     DateTime   @map("updated_at") @db.Timestamp(6)
-  state         String
-  revision      BigInt
-  planRef       Plan       @relation(fields: [planId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_runs_plans_id")
-  sourceCodeRef SourceCode @relation(fields: [sourceCodeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_runs_source_code_id")
+  id                    String                 @id @db.Uuid
+  sourceCodeId          String                 @map("source_code_id") @db.Uuid
+  planId                String                 @map("plan_id") @db.Uuid
+  createdAt             DateTime               @map("created_at") @db.Timestamp(6)
+  updatedAt             DateTime               @map("updated_at") @db.Timestamp(6)
+  state                 String
+  revision              BigInt
+  planRef               Plan                   @relation(fields: [planId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_runs_plans_id")
+  sourceCodeRef         SourceCode             @relation(fields: [sourceCodeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_runs_source_code_id")
+  validationControllers ValidationController[]
 
   @@map("runs")
+}
+
+model ValidationController {
+  id              String   @id @db.Uuid
+  startedAt       DateTime @map("started_at") @db.Timestamp(6)
+  updatedAt       DateTime @map("updated_at") @db.Timestamp(6)
+  revision        BigInt
+  sourceCodeState String   @map("source_code_state")
+  planState       String   @map("plan_state")
+  runId           String   @map("run_id") @db.Uuid
+  runs            Run      @relation(fields: [runId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_validation_controller_runs_id")
+
+  @@map("validation_controller")
 }
 
 model databasechangelog {

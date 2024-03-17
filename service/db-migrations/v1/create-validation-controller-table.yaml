@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: a430494a-4d5d-4db7-a4b4-2cd68c6e6d89
+      author: Giovanni Baratta
+      comment: Create the table to track the progress for validating a run
+      changes:
+        - createTable:
+            tableName: validation_controller
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: started_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: revision
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: source_code_state
+                  type: clob
+                  constraints:
+                    nullable: false
+              - column:
+                  name: plan_state
+                  type: clob
+                  constraints:
+                    nullable: false
+              - column:
+                  name: run_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_validation_controller_runs_id
+                    referencedTableName: runs
+                    referencedColumnNames: id
