@@ -7,7 +7,7 @@
     "deps:stop": "docker compose -f dev-external-deps/docker-compose.yaml --profile dev --profile test stop",
     "deps:down": "docker compose -f dev-external-deps/docker-compose.yaml --profile dev --profile test down",
     "deps:rebuild": "docker compose -f dev-external-deps/docker-compose.yaml --profile dev up -d --build",
-    "deps:update-schema": "yarn deps:start && yarn prisma:pull && yarn prisma:generate",
+    "db:update-schema": "yarn deps:start db && yarn prisma:pull && yarn prisma:generate",
     "db:migrate": "yarn deps:start && yarn liquibase:update:dev",
     "liquibase:update:dev": "docker run --network host --rm -v ./db-migrations:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties update",
     "liquibase:update:test": "docker run --network host --rm -v ./db-migrations:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/integration-test.liquibase.docker.properties update",
