@@ -129,3 +129,18 @@ services:
         read_only: true
     ports:
       - 9000:9000
+
+  s3:
+    profiles: [dev, test]
+    container_name: s3
+    image: "bitnami/minio:latest"
+    ports:
+      - "9010:9000"
+      - "9011:9001"
+    environment:
+      - MINIO_ROOT_USER=developer
+      - MINIO_ROOT_PASSWORD=SafePassword1!
+      - MINIO_SCHEME=http
+      - MINIO_SERVER_URL=http://localhost:9010
+      - MINIO_DEFAULT_BUCKETS=source-code,plans
+      - MINIO_APACHE_API_HTTP_PORT_NUMBER= 9000
