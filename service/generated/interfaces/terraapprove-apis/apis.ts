@@ -21,6 +21,10 @@ export interface paths {
     /** Get a run in the system */
     get: operations["getRun"];
   };
+  "/runs/status-changed": {
+    /** [INTERNAL] Notify the system that the status of a run has changed */
+    post: operations["notifyStatusChanged"];
+  };
   "/approvals": {
     /** Create an approval in the system */
     post: operations["createApproval"];
@@ -74,6 +78,18 @@ export interface components {
           /** @description A human readable message describing the error */
           readonly message: string;
         }[];
+    };
+    readonly PostRunStatusChanged: {
+      /**
+       * Format: uuid
+       * @description The ID managedy by the system of the run.
+       */
+      readonly id: string;
+      readonly state: string;
+      /** @description The revision of the run. */
+      readonly revision: string;
+      /** Format: date-time */
+      readonly updated_at?: string;
     };
   };
   responses: never;
@@ -162,6 +178,20 @@ export interface operations {
         content: {
           readonly "application/json": components["schemas"]["GetRun"];
         };
+      };
+    };
+  };
+  /** [INTERNAL] Notify the system that the status of a run has changed */
+  notifyStatusChanged: {
+    readonly requestBody: {
+      readonly content: {
+        readonly "application/json": components["schemas"]["PostRunStatusChanged"];
+      };
+    };
+    responses: {
+      /** @description Status change notification received successfully */
+      200: {
+        content: never;
       };
     };
   };
