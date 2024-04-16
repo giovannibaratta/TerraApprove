@@ -1,5 +1,9 @@
 # TerraApprove service
 
+## Architecture
+
+![service architecture](../docs/terraapprove-service-architecture.excalidraw.png)
+
 ## Serve the app locally
 
 1. Install the dependencies

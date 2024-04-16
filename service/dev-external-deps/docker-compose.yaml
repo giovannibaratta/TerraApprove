@@ -144,3 +144,18 @@ services:
       - MINIO_SERVER_URL=http://localhost:9010
       - MINIO_DEFAULT_BUCKETS=source-code,plans
       - MINIO_APACHE_API_HTTP_PORT_NUMBER= 9000
+
+  # minio-client:
+  #   profiles: [on-demand]
+  #   container_name: minio-client
+  #   image: "bitnami/minio-client:latest"
+  #   #command: ["mc", "ls", "minio"]
+  #   args: ["mc", "alias", "ls"]
+  #   #command: ["sleep", "1000000"]
+  #   # depends_on:
+  #   #   - s3
+  #   environment:
+  #     - MINIO_SERVER_HOST=s3
+  #     - MINIO_SERVER_PORT_NUMBER=9000
+  #     - MINIO_SERVER_ACCESS_KEY=developer
+  #     - MINIO_SERVER_SECRET_KEY=SafePassword1!
